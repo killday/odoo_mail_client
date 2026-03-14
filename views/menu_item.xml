@@ -25,7 +25,7 @@
                     <filter name="unread_filter" string="Unread" domain="[('is_read','=',False)]"/>
                     <filter name="starred_filter" string="Starred" domain="[('is_starred','=',True)]"/>
                     <filter name="archived_filter" string="Archived" domain="[('is_archived','=',True)]"/>
-                    <filter name="with_attachment_filter" string="With Attachments" domain="[('attachment_icon','=',True)]"/>
+                    <filter name="with_attachment_filter" string="With Attachments" domain="[('attachments','!=',False)]"/>
                     <group expand="0">
                         <filter name="priority" string="Priority" domain="[]"
                                 context="{'group_by':'priority'}"/>
