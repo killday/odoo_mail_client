@@ -6,6 +6,16 @@
         <field name="category_id" ref="base.module_category_hidden"/>
     </record>
 
+    <record id="access_fetchmail_server_email_manager_xml" model="ir.model.access">
+        <field name="name">fetchmail.server.email.manager.xml</field>
+        <field name="model_id" ref="mail.model_fetchmail_server"/>
+        <field name="group_id" ref="group_email_manager"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+
     <record id="associated_users_record_rule" model="ir.rule">
         <field name="name">Associated Users Record Rule</field>
         <field name="model_id" ref="model_email_record"/>
