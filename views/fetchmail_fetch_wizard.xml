@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_fetchmail_range_wizard_form" model="ir.ui.view">
+        <field name="name">fetchmail.range.wizard.form</field>
+        <field name="model">fetchmail.range.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Fetch Emails">
+                <group>
+                    <field name="fetchmail_server_id" options="{'no_create_edit': True}" readonly="1"/>
+                    <field name="period"/>
+                </group>
+                <footer>
+                    <button name="action_fetch" string="Fetch" type="object" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_email_server_form_inherit_rt_mail_fetch_period" model="ir.ui.view">
+        <field name="name">fetchmail.server.form.inherit.rt.mail.fetch.period</field>
+        <field name="model">fetchmail.server</field>
+        <field name="inherit_id" ref="mail.view_email_server_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='fetch_mail']" position="replace">
+                <button string="Fetch Now" type="object" name="action_open_fetch_range_wizard" invisible="state != 'done'"/>
+            </xpath>
+            <xpath expr="//field[@name='password']" position="after">
+                <field name="delete_from_server_on_local_delete"/>
+                <field name="smtp_host" placeholder="mail.example.com"/>
+                <field name="smtp_port"/>
+                <field name="smtp_user"/>
+                <field name="smtp_password" password="True"/>
+                <field name="smtp_encryption"/>
+                <separator string="Sync Metrics"/>
+                <field name="last_uid" readonly="1"/>
+                <field name="uid_validity" readonly="1"/>
+                <field name="last_fetch_start" readonly="1"/>
+                <field name="last_fetch_end" readonly="1"/>
+                <field name="last_fetch_duration_ms" readonly="1"/>
+                <field name="last_fetch_count" readonly="1"/>
+                <field name="last_fetch_failed_count" readonly="1"/>
+                <field name="last_fetch_error" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_fetchmail_server_health_tree" model="ir.ui.view">
+        <field name="name">fetchmail.server.health.tree</field>
+        <field name="model">fetchmail.server</field>
+        <field name="arch" type="xml">
+            <list default_order="last_fetch_end desc"
+                  decoration-danger="last_fetch_failed_count &gt; 0"
+                  decoration-warning="last_fetch_duration_ms &gt; 60000"
+                  decoration-muted="not last_fetch_end">
+                <field name="name"/>
+                <field name="server"/>
+                <field name="user"/>
+                <field name="last_uid"/>
+                <field name="last_fetch_start"/>
+                <field name="last_fetch_end"/>
+                <field name="last_fetch_duration_ms"/>
+                <field name="last_fetch_count"/>
+                <field name="last_fetch_failed_count"/>
+                <field name="last_fetch_error" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fetchmail_server_health_search" model="ir.ui.view">
+        <field name="name">fetchmail.server.health.search</field>
+        <field name="model">fetchmail.server</field>
+        <field name="arch" type="xml">
+            <search string="Account Health">
+                <field name="name"/>
+                <field name="user"/>
+                <filter name="failed_fetches" string="Has Failures" domain="[('last_fetch_failed_count','&gt;',0)]"/>
+                <filter name="slow_fetches" string="Slow Sync" domain="[('last_fetch_duration_ms','&gt;',60000)]"/>
+                <filter name="never_synced" string="Never Synced" domain="[('last_fetch_end','=',False)]"/>
+                <group expand="0">
+                    <filter name="group_server" string="Server" context="{'group_by':'server'}" domain="[]"/>
+                    <filter name="group_user" string="User Login" context="{'group_by':'user'}" domain="[]"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fetchmail_server_health_rt_mail" model="ir.actions.act_window">
+        <field name="name">Account Health</field>
+        <field name="res_model">fetchmail.server</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_fetchmail_server_health_tree"/>
+        <field name="search_view_id" ref="view_fetchmail_server_health_search"/>
+    </record>
+
+    <menuitem id="menu_fetchmail_server_health_rt_mail"
+              name="Account Health"
+              parent="email_configuration_list"
+              action="action_fetchmail_server_health_rt_mail"
+              sequence="1"/>
+
+</odoo>

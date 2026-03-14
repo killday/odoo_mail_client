@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--    email reply template-->
+    <record id="send_email_template" model="mail.template">
+        <field name="name">Send Email</field>
+        <field name="model_id" ref="model_email_record"/>
+        <field name="email_from">{{ object.get_partner_emails(object.sender) }}</field>
+        <field name="email_to">{{ object.get_partner_emails(object.to) }}</field>
+        <field name="email_cc">{{ object.get_partner_emails(object.cc) }}</field>
+        <field name="email_bcc">{{ object.get_partner_emails(object.bcc) }}</field>
+        <field name="subject">{{ object.subject }}</field>
+        <field name="body_html" type="html">
+            <div>
+                 <t t-out=" object.body "/>
+            </div>
+        </field>
+<!--        <field name="user_signature" eval="False"/>-->
+    </record>
+
+</odoo>

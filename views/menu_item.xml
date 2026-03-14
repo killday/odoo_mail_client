@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+<!--    search view-->
+    <record id="email_search_view" model="ir.ui.view">
+            <field name="name">email.record.search</field>
+            <field name="model">email.record</field>
+            <field name="arch" type="xml">
+                <search string="Email Search">
+                    <field name="to"/>
+                    <field name="cc"/>
+                    <field name="bcc"/>
+                    <field name="type"/>
+                    <field name="is_read"/>
+                    <field name="is_starred"/>
+                    <field name="is_archived"/>
+                    <field name="incoming_server_id" string="Incoming Account"/>
+                    <field name="date_time"/>
+                    <field name="subject"/>
+                    <field name="priority"/>
+                    <field name="body"/>
+                    <field name="tags"/>
+                                        <field name="sender"/>
+                    <field name="body" string="Keyword" filter_domain="['|','|','|','|','|','|', ('subject','ilike', self), ('body','ilike', self), ('to.name','ilike', self), ('to.email','ilike', self), ('cc.name','ilike', self), ('cc.email','ilike', self), ('tags.name','ilike', self)]"/>
+                    <filter name="unread_filter" string="Unread" domain="[('is_read','=',False)]"/>
+                    <filter name="starred_filter" string="Starred" domain="[('is_starred','=',True)]"/>
+                    <filter name="archived_filter" string="Archived" domain="[('is_archived','=',True)]"/>
+                    <filter name="with_attachment_filter" string="With Attachments" domain="[('attachment_icon','=',True)]"/>
+                    <group expand="0">
+                        <filter name="priority" string="Priority" domain="[]"
+                                context="{'group_by':'priority'}"/>
+                        <filter name="group_by_incoming_server" string="Incoming Account" domain="[]"
+                                context="{'group_by':'incoming_server_id'}"/>
+                    </group>
+                    <searchpanel>
+                        <field name="incoming_server_id" string="Incoming Account"/>
+                    </searchpanel>
+                </search>
+            </field>
+        </record>
+
+<!--    Tree views classification -->
+
+<!--    All emails-->
+    <record id="action_all_emails" model="ir.actions.act_window">
+        <field name="name">All Emails</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">email.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_archived','=',False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                You have no Emails
+            </p>
+        </field>
+    </record>
+
+<!--    Drafts-->
+    <record id="action_draft_emails" model="ir.actions.act_window">
+        <field name="name">Draft Emails</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">email.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('type','=','draft'),('is_archived','=',False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                You have no drafts
+            </p>
+        </field>
+    </record>
+
+<!--    Inbox-->
+    <record id="action_received_emails" model="ir.actions.act_window">
+        <field name="name">Received Emails</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">email.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="domain">[('type','=','incoming'),('is_archived','=',False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                You have no incoming emails
+            </p>
+        </field>
+    </record>
+
+<!--    Sent-->
+    <record id="action_sent_emails" model="ir.actions.act_window">
+        <field name="name">Sent Emails</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">email.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{}</field>
+        <field name="domain">[('type','=','outgoing'),('is_archived','=',False)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                You have no sent emails
+            </p>
+        </field>
+    </record>
+
+<!--    Email tags view-->
+    <record id="email_tag_action" model="ir.actions.act_window">
+        <field name="name">Email Tag</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">email.tags</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                You have no Tags
+            </p>
+        </field>
+    </record>
+
+    <!--    Unread -->
+    <record id="action_unread_emails" model="ir.actions.act_window">
+        <field name="name">Unread</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">email.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_read','=',False),('is_archived','=',False)]</field>
+    </record>
+
+    <!--    Starred -->
+    <record id="action_starred_emails" model="ir.actions.act_window">
+        <field name="name">Starred</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">email.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_starred','=',True),('is_archived','=',False)]</field>
+    </record>
+
+    <!--    Archived -->
+    <record id="action_archived_emails" model="ir.actions.act_window">
+        <field name="name">Archived</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">email.record</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_archived','=',True)]</field>
+    </record>
+
+<!--    Incoming Mail Servers action with default target model -->
+    <record id="action_fetchmail_server_tree_rt_mail" model="ir.actions.act_window">
+        <field name="name">Incoming Mail Servers</field>
+        <field name="res_model">fetchmail.server</field>
+        <field name="view_mode">list,form</field>
+        <field name="context" eval="{'default_object_id': ref('model_email_record')}"/>
+    </record>
+
+<!--    Root menu-->
+    <menuitem id="email_root_menu"
+              name="Email Management"
+              web_icon="odoo_mail_client,static/description/icon.png"
+              sequence="5"/>
+
+<!--    Tree view actions-->
+    <menuitem id="all_emails_list"
+              name="All Emails"
+              sequence="0"
+              action="action_all_emails"
+              parent="email_root_menu"/>
+
+    <menuitem id="received_emails_list"
+              name="Inbox"
+              sequence="1"
+              action="action_received_emails"
+              parent="email_root_menu"/>
+
+    <menuitem id="email_compose_list"
+              name="Sent"
+              sequence="2"
+              action="action_sent_emails"
+              parent="email_root_menu"/>
+
+    <menuitem id="unread_emails_list"
+              name="Unread"
+              sequence="3"
+              action="action_unread_emails"
+              parent="email_root_menu"/>
+
+    <menuitem id="starred_emails_list"
+              name="Starred"
+              sequence="4"
+              action="action_starred_emails"
+              parent="email_root_menu"/>
+
+    <menuitem id="archived_emails_list"
+              name="Archived"
+              sequence="5"
+              action="action_archived_emails"
+              parent="email_root_menu"/>
+
+    <menuitem id="draft_emails_list"
+              name="Draft"
+              sequence="6"
+              action="action_draft_emails"
+              parent="email_root_menu"/>
+
+    <menuitem id="email_configuration_list"
+              name="Configuration"
+              sequence="7"
+              parent="email_root_menu"/>
+
+    <menuitem id="email_tag_list"
+              name="Tags"
+              action="email_tag_action"
+              parent="email_configuration_list"/>
+
+    <menuitem id="inherit_menu_action_fetchmail_server_tree"
+              name="Incoming Mail Servers"
+              parent="email_configuration_list"
+              action="action_fetchmail_server_tree_rt_mail"
+              sequence="0"/>
+    
+</odoo>
