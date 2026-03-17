@@ -108,6 +108,7 @@ class Email(models.Model):
             'bcc',
             'body',
             'date_time',
+            'incoming_server_id',
             'attachments',
             'is_read',
             'is_starred',

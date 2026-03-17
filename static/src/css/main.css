@@ -30,7 +30,7 @@
 
 .body-wrapper {
 	display: grid;
-	grid-template-columns: 270px 1fr 55px;
+	grid-template-columns: 270px 1fr 220px;
 	grid-template-rows: auto calc(100vh - 64px);
 
 }
@@ -669,6 +669,20 @@ opacity:1;
 	flex: 1 1 auto;
 }
 
+.message-account-tag {
+	margin: 0 8px;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background: #eef3fd;
+	color: #3559a8;
+	font-size: 0.72rem;
+	font-weight: 600;
+	max-width: 160px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 .message-date {
 	position: relative;
 	color: var(--light-grey);
@@ -754,6 +768,39 @@ opacity:1;
 
 .app-item {
 	margin-bottom: 16px;
+}
+
+.account-filter-group {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 20px;
+}
+
+.account-filter-title {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--grey);
+	margin: 0;
+}
+
+.account-filter-btn {
+	text-align: left;
+	border: 1px solid var(--fill-border);
+	border-radius: 10px;
+	padding: 6px 8px;
+	font-size: 0.78rem;
+	line-height: 1.2;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.account-filter-btn.active {
+	background: #fce8e6;
+	color: #7a539e;
+	font-weight: 600;
 }
 
 .app-group > :nth-last-child(3) {

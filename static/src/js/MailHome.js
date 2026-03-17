@@ -19,6 +19,8 @@ class odooMail extends Component {
         this.mailState = useState({
             loadLogo: "",
             loadMail: [],
+            accounts: [],
+            selectedAccountId: null,
             selectedCount: 0,
             getCount: {
                 all_count: 0,
@@ -46,8 +48,39 @@ class odooMail extends Component {
             } catch (error) {
                 this.mailState.loadLogo = ''
             }
+            this.mailState.accounts = await this.orm.searchRead(
+                'fetchmail.server',
+                [],
+                ['name', 'user'],
+                { order: 'name asc' }
+            )
             this.getCount()
         })
+    }
+
+    get mailReadFields() {
+        return ['subject', 'sender', 'to', 'cc', 'bcc', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type', 'incoming_server_id']
+    }
+
+    get accountFilterDomain() {
+        if (!this.mailState.selectedAccountId) {
+            return []
+        }
+        return [['incoming_server_id', '=', this.mailState.selectedAccountId]]
+    }
+
+    filterByAccount(accountId) {
+        this.mailState.selectedAccountId = accountId || null
+        this.reloadCurrentFolder()
+    }
+
+    filterMailsBySelectedAccount(mails) {
+        if (!this.mailState.selectedAccountId) {
+            return mails
+        }
+        return (mails || []).filter((mail) =>
+            mail.incoming_server_id && mail.incoming_server_id[0] === this.mailState.selectedAccountId
+        )
     }
 
     async safeModelCall(model, method, args = [], kwargs = {}) {
@@ -329,15 +362,15 @@ class odooMail extends Component {
         this.resetView()
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
-            [...this.mailboxBaseDomain, ['type', '=', 'incoming'], ['is_archived', '=', false]],
-            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
+            [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['type', '=', 'incoming'], ['is_archived', '=', false]],
+            this.mailReadFields,
             { order: 'date_time desc' }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
-                [['type', '=', 'incoming'], ['is_archived', '=', false]],
-                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
+                [...this.accountFilterDomain, ['type', '=', 'incoming'], ['is_archived', '=', false]],
+                this.mailReadFields,
                 { order: 'date_time desc' }
             )
         }
@@ -351,20 +384,20 @@ class odooMail extends Component {
         this.resetView()
         const starred = await this.safeModelCall('email.record', 'get_starred_mail', [])
         if (starred !== null) {
-            this.mailState.loadMail = starred
+            this.mailState.loadMail = this.filterMailsBySelectedAccount(starred)
             return
         }
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
-            [...this.mailboxBaseDomain, ['is_starred', '=', true], ['is_archived', '=', false]],
-            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
+            [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['is_starred', '=', true], ['is_archived', '=', false]],
+            this.mailReadFields,
             { order: 'date_time desc' }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
-                [['is_starred', '=', true], ['is_archived', '=', false]],
-                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
+                [...this.accountFilterDomain, ['is_starred', '=', true], ['is_archived', '=', false]],
+                this.mailReadFields,
                 { order: 'date_time desc' }
             )
         }
@@ -378,20 +411,20 @@ class odooMail extends Component {
         this.resetView()
         const archived = await this.safeModelCall('email.record', 'get_archived_mail', [])
         if (archived !== null) {
-            this.mailState.loadMail = archived
+            this.mailState.loadMail = this.filterMailsBySelectedAccount(archived)
             return
         }
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
-            [...this.mailboxBaseDomain, ['is_archived', '=', true]],
-            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
+            [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['is_archived', '=', true]],
+            this.mailReadFields,
             { order: 'date_time desc' }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
-                [['is_archived', '=', true]],
-                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
+                [...this.accountFilterDomain, ['is_archived', '=', true]],
+                this.mailReadFields,
                 { order: 'date_time desc' }
             )
         }
@@ -405,15 +438,15 @@ class odooMail extends Component {
         this.resetView()
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
-            [...this.mailboxBaseDomain, ['type', '=', 'draft'], ['is_archived', '=', false]],
-            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
+            [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['type', '=', 'draft'], ['is_archived', '=', false]],
+            this.mailReadFields,
             { order: 'date_time desc' }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
-                [['type', '=', 'draft'], ['is_archived', '=', false]],
-                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
+                [...this.accountFilterDomain, ['type', '=', 'draft'], ['is_archived', '=', false]],
+                this.mailReadFields,
                 { order: 'date_time desc' }
             )
         }
@@ -427,15 +460,15 @@ class odooMail extends Component {
         this.resetView()
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
-            [...this.mailboxBaseDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]],
-            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
+            [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]],
+            this.mailReadFields,
             { order: 'date_time desc' }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
-                [['type', '=', 'outgoing'], ['is_archived', '=', false]],
-                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
+                [...this.accountFilterDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]],
+                this.mailReadFields,
                 { order: 'date_time desc' }
             )
         }

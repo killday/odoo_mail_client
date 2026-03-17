@@ -212,6 +212,23 @@
             <!-- RIGHT SIDEBAR -->
             <section class="app-container">
                 <div class="app-group">
+                    <div class="app-item account-filter-group">
+                        <p class="account-filter-title">Accounts</p>
+                        <button type="button"
+                                class="btn account-filter-btn"
+                                t-att-class="mailState.selectedAccountId ? 'btn account-filter-btn' : 'btn account-filter-btn active'"
+                                t-on-click="() => filterByAccount(null)">
+                            All accounts
+                        </button>
+                        <t t-foreach="mailState.accounts" t-as="account" t-key="account.id">
+                            <button type="button"
+                                    class="btn account-filter-btn"
+                                    t-att-class="mailState.selectedAccountId === account.id ? 'btn account-filter-btn active' : 'btn account-filter-btn'"
+                                    t-on-click="() => filterByAccount(account.id)">
+                                <span t-out="account.name"/>
+                            </button>
+                        </t>
+                    </div>
                     <div class="app-item">
                         <button class="btn google_calender"
                                 t-on-click="redirectCalender">
