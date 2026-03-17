@@ -1,6 +1,4 @@
 from odoo import api, fields, models, _, tools, exceptions
-from datetime import datetime
-import pytz
 import re
 import logging
 import base64
@@ -454,7 +452,13 @@ class Email(models.Model):
         sender_name = self.sender.display_name if self.sender else 'Unknown Sender'
         sender_email = self.sender.email if self.sender and self.sender.email else ''
         body_text = tools.html_sanitize(self.body)
-        localized_dt = fields.Datetime.context_timestamp(self, self.date_time or fields.Datetime.now())
+        tz_value = self.env.context.get('tz') or self.env.user.tz or 'UTC'
+        if not isinstance(tz_value, str):
+            tz_value = str(tz_value)
+        localized_dt = fields.Datetime.context_timestamp(
+            self.with_context(tz=tz_value),
+            self.date_time or fields.Datetime.now(),
+        )
         display_date_time = localized_dt.strftime("%a, %b %d, %Y at %H:%M")
         arr = self.to if self.type == 'outgoing' else self.sender
         compose_view = self.env.ref('odoo_mail_client.email_form_view', raise_if_not_found=False)
@@ -485,7 +489,13 @@ class Email(models.Model):
         sender_name = self.sender.display_name if self.sender else 'Unknown Sender'
         sender_email = self.sender.email if self.sender and self.sender.email else ''
         body_text = tools.html_sanitize(self.body)
-        localized_dt = fields.Datetime.context_timestamp(self, self.date_time or fields.Datetime.now())
+        tz_value = self.env.context.get('tz') or self.env.user.tz or 'UTC'
+        if not isinstance(tz_value, str):
+            tz_value = str(tz_value)
+        localized_dt = fields.Datetime.context_timestamp(
+            self.with_context(tz=tz_value),
+            self.date_time or fields.Datetime.now(),
+        )
         display_date_time = localized_dt.strftime("%a, %b %d, %Y at %H:%M")
         compose_view = self.env.ref('odoo_mail_client.email_form_view', raise_if_not_found=False)
         return {
