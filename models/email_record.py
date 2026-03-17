@@ -429,6 +429,7 @@ class Email(models.Model):
 
         sender_server, sender_email, _sender_partner = self._resolve_sender_account()
         self._check_sender_server_access(sender_server)
+        forced_server_id = self.env.context.get('force_outgoing_server_id')
         
         if not self.subject:
             self.subject = '(No subject)'
@@ -444,6 +445,12 @@ class Email(models.Model):
 
         smtp_attempted = bool(sender_server and sender_server.smtp_host)
         smtp_sent = False
+
+        if forced_server_id and not smtp_attempted:
+            raise exceptions.UserError(
+                _('Selected account does not have SMTP settings. Please configure SMTP Host/Port/User for this account.')
+            )
+
         if smtp_attempted:
             smtp_sent = self._send_via_smtp(
                 sender_server=sender_server,
@@ -454,6 +461,11 @@ class Email(models.Model):
                 subject=self.subject,
                 body=self.body,
                 attachments=self.attachments,
+            )
+
+        if forced_server_id and not smtp_sent:
+            raise exceptions.UserError(
+                _('Failed to send using the selected account SMTP server. Please verify SMTP credentials and encryption settings.')
             )
 
         if smtp_sent:

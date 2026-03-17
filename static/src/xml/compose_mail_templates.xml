@@ -32,7 +32,6 @@
                                     id="sender_account"
                                     t-model="state.senderServerId"
                                     t-if="state.senderAccounts.length">
-                                <option t-att-value="''">From account</option>
                                 <t t-foreach="state.senderAccounts" t-as="account" t-key="account.id">
                                     <option t-att-value="account.id + ''">
                                         <t t-out="account.user or account.name"/>
