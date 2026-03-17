@@ -8,8 +8,11 @@
     'website': 'https://www.rolustech.com/',
     'description': """
     """,
-    'depends': ['contacts', 'mail'],
+    'depends': ['contacts', 'mail', 'calendar', 'base'],
     'data': [
+        'data/mail_icon_data.xml',
+        'views/odoo_mail_views.xml',
+        'views/res_config_views.xml',
         'views/email_record.xml',
         'views/menu_item.xml',
         'views/email_tags.xml',
@@ -18,6 +21,13 @@
         'security/ir.model.access.csv',
         'data/email_templates.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'odoo_mail_client/static/src/css/main.css',
+            'odoo_mail_client/static/src/js/*',
+            'odoo_mail_client/static/src/xml/*',
+        ],
+    },
     'images': ['static/description/banner.gif'],
     'installable': True,
     'application': True,

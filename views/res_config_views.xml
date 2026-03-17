@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_inherit_mail_icon" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.mail.icon.client</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//setting[@id='email_servers_setting']" position="after">
+                <setting id="rt_custom_mail_logo" string="Custom Mail Logo" help="Customize mail logo in Odoo Mail Client">
+                    <field name="custom_mail_logo"/>
+                    <div class="content-group mt16" invisible="not custom_mail_logo">
+                        <field name="icon" widget="image" class="oe_avatar"/>
+                        <field name="mail_icon_id" invisible="1"/>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

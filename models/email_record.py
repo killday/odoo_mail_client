@@ -92,6 +92,119 @@ class Email(models.Model):
             rec.is_archived = not rec.is_archived
         return True
 
+    def _mail_interface_domain(self):
+        return [('associated_users', 'in', [self.env.user.id])]
+
+    def _mail_interface_fields(self):
+        return [
+            'subject',
+            'sender',
+            'to',
+            'body',
+            'date_time',
+            'attachments',
+            'is_starred',
+            'is_archived',
+            'type',
+        ]
+
+    @api.model
+    def get_mail_count(self):
+        base_domain = self._mail_interface_domain()
+        return {
+            'all_count': self.search_count(base_domain + [('is_archived', '=', False)]),
+            'sent_count': self.search_count(base_domain + [('type', '=', 'outgoing'), ('is_archived', '=', False)]),
+            'outbox_count': self.search_count(base_domain + [('type', '=', 'draft'), ('is_archived', '=', False)]),
+            'starred_count': self.search_count(base_domain + [('is_starred', '=', True), ('is_archived', '=', False)]),
+            'archived_count': self.search_count(base_domain + [('is_archived', '=', True)]),
+        }
+
+    @api.model
+    def get_starred_mail(self):
+        return self.search(
+            self._mail_interface_domain() + [('is_starred', '=', True), ('is_archived', '=', False)],
+            order='date_time desc',
+        ).read(self._mail_interface_fields())
+
+    @api.model
+    def get_archived_mail(self):
+        return self.search(
+            self._mail_interface_domain() + [('is_archived', '=', True)],
+            order='date_time desc',
+        ).read(self._mail_interface_fields())
+
+    @api.model
+    def delete_mail(self, ids):
+        records = self.search(self._mail_interface_domain() + [('id', 'in', ids)])
+        records.unlink()
+        return True
+
+    @api.model
+    def delete_checked_mail(self, mail_id):
+        return self.delete_mail([mail_id])
+
+    @api.model
+    def archive_mail(self, ids):
+        domain = self._mail_interface_domain()
+        if isinstance(ids, int):
+            ids = [ids]
+        records = self.search(domain + [('id', 'in', ids)])
+        records.write({'is_archived': True})
+        return True
+
+    @api.model
+    def unarchive_mail(self, mail_id):
+        records = self.search(self._mail_interface_domain() + [('id', '=', mail_id)])
+        records.write({'is_archived': False})
+        return True
+
+    @api.model
+    def star_mail(self, mail_id):
+        record = self.search(self._mail_interface_domain() + [('id', '=', mail_id)], limit=1)
+        if record:
+            record.write({'is_starred': not record.is_starred})
+            return record.is_starred
+        return False
+
+    @api.model
+    def sent_mail(self, **kwargs):
+        recipient = (kwargs.get('recipient') or '').strip()
+        if not recipient:
+            raise exceptions.UserError(_('Recipient is required before sending.'))
+
+        image_payloads = kwargs.get('images') or []
+        attachment_ids = []
+        for image_data in image_payloads:
+            content = image_data.get('image_uri')
+            if not content:
+                continue
+            attachment = self.env['ir.attachment'].sudo().create({
+                'name': image_data.get('name') or 'attachment',
+                'datas': content,
+                'res_model': 'email.record',
+            })
+            attachment_ids.append(attachment.id)
+
+        to_contact_ids = self.get_contact_ids(self.get_emails(recipient))
+        values = {
+            'subject': kwargs.get('subject') or '(No subject)',
+            'to': [(6, 0, to_contact_ids)],
+            'body': tools.html_sanitize((kwargs.get('content') or '').replace('\n', '<br/>')),
+            'attachments': [(6, 0, attachment_ids)],
+            'associated_users': [(6, 0, [self.env.user.id])],
+            'parent_exists': False,
+        }
+        email = self.create(values)
+        email.send_email()
+        return email.read(self._mail_interface_fields())
+
+    @api.model
+    def retry_mail(self, mail_id):
+        email = self.search(self._mail_interface_domain() + [('id', '=', mail_id)], limit=1)
+        if email and email.type == 'draft':
+            email.send_email()
+        return True
+
     @api.model
     def default_get(self, fields):
         res = super(Email, self).default_get(fields)
