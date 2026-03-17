@@ -94,10 +94,11 @@ class Email(models.Model):
 
     def _mail_interface_domain(self):
         return [
-            '|', '|',
+            '|', '|', '|',
             ('associated_users', 'in', [self.env.user.id]),
             ('associated_users', '=', False),
             ('create_uid', '=', self.env.user.id),
+            ('sender', '=', self.env.user.partner_id.id),
         ]
 
     def _mail_interface_fields(self):

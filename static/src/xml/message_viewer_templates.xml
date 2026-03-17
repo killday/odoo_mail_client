@@ -4,9 +4,13 @@
     <t t-name="MessageView" owl="1">
         <div class="message" t-ref="root-mail">
             <h4 t-out="props.mail.subject" style="margin-right: auto;"/>
-            <div style="display:flex; gap:8px; margin:8px 0 12px 0;">
+            <div style="display:flex; gap:8px; margin:8px 0 12px 0; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" t-on-click="backToList">Back</button>
                 <button type="button" class="btn btn-secondary" t-on-click="replyMail">Reply</button>
                 <button type="button" class="btn btn-secondary" t-on-click="forwardMail">Forward</button>
+                <button t-if="!props.mail.is_archived" type="button" class="btn btn-secondary" t-on-click="archiveMail">Archive</button>
+                <button t-if="props.mail.is_archived" type="button" class="btn btn-secondary" t-on-click="unarchiveMail">Unarchive</button>
+                <button type="button" class="btn btn-danger" t-on-click="deleteMail">Delete</button>
             </div>
             <br/>
             <div>

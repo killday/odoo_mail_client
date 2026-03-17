@@ -74,5 +74,45 @@ export class MessageView extends  Component {
         }
     }
 
+    async archiveMail(){
+        if (!this.props.mail.id) {
+            return
+        }
+        try {
+            await this.orm.call('email.record', 'archive_mail', [[this.props.mail.id]])
+        } catch (error) {
+            await this.orm.write('email.record', [this.props.mail.id], { is_archived: true })
+        }
+        window.location.reload()
+    }
+
+    async unarchiveMail(){
+        if (!this.props.mail.id) {
+            return
+        }
+        try {
+            await this.orm.call('email.record', 'unarchive_mail', [this.props.mail.id])
+        } catch (error) {
+            await this.orm.write('email.record', [this.props.mail.id], { is_archived: false })
+        }
+        window.location.reload()
+    }
+
+    async deleteMail(){
+        if (!this.props.mail.id) {
+            return
+        }
+        try {
+            await this.orm.call('email.record', 'delete_checked_mail', [this.props.mail.id])
+        } catch (error) {
+            await this.orm.unlink('email.record', [this.props.mail.id])
+        }
+        window.location.reload()
+    }
+
+    backToList(){
+        window.location.reload()
+    }
+
 }
 MessageView.template = 'MessageView'

@@ -58,10 +58,11 @@ class odooMail extends Component {
     }
 
     get mailboxBaseDomain() {
-        return ['|', '|',
+        return ['|', '|', '|',
             ['associated_users', 'in', [session.uid]],
             ['associated_users', '=', false],
             ['create_uid', '=', session.uid],
+            ['sender', '=', session.partner_id],
         ]
     }
 
