@@ -20,6 +20,14 @@ export class MailBody extends  Component {
             this.props.onSelectMail(this.props.mail.id, checked)
         })
     }
+
+    async safeModelCall(method, args = [], kwargs = {}) {
+      try {
+        return await this.orm.call('email.record', method, args, kwargs)
+      } catch (error) {
+        return null
+      }
+    }
     /**
      * Method triggered on click of the mail selection checkbox.
      * @param {Object} ev - Event object.
@@ -34,7 +42,10 @@ export class MailBody extends  Component {
      */
      async archiveMail(event){
       var mail = this.props.mail.id
-      await this.orm.call('email.record','archive_mail',[mail])
+      const archived = await this.safeModelCall('archive_mail', [mail])
+      if (archived === null) {
+        await this.orm.write('email.record', [mail], { is_archived: true })
+      }
       window.location.reload();
     }
     /**
@@ -43,7 +54,10 @@ export class MailBody extends  Component {
      */
      async unArchive(event){
       var mail = this.props.mail.id
-       await this.orm.call('email.record','unarchive_mail',[mail])
+      const unarchived = await this.safeModelCall('unarchive_mail', [mail])
+      if (unarchived === null) {
+        await this.orm.write('email.record', [mail], { is_archived: false })
+      }
        window.location.reload();
       }
       /**
@@ -52,7 +66,10 @@ export class MailBody extends  Component {
      */
     async resendMail(){
       var mail = this.props.mail.id
-      await this.orm.call('email.record','retry_mail',[mail])
+      const retried = await this.safeModelCall('retry_mail', [mail])
+      if (retried === null) {
+        await this.safeModelCall('send_email', [[mail]])
+      }
     }
     /**
      * Method to delete the mail.
@@ -60,7 +77,10 @@ export class MailBody extends  Component {
      */
     async deleteMail(event){
        var mail = this.props.mail.id
-       await this.orm.call('email.record','delete_checked_mail',[mail])
+       const deleted = await this.safeModelCall('delete_checked_mail', [mail])
+       if (deleted === null) {
+          await this.orm.unlink('email.record', [mail])
+       }
        window.location.reload();
     }
     /**
@@ -71,7 +91,10 @@ export class MailBody extends  Component {
         var mail = this.props.mail.id
       this.state.starred = !this.state.starred
         this.props.starMail(mail, this.state.starred)
-      await this.orm.call('email.record','star_mail',[mail])
+      const starred = await this.safeModelCall('star_mail', [mail])
+      if (starred === null) {
+            await this.orm.write('email.record', [mail], { is_starred: this.state.starred })
+      }
     }
     /**
      * Method to open the mail.

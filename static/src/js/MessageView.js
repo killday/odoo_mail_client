@@ -26,7 +26,17 @@ export class MessageView extends  Component {
     async fetch_data(){
         const attachmentIds = this.props.mail.attachments || []
         if (attachmentIds.length) {
-            this.state.attachments = await this.orm.call("ir.attachment", "get_fields", [attachmentIds], {})
+            try {
+                this.state.attachments = await this.orm.call("ir.attachment", "get_fields", [attachmentIds], {})
+            } catch (error) {
+                this.state.attachments = await this.orm.read("ir.attachment", attachmentIds, ["datas", "mimetype", "name"])
+                this.state.attachments = this.state.attachments.map((item) => ({
+                    attachment: item.id,
+                    datas: item.datas,
+                    mimetype: item.mimetype,
+                    name: item.name,
+                }))
+            }
         }
     }
     onClickImage(value){

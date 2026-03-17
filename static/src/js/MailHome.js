@@ -49,6 +49,30 @@ class odooMail extends Component {
         })
     }
 
+    async safeModelCall(model, method, args = [], kwargs = {}) {
+        try {
+            return await this.orm.call(model, method, args, kwargs)
+        } catch (error) {
+            return null
+        }
+    }
+
+    async computeCountsFallback() {
+        const baseDomain = [['associated_users', 'in', [session.uid]]]
+        const allCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_archived', '=', false]])
+        const sentCount = await this.orm.searchCount('email.record', [...baseDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]])
+        const outboxCount = await this.orm.searchCount('email.record', [...baseDomain, ['type', '=', 'draft'], ['is_archived', '=', false]])
+        const starredCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_starred', '=', true], ['is_archived', '=', false]])
+        const archivedCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_archived', '=', true]])
+        return {
+            all_count: allCount,
+            sent_count: sentCount,
+            outbox_count: outboxCount,
+            starred_count: starredCount,
+            archived_count: archivedCount,
+        }
+    }
+
     setActiveSidebarItem(activeClass) {
         const classNames = ['all_mail', 'archieved-mail', 'sent-mail', 'outbox', 'sent'];
         for (const className of classNames) {
@@ -63,7 +87,8 @@ class odooMail extends Component {
      * Method to get the count of different mail categories.
      */
     async getCount() {
-        this.mailState.getCount = await this.orm.call('email.record', 'get_mail_count', [])
+        const counts = await this.safeModelCall('email.record', 'get_mail_count', [])
+        this.mailState.getCount = counts || await this.computeCountsFallback()
     }
     /**
      * Method to compose a new mail.
@@ -153,7 +178,10 @@ class odooMail extends Component {
     async archiveMail(event) {
         if (this.selectedMails.length) {
             this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
-            await this.orm.call('email.record', 'archive_mail', [this.selectedMails])
+            const archived = await this.safeModelCall('email.record', 'archive_mail', [this.selectedMails])
+            if (archived === null) {
+                await this.orm.write('email.record', this.selectedMails, { is_archived: true })
+            }
             this.getCount()
             this.selectedMails = []
         }
@@ -172,7 +200,10 @@ class odooMail extends Component {
     async deleteMail(event) {
         if (this.selectedMails.length) {
             this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
-            await this.orm.call('email.record', 'delete_mail', [this.selectedMails])
+            const deleted = await this.safeModelCall('email.record', 'delete_mail', [this.selectedMails])
+            if (deleted === null) {
+                await this.orm.unlink('email.record', this.selectedMails)
+            }
             this.getCount()
             this.selectedMails = []
         }
@@ -198,7 +229,17 @@ class odooMail extends Component {
         this.setActiveSidebarItem('sent-mail');
         this.mailState.mailType = "starred"
         this.resetView()
-        this.mailState.loadMail = await this.orm.call('email.record', 'get_starred_mail', [])
+        const starred = await this.safeModelCall('email.record', 'get_starred_mail', [])
+        if (starred !== null) {
+            this.mailState.loadMail = starred
+            return
+        }
+        this.mailState.loadMail = await this.orm.searchRead(
+            'email.record',
+            [['associated_users', 'in', [session.uid]], ['is_starred', '=', true], ['is_archived', '=', false]],
+            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+            { order: 'date_time desc' }
+        )
     }
     /**
      * Method to view archived mails.
@@ -207,7 +248,17 @@ class odooMail extends Component {
         this.setActiveSidebarItem('archieved-mail');
         this.mailState.mailType = 'archive'
         this.resetView()
-        this.mailState.loadMail = await this.orm.call('email.record', 'get_archived_mail', [])
+        const archived = await this.safeModelCall('email.record', 'get_archived_mail', [])
+        if (archived !== null) {
+            this.mailState.loadMail = archived
+            return
+        }
+        this.mailState.loadMail = await this.orm.searchRead(
+            'email.record',
+            [['associated_users', 'in', [session.uid]], ['is_archived', '=', true]],
+            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+            { order: 'date_time desc' }
+        )
     }
     /**
      * Method to view outbox mails.

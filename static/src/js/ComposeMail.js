@@ -65,12 +65,16 @@ export class ComposeMail extends Component {
         } = this.state
         let sendMail = []
         if (recipient) {
-            sendMail = await this.orm.call('email.record', 'sent_mail', [], {
-                subject,
-                recipient,
-                content,
-                images,
-            })
+            try {
+                sendMail = await this.orm.call('email.record', 'sent_mail', [], {
+                    subject,
+                    recipient,
+                    content,
+                    images,
+                })
+            } catch (error) {
+                sendMail = []
+            }
             if (Array.isArray(sendMail) && sendMail.length) {
                 this.props.loadMail(sendMail[0])
             }
