@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="asset_mail_client_main_css" model="ir.asset">
+        <field name="name">Mail Client Main CSS</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/css/main.css</field>
+    </record>
+
+    <record id="asset_mail_client_attachment_js" model="ir.asset">
+        <field name="name">Mail Client Attachment JS</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/js/AttachmentMail.js</field>
+    </record>
+    <record id="asset_mail_client_compose_js" model="ir.asset">
+        <field name="name">Mail Client Compose JS</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/js/ComposeMail.js</field>
+    </record>
+    <record id="asset_mail_client_mail_body_js" model="ir.asset">
+        <field name="name">Mail Client MailBody JS</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/js/MailBody.js</field>
+    </record>
+    <record id="asset_mail_client_message_view_js" model="ir.asset">
+        <field name="name">Mail Client MessageView JS</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/js/MessageView.js</field>
+    </record>
+    <record id="asset_mail_client_sent_js" model="ir.asset">
+        <field name="name">Mail Client Sent JS</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/js/SentMail.js</field>
+    </record>
+    <record id="asset_mail_client_home_js" model="ir.asset">
+        <field name="name">Mail Client Home JS</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/js/MailHome.js</field>
+    </record>
+
+    <record id="asset_mail_client_attachment_xml" model="ir.asset">
+        <field name="name">Mail Client Attachment XML</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/xml/attachment_mail_templates.xml</field>
+    </record>
+    <record id="asset_mail_client_compose_xml" model="ir.asset">
+        <field name="name">Mail Client Compose XML</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/xml/compose_mail_templates.xml</field>
+    </record>
+    <record id="asset_mail_client_mail_body_xml" model="ir.asset">
+        <field name="name">Mail Client MailBody XML</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/xml/mail_body_templates.xml</field>
+    </record>
+    <record id="asset_mail_client_mail_page_xml" model="ir.asset">
+        <field name="name">Mail Client MailPage XML</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/xml/mail_page_templates.xml</field>
+    </record>
+    <record id="asset_mail_client_message_view_xml" model="ir.asset">
+        <field name="name">Mail Client MessageView XML</field>
+        <field name="bundle">web.assets_backend</field>
+        <field name="path">odoo_mail_client/static/src/xml/message_viewer_templates.xml</field>
+    </record>
+</odoo>

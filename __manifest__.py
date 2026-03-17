@@ -11,6 +11,7 @@
     'depends': ['contacts', 'mail', 'calendar', 'base', 'web'],
     'data': [
         'data/mail_icon_data.xml',
+        'views/assets.xml',
         'views/odoo_mail_views.xml',
         'views/res_config_views.xml',
         'views/email_record.xml',
