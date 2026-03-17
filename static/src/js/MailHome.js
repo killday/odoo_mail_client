@@ -67,11 +67,20 @@ class odooMail extends Component {
 
     async computeCountsFallback() {
         const baseDomain = this.mailboxBaseDomain
-        const allCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_archived', '=', false]])
-        const sentCount = await this.orm.searchCount('email.record', [...baseDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]])
-        const outboxCount = await this.orm.searchCount('email.record', [...baseDomain, ['type', '=', 'draft'], ['is_archived', '=', false]])
-        const starredCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_starred', '=', true], ['is_archived', '=', false]])
-        const archivedCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_archived', '=', true]])
+        let allCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_archived', '=', false]])
+        let sentCount = await this.orm.searchCount('email.record', [...baseDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]])
+        let outboxCount = await this.orm.searchCount('email.record', [...baseDomain, ['type', '=', 'draft'], ['is_archived', '=', false]])
+        let starredCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_starred', '=', true], ['is_archived', '=', false]])
+        let archivedCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_archived', '=', true]])
+
+        if (!allCount) {
+            allCount = await this.orm.searchCount('email.record', [['is_archived', '=', false]])
+            sentCount = await this.orm.searchCount('email.record', [['type', '=', 'outgoing'], ['is_archived', '=', false]])
+            outboxCount = await this.orm.searchCount('email.record', [['type', '=', 'draft'], ['is_archived', '=', false]])
+            starredCount = await this.orm.searchCount('email.record', [['is_starred', '=', true], ['is_archived', '=', false]])
+            archivedCount = await this.orm.searchCount('email.record', [['is_archived', '=', true]])
+        }
+
         return {
             all_count: allCount,
             sent_count: sentCount,
@@ -229,6 +238,14 @@ class odooMail extends Component {
             ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
+        if (!this.mailState.loadMail.length) {
+            this.mailState.loadMail = await this.orm.searchRead(
+                'email.record',
+                [['is_archived', '=', false]],
+                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+                { order: 'date_time desc' }
+            )
+        }
     }
     /**
      * Method to view starred mails.
@@ -248,6 +265,14 @@ class odooMail extends Component {
             ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
+        if (!this.mailState.loadMail.length) {
+            this.mailState.loadMail = await this.orm.searchRead(
+                'email.record',
+                [['is_starred', '=', true], ['is_archived', '=', false]],
+                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+                { order: 'date_time desc' }
+            )
+        }
     }
     /**
      * Method to view archived mails.
@@ -267,6 +292,14 @@ class odooMail extends Component {
             ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
+        if (!this.mailState.loadMail.length) {
+            this.mailState.loadMail = await this.orm.searchRead(
+                'email.record',
+                [['is_archived', '=', true]],
+                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+                { order: 'date_time desc' }
+            )
+        }
     }
     /**
      * Method to view outbox mails.
@@ -281,6 +314,14 @@ class odooMail extends Component {
             ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
+        if (!this.mailState.loadMail.length) {
+            this.mailState.loadMail = await this.orm.searchRead(
+                'email.record',
+                [['type', '=', 'draft'], ['is_archived', '=', false]],
+                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+                { order: 'date_time desc' }
+            )
+        }
     }
     /**
      * Method to view sent mails.
@@ -295,6 +336,14 @@ class odooMail extends Component {
             ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
+        if (!this.mailState.loadMail.length) {
+            this.mailState.loadMail = await this.orm.searchRead(
+                'email.record',
+                [['type', '=', 'outgoing'], ['is_archived', '=', false]],
+                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+                { order: 'date_time desc' }
+            )
+        }
     }
     /**
      * Method to redirect to the calendar view.
