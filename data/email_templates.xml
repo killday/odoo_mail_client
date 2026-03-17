@@ -8,6 +8,7 @@
         <field name="email_from">{{ object.get_partner_emails(object.sender) }}</field>
         <field name="email_to">{{ object.get_partner_emails(object.to) }}</field>
         <field name="email_cc">{{ object.get_partner_emails(object.cc) }}</field>
+        <field name="email_bcc" eval="False"/>
         <field name="subject">{{ object.subject }}</field>
         <field name="body_html" type="html">
             <div>

@@ -464,8 +464,6 @@ class Email(models.Model):
         }
         if 'email_cc' in mail_fields:
             email_values['email_cc'] = ','.join(cc_list)
-        if 'email_bcc' in mail_fields:
-            email_values['email_bcc'] = ','.join(bcc_list)
         if sender_email:
             email_values['email_from'] = sender_email
             email_values['reply_to'] = sender_email
