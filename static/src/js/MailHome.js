@@ -74,6 +74,12 @@ class odooMail extends Component {
         this.reloadCurrentFolder()
     }
 
+    onAccountFilterClick(ev) {
+        const rawId = ev.currentTarget.dataset.accountId
+        const accountId = rawId ? parseInt(rawId, 10) : null
+        this.filterByAccount(Number.isNaN(accountId) ? null : accountId)
+    }
+
     filterMailsBySelectedAccount(mails) {
         if (!this.mailState.selectedAccountId) {
             return mails
