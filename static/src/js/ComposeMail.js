@@ -1,4 +1,4 @@
-/* @odoo-module*/
+/** @odoo-module **/
 import {Component,useState,useRef} from '@odoo/owl'
 import { useService } from "@web/core/utils/hooks";
 import {ImportDialog} from "./AttachmentMail";
