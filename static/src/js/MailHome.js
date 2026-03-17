@@ -40,7 +40,11 @@ class odooMail extends Component {
             this.allMailView()
         })
         onWillStart(async () => {
-            this.mailState.loadLogo = await this.orm.call('mail.icon', 'load_logo', [])
+            try {
+                this.mailState.loadLogo = await this.orm.call('mail.icon', 'load_logo', [])
+            } catch (error) {
+                this.mailState.loadLogo = ''
+            }
             this.getCount()
         })
     }
