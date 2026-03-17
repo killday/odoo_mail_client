@@ -1,5 +1,5 @@
 /** @odoo-module **/
-import {Component,useState,useRef} from '@odoo/owl'
+import {Component,useState,useRef,onWillStart} from '@odoo/owl'
 import { useService } from "@web/core/utils/hooks";
 import {ImportDialog} from "./AttachmentMail";
 /**
@@ -18,6 +18,8 @@ export class ComposeMail extends Component {
             recipient: this.props.initialRecipient || "",
             cc: this.props.initialCc || "",
             bcc: this.props.initialBcc || "",
+            senderServerId: this.props.initialServerId ? String(this.props.initialServerId) : "",
+            senderAccounts: [],
             content: this.props.initialContent || "",
             images: [],
             originalHeight: null,
@@ -26,6 +28,22 @@ export class ComposeMail extends Component {
         })
         this.contentState = useState({
             images: [],
+        })
+
+        onWillStart(async () => {
+            try {
+                this.state.senderAccounts = await this.orm.searchRead(
+                    'fetchmail.server',
+                    [],
+                    ['name', 'user'],
+                    { order: 'name asc' }
+                )
+            } catch (error) {
+                this.state.senderAccounts = []
+            }
+            if (!this.state.senderServerId && this.state.senderAccounts.length) {
+                this.state.senderServerId = String(this.state.senderAccounts[0].id)
+            }
         })
 
     }
@@ -65,6 +83,7 @@ export class ComposeMail extends Component {
             recipient,
             cc,
             bcc,
+            senderServerId,
             content,
             images,
         } = this.state
@@ -76,6 +95,7 @@ export class ComposeMail extends Component {
                     recipient,
                     cc,
                     bcc,
+                    incoming_server_id: senderServerId ? parseInt(senderServerId, 10) : false,
                     content,
                     images,
                 })

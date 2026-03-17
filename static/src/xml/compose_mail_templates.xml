@@ -28,6 +28,18 @@
                             </div>
                         </div>
                         <div class="body">
+                            <select class="form-control"
+                                    id="sender_account"
+                                    t-model="state.senderServerId"
+                                    t-if="state.senderAccounts.length">
+                                <option t-att-value="''">From account</option>
+                                <t t-foreach="state.senderAccounts" t-as="account" t-key="account.id">
+                                    <option t-att-value="String(account.id)">
+                                        <t t-out="account.user or account.name"/>
+                                    </option>
+                                </t>
+                            </select>
+                            <br/>
                             <input type="email" class="form-control"
                                    id="Recipient" t-model="state.recipient"
                                    aria-describedby="emailHelp" required="1"

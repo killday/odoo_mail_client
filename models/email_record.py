@@ -198,6 +198,12 @@ class Email(models.Model):
         cc_contact_ids = self.get_contact_ids(self.get_emails(cc_string)) if cc_string else []
         bcc_string = (kwargs.get('bcc') or '').strip()
         bcc_contact_ids = self.get_contact_ids(self.get_emails(bcc_string)) if bcc_string else []
+        incoming_server_id = kwargs.get('incoming_server_id')
+        if incoming_server_id:
+            try:
+                incoming_server_id = int(incoming_server_id)
+            except (TypeError, ValueError):
+                incoming_server_id = False
         
         values = {
             'subject': kwargs.get('subject') or '(No subject)',
@@ -209,6 +215,8 @@ class Email(models.Model):
             'associated_users': [(6, 0, [self.env.user.id])],
             'parent_exists': False,
         }
+        if incoming_server_id:
+            values['incoming_server_id'] = incoming_server_id
         email = self.create(values)
         email.send_email()
         return email.read(self._mail_interface_fields())
