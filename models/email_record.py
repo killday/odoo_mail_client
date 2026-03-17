@@ -361,7 +361,6 @@ class Email(models.Model):
             msg['From'] = sender_email
             msg['To'] = ', '.join(recipients) if isinstance(recipients, list) else recipients
             msg['Cc'] = ', '.join(cc_list) if cc_list else ''
-            msg['Bcc'] = ', '.join(bcc_list) if bcc_list else ''
             msg['Subject'] = subject or '(No subject)'
             
             # Add body
@@ -425,6 +424,38 @@ class Email(models.Model):
 
         template = self.env.ref("odoo_mail_client.send_email_template").sudo()
         mail_fields = self.env['mail.mail']._fields
+
+        smtp_attempted = bool(sender_server and sender_server.smtp_host)
+        smtp_sent = False
+        if smtp_attempted:
+            smtp_sent = self._send_via_smtp(
+                sender_server=sender_server,
+                sender_email=sender_email or self.env.user.email,
+                recipients=recipients,
+                cc_list=cc_list,
+                bcc_list=bcc_list,
+                subject=self.subject,
+                body=self.body,
+                attachments=self.attachments,
+            )
+
+        if smtp_sent:
+            self.message_post(body=_('Email sent via configured outgoing SMTP server.'))
+            if sender_server and not self.incoming_server_id:
+                self.incoming_server_id = sender_server.id
+            self.type = 'outgoing'
+            self.is_read = True
+            self.date_time = fields.Datetime.now()
+            self.parent_exists = False
+            self.log_message_history(message="Email", key=self.env.context.get('key'))
+            return
+
+        if smtp_attempted:
+            _logger.warning(
+                'Configured SMTP send failed for email.record %s. Falling back to Odoo mail queue.',
+                self.id,
+            )
+
         email_values = {
             'attachment_ids': [(6, 0, self.attachments.ids)],
             'email_to': ','.join(recipients),
