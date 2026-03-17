@@ -9,10 +9,10 @@
                 <div class="header-group">
                     <img t-if="mailState.loadLogo"
                         t-attf-src="data:image/png;base64,{{mailState.loadLogo}}"
-                        style="width:25%"/>
+                        style="width:44px;height:44px;object-fit:contain;border-radius:50%;"/>
                     <img t-else=""
                         src="/odoo_mail_client/static/description/icon.png"
-                        style="width:25%"/>
+                        style="width:44px;height:44px;object-fit:contain;border-radius:50%;"/>
                 </div>
                 <form class="header-search" action="">
                     <div class="icons">

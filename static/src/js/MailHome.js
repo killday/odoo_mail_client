@@ -57,8 +57,16 @@ class odooMail extends Component {
         }
     }
 
+    get mailboxBaseDomain() {
+        return ['|', '|',
+            ['associated_users', 'in', [session.uid]],
+            ['associated_users', '=', false],
+            ['create_uid', '=', session.uid],
+        ]
+    }
+
     async computeCountsFallback() {
-        const baseDomain = [['associated_users', 'in', [session.uid]]]
+        const baseDomain = this.mailboxBaseDomain
         const allCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_archived', '=', false]])
         const sentCount = await this.orm.searchCount('email.record', [...baseDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]])
         const outboxCount = await this.orm.searchCount('email.record', [...baseDomain, ['type', '=', 'draft'], ['is_archived', '=', false]])
@@ -217,7 +225,7 @@ class odooMail extends Component {
         this.resetView()
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
-            [['associated_users', 'in', [session.uid]], ['is_archived', '=', false]],
+            [...this.mailboxBaseDomain, ['is_archived', '=', false]],
             ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
@@ -236,7 +244,7 @@ class odooMail extends Component {
         }
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
-            [['associated_users', 'in', [session.uid]], ['is_starred', '=', true], ['is_archived', '=', false]],
+            [...this.mailboxBaseDomain, ['is_starred', '=', true], ['is_archived', '=', false]],
             ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
@@ -255,7 +263,7 @@ class odooMail extends Component {
         }
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
-            [['associated_users', 'in', [session.uid]], ['is_archived', '=', true]],
+            [...this.mailboxBaseDomain, ['is_archived', '=', true]],
             ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
@@ -269,7 +277,7 @@ class odooMail extends Component {
         this.resetView()
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
-            [['associated_users', 'in', [session.uid]], ['type', '=', 'draft'], ['is_archived', '=', false]],
+            [...this.mailboxBaseDomain, ['type', '=', 'draft'], ['is_archived', '=', false]],
             ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
@@ -283,7 +291,7 @@ class odooMail extends Component {
         this.resetView()
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
-            [['associated_users', 'in', [session.uid]], ['type', '=', 'outgoing'], ['is_archived', '=', false]],
+            [...this.mailboxBaseDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]],
             ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
