@@ -122,6 +122,25 @@
                                   t-out="mailState.getCount.outbox_count"/>
                         </li>
                     </ul>
+                    <div class="left-sidebar-accounts account-filter-group">
+                        <p class="account-filter-title">Accounts</p>
+                        <button type="button"
+                                class="btn account-filter-btn"
+                                t-att-class="mailState.selectedAccountId ? 'btn account-filter-btn' : 'btn account-filter-btn active'"
+                                data-account-id=""
+                                t-on-click="onAccountFilterClick">
+                            All accounts
+                        </button>
+                        <t t-foreach="mailState.accounts" t-as="account" t-key="account.id">
+                            <button type="button"
+                                    class="btn account-filter-btn"
+                                    t-att-class="mailState.selectedAccountId === account.id ? 'btn account-filter-btn active' : 'btn account-filter-btn'"
+                                    t-att-data-account-id="account.id"
+                                    t-on-click="onAccountFilterClick">
+                                <span t-out="account.name"/>
+                            </button>
+                        </t>
+                    </div>
                 </div>
             </section>
             <!-- BODY -->
@@ -212,25 +231,6 @@
             <!-- RIGHT SIDEBAR -->
             <section class="app-container">
                 <div class="app-group">
-                    <div class="app-item account-filter-group">
-                        <p class="account-filter-title">Accounts</p>
-                        <button type="button"
-                                class="btn account-filter-btn"
-                                t-att-class="mailState.selectedAccountId ? 'btn account-filter-btn' : 'btn account-filter-btn active'"
-                                data-account-id=""
-                                t-on-click="onAccountFilterClick">
-                            All accounts
-                        </button>
-                        <t t-foreach="mailState.accounts" t-as="account" t-key="account.id">
-                            <button type="button"
-                                    class="btn account-filter-btn"
-                                    t-att-class="mailState.selectedAccountId === account.id ? 'btn account-filter-btn active' : 'btn account-filter-btn'"
-                                    t-att-data-account-id="account.id"
-                                    t-on-click="onAccountFilterClick">
-                                <span t-out="account.name"/>
-                            </button>
-                        </t>
-                    </div>
                     <div class="app-item">
                         <button class="btn google_calender"
                                 t-on-click="redirectCalender">

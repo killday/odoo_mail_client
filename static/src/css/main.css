@@ -30,7 +30,7 @@
 
 .body-wrapper {
 	display: grid;
-	grid-template-columns: 270px 1fr 220px;
+	grid-template-columns: 270px 1fr 55px;
 	grid-template-rows: auto calc(100vh - 64px);
 
 }
@@ -776,6 +776,12 @@ opacity:1;
 	flex-direction: column;
 	gap: 8px;
 	margin-bottom: 20px;
+}
+
+.left-sidebar-accounts {
+	padding: 8px 16px 0 26px;
+	max-height: 260px;
+	overflow-y: auto;
 }
 
 .account-filter-title {
