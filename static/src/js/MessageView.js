@@ -20,7 +20,8 @@ export class MessageView extends  Component {
         this.state = useState({
             attachments: [],
             data: [],
-
+            toEmails: '',
+            receivedAt: '',
         })
         onMounted(() => {
             this.fetch_data()
@@ -28,6 +29,11 @@ export class MessageView extends  Component {
     }
     async fetch_data(){
         const attachmentIds = this.props.mail.attachments || []
+        const toIds = Array.isArray(this.props.mail.to) ? this.props.mail.to : []
+
+        this.state.toEmails = await this.getRecipientEmails(toIds)
+        this.state.receivedAt = this.formatDateTime(this.props.mail.date_time)
+
         if (attachmentIds.length) {
             try {
                 this.state.attachments = await this.orm.call("ir.attachment", "get_fields", [attachmentIds], {})
@@ -41,6 +47,24 @@ export class MessageView extends  Component {
                 }))
             }
         }
+    }
+
+    formatDateTime(value) {
+        if (!value) {
+            return ''
+        }
+        const normalized = String(value).replace(' ', 'T')
+        const parsed = new Date(normalized)
+        if (Number.isNaN(parsed.getTime())) {
+            return String(value)
+        }
+        return new Intl.DateTimeFormat(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+        }).format(parsed)
     }
     onClickImage(value){
      this.action.doAction({

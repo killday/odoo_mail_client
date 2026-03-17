@@ -36,7 +36,11 @@
             </div>
             <div>
                 <strong>To:</strong>
-                <span t-out="(props.mail.to and props.mail.to.length) or 0"/> recipients
+                <span t-out="state.toEmails or 'No recipients'"/>
+            </div>
+            <div>
+                <strong>Received:</strong>
+                <span t-out="state.receivedAt or (props.mail.date_time or '')"/>
             </div>
             <br/>
             <div>
