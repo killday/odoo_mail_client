@@ -415,13 +415,16 @@ class Email(models.Model):
             raise exceptions.UserError(_('Please add at least one recipient in To before sending.'))
 
         template = self.env.ref("odoo_mail_client.send_email_template").sudo()
+        mail_fields = self.env['mail.mail']._fields
         email_values = {
             'attachment_ids': [(6, 0, self.attachments.ids)],
             'email_to': ','.join(recipients),
-            'email_cc': ','.join(cc_list),
-            'email_bcc': ','.join(bcc_list),
             'auto_delete': False,
         }
+        if 'email_cc' in mail_fields:
+            email_values['email_cc'] = ','.join(cc_list)
+        if 'email_bcc' in mail_fields:
+            email_values['email_bcc'] = ','.join(bcc_list)
         if sender_email:
             email_values['email_from'] = sender_email
             email_values['reply_to'] = sender_email
