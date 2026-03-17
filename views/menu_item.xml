@@ -159,6 +159,34 @@
               action="action_email_root_client"
               sequence="5"/>
 
+    <record id="all_emails_list" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="received_emails_list" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="email_compose_list" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="unread_emails_list" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="starred_emails_list" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="archived_emails_list" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="draft_emails_list" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
     <menuitem id="email_configuration_list"
               name="Configuration"
               sequence="0"
