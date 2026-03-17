@@ -709,7 +709,12 @@ class Email(models.Model):
     def log_message_history(self, message=None, key=None):
         parent_record_id = self.env['email.record'].browse(self.env.context.get('active_ids'))
         record_url = '/web#id=' + str(self._origin.id) + '&model=email.record&view_type=form'
-        self.message_post(body=message + " " + key)
-        parent_record_id.message_post(
-            body=message + ' ' + key + ", <a href='%s'>view record</a>" % record_url) if parent_record_id else None
+        message_text = (message or '').strip()
+        key_text = (key or '').strip()
+        body_text = ' '.join(part for part in [message_text, key_text] if part)
+        self.message_post(body=body_text)
+        if parent_record_id:
+            parent_record_id.message_post(
+                body=body_text + ", <a href='%s'>view record</a>" % record_url
+            )
 
