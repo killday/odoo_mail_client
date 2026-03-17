@@ -156,55 +156,12 @@
     <menuitem id="email_root_menu"
               name="Email Management"
               web_icon="odoo_mail_client,static/description/icon.png"
-              action="action_all_emails"
+              action="action_email_root_client"
               sequence="5"/>
-
-<!--    Tree view actions-->
-    <menuitem id="all_emails_list"
-              name="All Emails"
-              sequence="0"
-              action="action_all_emails"
-              parent="email_root_menu"/>
-
-    <menuitem id="received_emails_list"
-              name="Inbox"
-              sequence="1"
-              action="action_received_emails"
-              parent="email_root_menu"/>
-
-    <menuitem id="email_compose_list"
-              name="Sent"
-              sequence="2"
-              action="action_sent_emails"
-              parent="email_root_menu"/>
-
-    <menuitem id="unread_emails_list"
-              name="Unread"
-              sequence="3"
-              action="action_unread_emails"
-              parent="email_root_menu"/>
-
-    <menuitem id="starred_emails_list"
-              name="Starred"
-              sequence="4"
-              action="action_starred_emails"
-              parent="email_root_menu"/>
-
-    <menuitem id="archived_emails_list"
-              name="Archived"
-              sequence="5"
-              action="action_archived_emails"
-              parent="email_root_menu"/>
-
-    <menuitem id="draft_emails_list"
-              name="Draft"
-              sequence="6"
-              action="action_draft_emails"
-              parent="email_root_menu"/>
 
     <menuitem id="email_configuration_list"
               name="Configuration"
-              sequence="7"
+              sequence="0"
               parent="email_root_menu"/>
 
     <menuitem id="email_tag_list"
