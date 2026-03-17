@@ -1,5 +1,5 @@
 /** @odoo-module **/
-import { Component, useRef, useState } from '@odoo/owl'
+import { Component, onWillUnmount, useRef, useState } from '@odoo/owl'
 import { useService } from "@web/core/utils/hooks";
 
 /**
@@ -14,10 +14,21 @@ export class MailBody extends  Component {
         this.state = useState({
       starred: !!this.props.mail.is_starred,
         })
-        this.env.bus.addEventListener("SELECT:ALL", (event) => {
+        this._onSelectAll = (event) => {
+          if (!this.ref.el) {
+            return
+          }
             const { checked } = event.detail
-            this.ref.el.querySelector(".mail_check_box").checked = checked
+          const checkbox = this.ref.el.querySelector(".mail_check_box")
+          if (!checkbox) {
+            return
+          }
+          checkbox.checked = checked
             this.props.onSelectMail(this.props.mail.id, checked)
+        }
+        this.env.bus.addEventListener("SELECT:ALL", this._onSelectAll)
+        onWillUnmount(() => {
+          this.env.bus.removeEventListener("SELECT:ALL", this._onSelectAll)
         })
     }
 
