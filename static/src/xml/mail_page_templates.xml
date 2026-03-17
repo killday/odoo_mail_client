@@ -218,6 +218,31 @@
                     <!-- MAIL CONTENT -->
                     <div class="mail-content">
                         <t t-if="mailState.mode == 'tree'">
+                            <!-- MAIL LIST HEADER -->
+                            <div class="mail-list-header">
+                                <div class="mail-header-checkbox">
+                                    <input type="checkbox" class="checkbox-header" disabled="disabled"/>
+                                </div>
+                                <div class="mail-header-star"></div>
+                                <div class="mail-header-sender" t-on-click="onHeaderClick" data-sort="sender">
+                                    <span>From</span>
+                                    <span t-if="mailState.sortBy === 'sender'" t-att-class="'sort-indicator ' + mailState.sortOrder"/>
+                                </div>
+                                <div class="mail-header-subject" t-on-click="onHeaderClick" data-sort="subject">
+                                    <span>Subject</span>
+                                    <span t-if="mailState.sortBy === 'subject'" t-att-class="'sort-indicator ' + mailState.sortOrder"/>
+                                </div>
+                                <div class="mail-header-body"></div>
+                                <div class="mail-header-account" t-on-click="onHeaderClick" data-sort="account">
+                                    <span>Account</span>
+                                    <span t-if="mailState.sortBy === 'account'" t-att-class="'sort-indicator ' + mailState.sortOrder"/>
+                                </div>
+                                <div class="mail-header-date" t-on-click="onHeaderClick" data-sort="date">
+                                    <span>Date</span>
+                                    <span t-if="mailState.sortBy === 'date'" t-att-class="'sort-indicator ' + mailState.sortOrder"/>
+                                </div>
+                            </div>
+                            <!-- MAIL LIST ITEMS -->
                             <MailBody t-foreach="mailState.loadMail"
                                       t-as="mail" t-key="mail.id"
                                       mail="mail" t-props="mailProps"/>

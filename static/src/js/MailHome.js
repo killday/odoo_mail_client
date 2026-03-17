@@ -32,7 +32,9 @@ class odooMail extends Component {
             outBox: "",
             mode: "tree",
             formData: {},
-            mailType: "all"
+            mailType: "all",
+            sortBy: "date",
+            sortOrder: "desc"
         })
         this.dialogService = useService("dialog")
         this.root = useRef('root');
@@ -62,6 +64,19 @@ class odooMail extends Component {
         return ['subject', 'sender', 'to', 'cc', 'bcc', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type', 'incoming_server_id']
     }
 
+    get sortOrder() {
+        // Map UI sort field names to ORM field names
+        const fieldMap = {
+            'sender': 'sender',
+            'subject': 'subject',
+            'account': 'incoming_server_id',
+            'date': 'date_time'
+        }
+        const field = fieldMap[this.mailState.sortBy] || 'date_time'
+        const order = this.mailState.sortOrder || 'desc'
+        return `${field} ${order}`
+    }
+
     get accountFilterDomain() {
         if (!this.mailState.selectedAccountId) {
             return []
@@ -78,6 +93,32 @@ class odooMail extends Component {
         const rawId = ev.currentTarget.dataset.accountId
         const accountId = rawId ? parseInt(rawId, 10) : null
         this.filterByAccount(Number.isNaN(accountId) ? null : accountId)
+    }
+
+    onHeaderClick(ev) {
+        const sortField = ev.currentTarget.dataset.sort
+        if (!sortField) return
+
+        // Map UI sort names to ORM field names
+        const sortFieldMap = {
+            'sender': 'sender',
+            'subject': 'subject',
+            'account': 'incoming_server_id',
+            'date': 'date_time'
+        }
+        
+        const ormField = sortFieldMap[sortField]
+        
+        if (this.mailState.sortBy === sortField) {
+            // Toggle sort order
+            this.mailState.sortOrder = this.mailState.sortOrder === 'asc' ? 'desc' : 'asc'
+        } else {
+            // New sort column
+            this.mailState.sortBy = sortField
+            this.mailState.sortOrder = 'desc'
+        }
+        
+        this.reloadCurrentFolder()
     }
 
     filterMailsBySelectedAccount(mails) {
@@ -370,14 +411,14 @@ class odooMail extends Component {
             'email.record',
             [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['type', '=', 'incoming'], ['is_archived', '=', false]],
             this.mailReadFields,
-            { order: 'date_time desc' }
+            { order: this.sortOrder }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
                 [...this.accountFilterDomain, ['type', '=', 'incoming'], ['is_archived', '=', false]],
                 this.mailReadFields,
-                { order: 'date_time desc' }
+                { order: this.sortOrder }
             )
         }
     }
@@ -397,14 +438,14 @@ class odooMail extends Component {
             'email.record',
             [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['is_starred', '=', true], ['is_archived', '=', false]],
             this.mailReadFields,
-            { order: 'date_time desc' }
+            { order: this.sortOrder }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
                 [...this.accountFilterDomain, ['is_starred', '=', true], ['is_archived', '=', false]],
                 this.mailReadFields,
-                { order: 'date_time desc' }
+                { order: this.sortOrder }
             )
         }
     }
@@ -424,14 +465,14 @@ class odooMail extends Component {
             'email.record',
             [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['is_archived', '=', true]],
             this.mailReadFields,
-            { order: 'date_time desc' }
+            { order: this.sortOrder }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
                 [...this.accountFilterDomain, ['is_archived', '=', true]],
                 this.mailReadFields,
-                { order: 'date_time desc' }
+                { order: this.sortOrder }
             )
         }
     }
@@ -446,14 +487,14 @@ class odooMail extends Component {
             'email.record',
             [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['type', '=', 'draft'], ['is_archived', '=', false]],
             this.mailReadFields,
-            { order: 'date_time desc' }
+            { order: this.sortOrder }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
                 [...this.accountFilterDomain, ['type', '=', 'draft'], ['is_archived', '=', false]],
                 this.mailReadFields,
-                { order: 'date_time desc' }
+                { order: this.sortOrder }
             )
         }
     }
@@ -468,14 +509,14 @@ class odooMail extends Component {
             'email.record',
             [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]],
             this.mailReadFields,
-            { order: 'date_time desc' }
+            { order: this.sortOrder }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
                 [...this.accountFilterDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]],
                 this.mailReadFields,
-                { order: 'date_time desc' }
+                { order: this.sortOrder }
             )
         }
     }

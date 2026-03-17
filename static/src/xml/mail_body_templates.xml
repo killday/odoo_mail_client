@@ -4,7 +4,7 @@
     <t t-name="MailBody" owl="1">
         <div t-att-class="'inbox-message-item ' + (props.mail.is_read ? '' : 'message-default-unread')"
              data-id="' + name.id + '" t-ref="root">
-           <div class="checkbox" style="margin-right: -12px;">
+           <div class="mail-item-checkbox">
                <button class="btn">
                    <input type="checkbox" id="checkbox"
                           data-id="' + name.id + '"
@@ -13,7 +13,7 @@
                    </input>
                </button>
            </div>
-            <div>
+            <div class="mail-item-star">
         <button class="btn star" data-id="' + name.id + '" style="margin: 0;"
                 t-on-click="starMail">
             <img t-if="!state.starred"
@@ -36,16 +36,14 @@
                 <div class="message-subject message-content">
             <span t-att-class="props.mail.is_read ? 'read' : 'unread'" t-out="props.mail.subject"/>
         </div>
-                <div class="message-seperator message-content">-</div>
                 <div class="message-body message-content">
              <span t-out="html_content"/>
         </div>
                 <div class="message-account-tag" t-if="props.mail.incoming_server_id and props.mail.incoming_server_id[1]">
             <span t-out="props.mail.incoming_server_id[1]"/>
         </div>
-                <div class="gap message-content"> </div>
                 <div class="message-date center-text">
-            <span style="margin-left: 500px;" t-out="props.mail.date_time"/>
+            <span t-out="props.mail.date_time"/>
         </div>
     </div>
             <div class="message-group-hidden">
