@@ -218,7 +218,10 @@ class Email(models.Model):
         if incoming_server_id:
             values['incoming_server_id'] = incoming_server_id
         email = self.create(values)
-        email.send_email()
+        if incoming_server_id:
+            email.send_email(forced_server_id=incoming_server_id)
+        else:
+            email.send_email()
         return email.read(self._mail_interface_fields())
 
     @api.model
@@ -315,9 +318,9 @@ class Email(models.Model):
             server = self.env['fetchmail.server'].sudo().search([], order='id asc', limit=1)
         return server
 
-    def _resolve_sender_account(self):
+    def _resolve_sender_account(self, forced_server_id=False):
         self.ensure_one()
-        forced_server_id = self.env.context.get('force_outgoing_server_id')
+        forced_server_id = forced_server_id or self.env.context.get('force_outgoing_server_id')
         server = False
         if forced_server_id:
             server = self.env['fetchmail.server'].sudo().browse(forced_server_id).exists()
@@ -421,15 +424,15 @@ class Email(models.Model):
             _logger.error('SMTP send failed for %s: %s', sender_email, str(e), exc_info=True)
             return False
 
-    def send_email(self):
+    def send_email(self, forced_server_id=False):
         self.ensure_one()
         self.validate_partner_emails(self.to)
         self.validate_partner_emails(self.cc)
         self.validate_partner_emails(self.bcc)
 
-        sender_server, sender_email, _sender_partner = self._resolve_sender_account()
+        sender_server, sender_email, _sender_partner = self._resolve_sender_account(forced_server_id=forced_server_id)
         self._check_sender_server_access(sender_server)
-        forced_server_id = self.env.context.get('force_outgoing_server_id')
+        forced_server_id = forced_server_id or self.env.context.get('force_outgoing_server_id')
         
         if not self.subject:
             self.subject = '(No subject)'
