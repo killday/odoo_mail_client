@@ -287,6 +287,16 @@ class odooMail extends Component {
             this.mailState.selectedCount = 0
         }
     }
+
+    async unarchiveSelected(event) {
+        if (this.selectedMails.length) {
+            this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
+            await this.orm.write('email.record', this.selectedMails, { is_archived: false })
+            this.getCount()
+            this.selectedMails = []
+            this.mailState.selectedCount = 0
+        }
+    }
     /**
      * Method to refresh the page.
      * @param {Object} event - Event object.

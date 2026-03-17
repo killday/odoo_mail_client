@@ -143,13 +143,22 @@
                                  alt="Refresh"
                                  class="btn-icon btn-icon-sm btn-icon-alt btn-icon-hover"/>
                         </button>
-                        <button class="btn archive_checked toolbar-btn"
+                        <button t-if="mailState.mailType != 'archive'" class="btn archive_checked toolbar-btn"
                                 title="Archive"
                                 aria-label="Archive"
                                 t-att-disabled="!hasSelection"
                                 t-on-click="archiveMail">
                             <img src="/odoo_mail_client/static/src/img/archive_black_24dp.svg"
                                  alt="archive"
+                                 class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_archive"/>
+                        </button>
+                        <button t-if="mailState.mailType == 'archive'" class="btn archive_checked toolbar-btn"
+                                title="Unarchive"
+                                aria-label="Unarchive"
+                                t-att-disabled="!hasSelection"
+                                t-on-click="unarchiveSelected">
+                            <img src="/odoo_mail_client/static/src/img/unarchive_FILL1_wght400_GRAD0_opsz48.svg"
+                                 alt="unarchive"
                                  class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_archive"/>
                         </button>
                         <button class="btn delete_checked toolbar-btn"
