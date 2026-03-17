@@ -3,15 +3,32 @@
         <!-- MessageView template for displaying a single mail message -->
     <t t-name="MessageView" owl="1">
         <div class="message" t-ref="root-mail">
-            <h4 t-out="props.mail.subject" style="margin-right: auto;"/>
-            <div style="display:flex; gap:8px; margin:8px 0 12px 0; flex-wrap: wrap;">
-                <button type="button" class="btn btn-secondary" t-on-click="backToList">Back</button>
-                <button type="button" class="btn btn-secondary" t-on-click="replyMail">Reply</button>
-                <button type="button" class="btn btn-secondary" t-on-click="forwardMail">Forward</button>
-                <button t-if="!props.mail.is_archived" type="button" class="btn btn-secondary" t-on-click="archiveMail">Archive</button>
-                <button t-if="props.mail.is_archived" type="button" class="btn btn-secondary" t-on-click="unarchiveMail">Unarchive</button>
-                <button type="button" class="btn btn-danger" t-on-click="deleteMail">Delete</button>
+            <div class="inbox-menu open-mail-toolbar">
+                <div class="inbox-menu-group">
+                    <button type="button" class="btn toolbar-btn" title="Back to Inbox" aria-label="Back to Inbox" t-on-click="backToList">
+                        <i class="fa fa-arrow-left"/>
+                    </button>
+                    <button t-if="!props.mail.is_archived" type="button" class="btn toolbar-btn" title="Archive" aria-label="Archive" t-on-click="archiveMail">
+                        <img src="/odoo_mail_client/static/src/img/archive_black_24dp.svg" alt="Archive" class="btn-icon-sm btn-icon-alt"/>
+                    </button>
+                    <button t-if="props.mail.is_archived" type="button" class="btn toolbar-btn" title="Unarchive" aria-label="Unarchive" t-on-click="unarchiveMail">
+                        <img src="/odoo_mail_client/static/src/img/unarchive_FILL1_wght400_GRAD0_opsz48.svg" alt="Unarchive" class="btn-icon-sm btn-icon-alt"/>
+                    </button>
+                    <button type="button" class="btn toolbar-btn" title="Delete" aria-label="Delete" t-on-click="deleteMail">
+                        <img src="/odoo_mail_client/static/src/img/delete_black_24dp.svg" alt="Delete" class="btn-icon-sm btn-icon-alt"/>
+                    </button>
+                    <button type="button" class="btn toolbar-btn" title="Mark as unread" aria-label="Mark as unread" t-on-click="markUnreadMail">
+                        <i class="fa fa-envelope-o"/>
+                    </button>
+                    <button type="button" class="btn toolbar-btn" title="Reply" aria-label="Reply" t-on-click="replyMail">
+                        <i class="fa fa-reply"/>
+                    </button>
+                    <button type="button" class="btn toolbar-btn" title="Forward" aria-label="Forward" t-on-click="forwardMail">
+                        <i class="fa fa-mail-forward"/>
+                    </button>
+                </div>
             </div>
+            <h4 t-out="props.mail.subject" style="margin-right: auto; margin-top: 8px;"/>
             <br/>
             <div>
                 <strong>From:</strong>

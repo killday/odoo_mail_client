@@ -140,12 +140,22 @@ class odooMail extends Component {
             mailType: this.mailType,
         }
     }
+
+    get messageProps() {
+        return {
+            mail: this.mailState.formData,
+            onBack: this.resetView.bind(this),
+            onReloadList: this.reloadCurrentFolder.bind(this),
+            currentFolder: this.mailState.mailType,
+        }
+    }
     /**
      * Method to reset the mail view.
      */
     resetView() {
         this.mailState.formData = {}
         this.mailState.mode = "tree"
+        this.selectedMails = []
     }
     /**
      * Method to open a specific mail.
@@ -187,11 +197,69 @@ class odooMail extends Component {
      */
     onSelectMail(mailId, check) {
         if (check) {
-            this.selectedMails.push(mailId)
+            if (!this.selectedMails.includes(mailId)) {
+                this.selectedMails.push(mailId)
+            }
         }
         else {
             this.selectedMails = this.selectedMails.filter(item => item !== mailId)
         }
+    }
+
+    get hasSelection() {
+        return this.selectedMails.length > 0
+    }
+
+    async markSelectedRead() {
+        if (!this.selectedMails.length) {
+            return
+        }
+        const updated = await this.safeModelCall('email.record', 'action_mark_read', [this.selectedMails])
+        if (updated === null) {
+            await this.orm.write('email.record', this.selectedMails, { is_read: true })
+        }
+        for (const mail of this.mailState.loadMail) {
+            if (this.selectedMails.includes(mail.id)) {
+                mail.is_read = true
+            }
+        }
+        this.getCount()
+    }
+
+    async markSelectedUnread() {
+        if (!this.selectedMails.length) {
+            return
+        }
+        const updated = await this.safeModelCall('email.record', 'action_mark_unread', [this.selectedMails])
+        if (updated === null) {
+            await this.orm.write('email.record', this.selectedMails, { is_read: false })
+        }
+        for (const mail of this.mailState.loadMail) {
+            if (this.selectedMails.includes(mail.id)) {
+                mail.is_read = false
+            }
+        }
+        this.getCount()
+    }
+
+    async reloadCurrentFolder() {
+        if (this.mailState.mailType === 'starred') {
+            await this.starredMail()
+            return
+        }
+        if (this.mailState.mailType === 'archive') {
+            await this.archivedMail()
+            return
+        }
+        if (this.mailState.mailType === 'outbox') {
+            await this.outboxMailView()
+            return
+        }
+        if (this.mailState.mailType === 'sent') {
+            await this.sentMail()
+            return
+        }
+        await this.allMailView()
     }
     /**
      * Getter method to get the mail type.

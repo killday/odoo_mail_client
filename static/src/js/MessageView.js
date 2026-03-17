@@ -84,7 +84,12 @@ export class MessageView extends  Component {
         } catch (error) {
             await this.orm.write('email.record', [this.props.mail.id], { is_archived: true })
         }
-        window.location.reload()
+        if (this.props.onBack) {
+            this.props.onBack()
+        }
+        if (this.props.onReloadList) {
+            await this.props.onReloadList()
+        }
     }
 
     async unarchiveMail(){
@@ -96,7 +101,12 @@ export class MessageView extends  Component {
         } catch (error) {
             await this.orm.write('email.record', [this.props.mail.id], { is_archived: false })
         }
-        window.location.reload()
+        if (this.props.onBack) {
+            this.props.onBack()
+        }
+        if (this.props.onReloadList) {
+            await this.props.onReloadList()
+        }
     }
 
     async deleteMail(){
@@ -108,11 +118,35 @@ export class MessageView extends  Component {
         } catch (error) {
             await this.orm.unlink('email.record', [this.props.mail.id])
         }
-        window.location.reload()
+        if (this.props.onBack) {
+            this.props.onBack()
+        }
+        if (this.props.onReloadList) {
+            await this.props.onReloadList()
+        }
+    }
+
+    async markUnreadMail(){
+        if (!this.props.mail.id) {
+            return
+        }
+        try {
+            await this.orm.call('email.record', 'action_mark_unread', [[this.props.mail.id]])
+        } catch (error) {
+            await this.orm.write('email.record', [this.props.mail.id], { is_read: false })
+        }
+        if (this.props.onBack) {
+            this.props.onBack()
+        }
+        if (this.props.onReloadList) {
+            await this.props.onReloadList()
+        }
     }
 
     backToList(){
-        window.location.reload()
+        if (this.props.onBack) {
+            this.props.onBack()
+        }
     }
 
 }

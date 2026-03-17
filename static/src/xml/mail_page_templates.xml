@@ -130,29 +130,46 @@
                 <div class="inbox-menu">
                     <div class="inbox-menu-group">
                         <div class="inbox-btn-group">
-                            <button class="btn-alt checkbox"
+                            <button class="btn-alt checkbox toolbar-btn"
+                                    title="Select"
+                                    aria-label="Select"
                                     style="margin-top:6px;">
                                 <input type="checkbox" id="checkall"
                                        t-on-click="onClickSelectAll"/>
                             </button>
                         </div>
-                        <button class="btn refresh" t-on-click="refreshPage">
+                        <button class="btn refresh toolbar-btn" title="Refresh" aria-label="Refresh" t-on-click="refreshPage">
                             <img src="/odoo_mail_client/static/src/img/refresh_black_24dp.svg"
                                  alt="Refresh"
                                  class="btn-icon btn-icon-sm btn-icon-alt btn-icon-hover"/>
                         </button>
-                        <button class="btn delete_checked"
-                                t-on-click="deleteMail">
-                            <img src="/odoo_mail_client/static/src/img/delete_black_24dp.svg"
-                                 alt="Delete"
-                                 class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_delete"/>
-                        </button>
-                        <button class="btn archive_checked"
+                        <button class="btn archive_checked toolbar-btn"
+                                title="Archive"
+                                aria-label="Archive"
+                                t-att-disabled="!hasSelection"
                                 t-on-click="archiveMail">
                             <img src="/odoo_mail_client/static/src/img/archive_black_24dp.svg"
                                  alt="archive"
                                  class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_archive"/>
                         </button>
+                        <button class="btn delete_checked toolbar-btn"
+                                title="Delete"
+                                aria-label="Delete"
+                                t-att-disabled="!hasSelection"
+                                t-on-click="deleteMail">
+                            <img src="/odoo_mail_client/static/src/img/delete_black_24dp.svg"
+                                 alt="Delete"
+                                 class="btn-icon-sm btn-icon-alt btn-icon-hover checkbox_delete"/>
+                        </button>
+                        <button class="btn toolbar-btn" title="Mark as read" aria-label="Mark as read" t-att-disabled="!hasSelection" t-on-click="markSelectedRead">
+                            <i class="fa fa-envelope-open-o"/>
+                        </button>
+                        <button class="btn toolbar-btn" title="Mark as unread" aria-label="Mark as unread" t-att-disabled="!hasSelection" t-on-click="markSelectedUnread">
+                            <i class="fa fa-envelope-o"/>
+                        </button>
+                    </div>
+                    <div class="inbox-menu-pagination">
+                        <span t-out="mailState.loadMail.length"/> messages
                     </div>
                 </div>
                 <div class="inbox-container">
@@ -178,7 +195,7 @@
                                       mail="mail" t-props="mailProps"/>
                         </t>
                         <t t-else="">
-                            <MessageView mail="mailState.formData"/>
+                            <MessageView t-props="messageProps"/>
                         </t>
                     </div>
                 </div>

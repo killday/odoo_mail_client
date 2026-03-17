@@ -365,6 +365,32 @@
 	-ms-flex-pack: center;
 	justify-content: center;
 	vertical-align: middle;
+	gap: 4px;
+}
+
+.toolbar-btn {
+	width: 36px;
+	height: 36px;
+	border-radius: 18px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+}
+
+.toolbar-btn i {
+	font-size: 15px;
+	color: var(--light-grey);
+}
+
+.toolbar-btn:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+.open-mail-toolbar {
+	margin-right: 0;
+	padding-left: 0;
 }
 
 .inbox-btn-group {
