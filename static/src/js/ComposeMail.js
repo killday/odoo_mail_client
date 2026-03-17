@@ -13,9 +13,10 @@ export class ComposeMail extends Component {
         this.action = useService('action')
         this.dialog = useService('dialog')
         this.state = useState({
-            subject: "",
-            recipient: "",
-            content: "",
+            title: this.props.title || "New Message",
+            subject: this.props.initialSubject || "",
+            recipient: this.props.initialRecipient || "",
+            content: this.props.initialContent || "",
             images: [],
             originalHeight: null,
             minimized: false,
@@ -76,10 +77,14 @@ export class ComposeMail extends Component {
                 sendMail = []
             }
             if (Array.isArray(sendMail) && sendMail.length) {
-                this.props.loadMail(sendMail[0])
+                if (this.props.loadMail) {
+                    this.props.loadMail(sendMail[0])
+                }
             }
             this.props.close()
-            window.location.reload()
+            if (this.props.reloadOnSend !== false) {
+                window.location.reload()
+            }
         }
     }
     /**

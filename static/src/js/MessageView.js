@@ -2,6 +2,7 @@
 import { Component } from '@odoo/owl';
 import { useService } from "@web/core/utils/hooks";
 import { useState, onMounted, markup, useRef} from "@odoo/owl";
+import { ComposeMail } from './ComposeMail'
 
 
 /**
@@ -12,6 +13,7 @@ export class MessageView extends  Component {
     setup(){
         this.root = useRef("root-mail")
         this.action = useService("action");
+        this.dialog = useService("dialog");
         this.notification = useService("notification");
         this.html_content = markup(this.props.mail.body || "")
         this.orm = useService("orm");
@@ -53,21 +55,16 @@ export class MessageView extends  Component {
         }
         const senderId = this.props.mail.sender && this.props.mail.sender[0] ? this.props.mail.sender[0] : false
         const toIds = Array.isArray(this.props.mail.to) ? this.props.mail.to : []
-        const recipients = this.props.mail.type === 'outgoing' ? toIds : (senderId ? [senderId] : [])
+        const recipientIds = this.props.mail.type === 'outgoing' ? toIds : (senderId ? [senderId] : [])
+        const recipients = await this.getRecipientEmails(recipientIds)
         const subject = this.props.mail.subject || '(No subject)'
         const body = this.props.mail.body || ''
-        await this.action.doAction({
-            type: 'ir.actions.act_window',
-            name: 'Compose Reply',
-            res_model: 'email.record',
-            view_mode: 'form',
-            views: [[false, 'form']],
-            target: 'new',
-            context: {
-                default_subject: `Re: ${subject}`,
-                default_to: recipients,
-                default_body: `<p><br><br></p>${body}`,
-            },
+        this.dialog.add(ComposeMail, {
+            title: 'Reply',
+            initialSubject: `Re: ${subject}`,
+            initialRecipient: recipients,
+            initialContent: `\n\n${this.stripHtml(body)}`,
+            reloadOnSend: true,
         })
     }
 
@@ -77,20 +74,44 @@ export class MessageView extends  Component {
         }
         const subject = this.props.mail.subject || '(No subject)'
         const body = this.props.mail.body || ''
-        const attachmentIds = Array.isArray(this.props.mail.attachments) ? this.props.mail.attachments : []
-        await this.action.doAction({
-            type: 'ir.actions.act_window',
-            name: 'Compose Forward',
-            res_model: 'email.record',
-            view_mode: 'form',
-            views: [[false, 'form']],
-            target: 'new',
-            context: {
-                default_subject: `Fwd: ${subject}`,
-                default_attachments: attachmentIds,
-                default_body: `<p><br><br></p>${body}`,
-            },
+        const senderLabel = this.props.mail.sender && this.props.mail.sender[1] ? this.props.mail.sender[1] : ''
+        const forwardBody = [
+            '',
+            '',
+            '---------- Forwarded message ----------',
+            `From: ${senderLabel}`,
+            `Subject: ${subject}`,
+            '',
+            this.stripHtml(body),
+        ].join('\n')
+        this.dialog.add(ComposeMail, {
+            title: 'Forward',
+            initialSubject: `Fwd: ${subject}`,
+            initialRecipient: '',
+            initialContent: forwardBody,
+            reloadOnSend: true,
         })
+    }
+
+    async getRecipientEmails(partnerIds) {
+        if (!Array.isArray(partnerIds) || !partnerIds.length) {
+            return ''
+        }
+        try {
+            const partners = await this.orm.read('res.partner', partnerIds, ['email'])
+            return partners
+                .map((partner) => partner.email)
+                .filter((email) => !!email)
+                .join(', ')
+        } catch (error) {
+            return ''
+        }
+    }
+
+    stripHtml(html) {
+        const parser = new DOMParser()
+        const doc = parser.parseFromString(html || '', 'text/html')
+        return (doc.body.textContent || '').trim()
     }
 
     async archiveMail(){

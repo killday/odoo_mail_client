@@ -10,7 +10,7 @@
                 <form class="form_submit">
                     <div class="content-group">
                         <div class="header d-flex justify-content-between">
-                            <h1 class="title fs-5" id="send_message_label">New Message</h1>
+                            <h1 class="title fs-5" id="send_message_label"><t t-out="state.title"/></h1>
                             <div class="ms-auto">
                                 <button class="btn" id="minimizeButton"
                                         type="button"
