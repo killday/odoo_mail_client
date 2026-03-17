@@ -127,7 +127,7 @@
             <!-- BODY -->
             <section class="inbox mail_inbox">
                 <!-- MAIL -->
-                <div class="inbox-menu">
+                <div class="inbox-menu" t-if="mailState.mode == 'tree'">
                     <div class="inbox-menu-group">
                         <div class="inbox-btn-group">
                             <button class="btn-alt checkbox toolbar-btn"

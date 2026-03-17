@@ -19,6 +19,7 @@ class odooMail extends Component {
         this.mailState = useState({
             loadLogo: "",
             loadMail: [],
+            selectedCount: 0,
             getCount: {
                 all_count: 0,
                 sent_count: 0,
@@ -156,6 +157,7 @@ class odooMail extends Component {
         this.mailState.formData = {}
         this.mailState.mode = "tree"
         this.selectedMails = []
+        this.mailState.selectedCount = 0
     }
     /**
      * Method to open a specific mail.
@@ -204,10 +206,11 @@ class odooMail extends Component {
         else {
             this.selectedMails = this.selectedMails.filter(item => item !== mailId)
         }
+        this.mailState.selectedCount = this.selectedMails.length
     }
 
     get hasSelection() {
-        return this.selectedMails.length > 0
+        return this.mailState.selectedCount > 0
     }
 
     async markSelectedRead() {
@@ -281,6 +284,7 @@ class odooMail extends Component {
             }
             this.getCount()
             this.selectedMails = []
+            this.mailState.selectedCount = 0
         }
     }
     /**
@@ -303,6 +307,7 @@ class odooMail extends Component {
             }
             this.getCount()
             this.selectedMails = []
+            this.mailState.selectedCount = 0
         }
     }
     /**
