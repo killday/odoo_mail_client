@@ -34,4 +34,4 @@ class MailIcon(models.Model):
 
     @api.model
     def load_logo(self):
-        return self.search([], order='id desc', limit=1).mail_icon
+        return self.sudo().search([], order='id desc', limit=1).mail_icon
