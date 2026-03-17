@@ -113,6 +113,16 @@ export class MailBody extends  Component {
      */
    async openMail(event){
      var mail = this.props.mail
+     if (!mail.is_read) {
+        const marked = await this.safeModelCall('action_mark_read', [[mail.id]])
+        if (marked === null) {
+            await this.orm.write('email.record', [mail.id], { is_read: true })
+        }
+        mail.is_read = true
+        if (this.props.markRead) {
+            this.props.markRead(mail.id)
+        }
+     }
      this.props.openMail(mail)
    }
 }

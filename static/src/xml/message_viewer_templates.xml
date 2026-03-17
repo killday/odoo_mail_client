@@ -4,6 +4,10 @@
     <t t-name="MessageView" owl="1">
         <div class="message" t-ref="root-mail">
             <h4 t-out="props.mail.subject" style="margin-right: auto;"/>
+            <div style="display:flex; gap:8px; margin:8px 0 12px 0;">
+                <button type="button" class="btn btn-secondary" t-on-click="replyMail">Reply</button>
+                <button type="button" class="btn btn-secondary" t-on-click="forwardMail">Forward</button>
+            </div>
             <br/>
             <div>
                 <strong>From:</strong>

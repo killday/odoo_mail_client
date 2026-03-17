@@ -135,6 +135,7 @@ class odooMail extends Component {
             onSelectMail: this.onSelectMail.bind(this),
             starMail: this.starMail.bind(this),
             openMail: this.openMail.bind(this),
+            markRead: this.markRead.bind(this),
             mailType: this.mailType,
         }
     }
@@ -152,6 +153,16 @@ class odooMail extends Component {
     openMail(mail) {
         this.mailState.formData = mail
         this.mailState.mode = "form"
+    }
+
+    markRead(mailId) {
+        const row = this.mailState.loadMail.find((item) => item.id === mailId)
+        if (row && !row.is_read) {
+            row.is_read = true
+            if (this.mailState.getCount.all_count > 0) {
+                this.mailState.getCount.all_count--
+            }
+        }
     }
     /**
      * Method to star or unstar a mail.
@@ -235,14 +246,14 @@ class odooMail extends Component {
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
             [...this.mailboxBaseDomain, ['type', '=', 'incoming'], ['is_archived', '=', false]],
-            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
                 [['type', '=', 'incoming'], ['is_archived', '=', false]],
-                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
                 { order: 'date_time desc' }
             )
         }
@@ -262,14 +273,14 @@ class odooMail extends Component {
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
             [...this.mailboxBaseDomain, ['is_starred', '=', true], ['is_archived', '=', false]],
-            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
                 [['is_starred', '=', true], ['is_archived', '=', false]],
-                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
                 { order: 'date_time desc' }
             )
         }
@@ -289,14 +300,14 @@ class odooMail extends Component {
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
             [...this.mailboxBaseDomain, ['is_archived', '=', true]],
-            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
                 [['is_archived', '=', true]],
-                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
                 { order: 'date_time desc' }
             )
         }
@@ -311,14 +322,14 @@ class odooMail extends Component {
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
             [...this.mailboxBaseDomain, ['type', '=', 'draft'], ['is_archived', '=', false]],
-            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
                 [['type', '=', 'draft'], ['is_archived', '=', false]],
-                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
                 { order: 'date_time desc' }
             )
         }
@@ -333,14 +344,14 @@ class odooMail extends Component {
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
             [...this.mailboxBaseDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]],
-            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+            ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
                 [['type', '=', 'outgoing'], ['is_archived', '=', false]],
-                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
+                ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type'],
                 { order: 'date_time desc' }
             )
         }

@@ -2,7 +2,7 @@
 <templates id="template" xml:space="preserve">
         <!-- MailBody template for displaying individual mail items in the inbox -->
     <t t-name="MailBody" owl="1">
-        <div class="inbox-message-item  message-default-unread"
+        <div t-att-class="'inbox-message-item ' + (props.mail.is_read ? '' : 'message-default-unread')"
              data-id="' + name.id + '" t-ref="root">
            <div class="checkbox" style="margin-right: -12px;">
                <button class="btn">
@@ -31,10 +31,10 @@
             <div class="message-default" data-id="' + name.id + '"
                  t-on-click="openMail">
         <div class="message-sender message-content">
-            <span t-out="props.mail.sender and props.mail.sender[1] or ''"/>
+            <span t-att-class="props.mail.is_read ? 'read' : 'unread'" t-out="props.mail.sender and props.mail.sender[1] or ''"/>
         </div>
                 <div class="message-subject message-content">
-            <span t-out="props.mail.subject"/>
+            <span t-att-class="props.mail.is_read ? 'read' : 'unread'" t-out="props.mail.subject"/>
         </div>
                 <div class="message-seperator message-content">-</div>
                 <div class="message-body message-content">

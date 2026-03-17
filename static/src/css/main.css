@@ -666,12 +666,12 @@ opacity:1;
 	background-color: var(--fill-grey);
 }
 
-.message-default .unread {
+.inbox-message-item .unread {
 	color: var(--black);
 	font-weight: 600;
 }
 
-.message-default .read {
+.inbox-message-item .read {
 	color: var(--light-grey);
 	font-weight: 400;
 }

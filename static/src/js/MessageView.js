@@ -46,5 +46,33 @@ export class MessageView extends  Component {
         });
     }
 
+    async replyMail(){
+        if (!this.props.mail.id) {
+            return
+        }
+        try {
+            const action = await this.orm.call('email.record', 'reply_popup', [[this.props.mail.id]])
+            if (action) {
+                await this.action.doAction(action)
+            }
+        } catch (error) {
+            // keep message view usable even if backend method is unavailable
+        }
+    }
+
+    async forwardMail(){
+        if (!this.props.mail.id) {
+            return
+        }
+        try {
+            const action = await this.orm.call('email.record', 'forward_popup', [[this.props.mail.id]])
+            if (action) {
+                await this.action.doAction(action)
+            }
+        } catch (error) {
+            // keep message view usable even if backend method is unavailable
+        }
+    }
+
 }
 MessageView.template = 'MessageView'

@@ -108,6 +108,7 @@ class Email(models.Model):
             'body',
             'date_time',
             'attachments',
+            'is_read',
             'is_starred',
             'is_archived',
             'type',
