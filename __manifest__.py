@@ -15,6 +15,7 @@
         'views/odoo_mail_views.xml',
         'views/res_config_views.xml',
         'views/email_record.xml',
+        'views/mail_signature_views.xml',
         'views/menu_item.xml',
         'views/email_tags.xml',
         'views/fetchmail_fetch_wizard.xml',

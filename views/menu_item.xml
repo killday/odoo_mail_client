@@ -211,6 +211,12 @@
               action="email_tag_action"
               parent="email_configuration_list"/>
 
+    <menuitem id="email_signature_list"
+              name="Signatures"
+              action="action_mail_signatures"
+              parent="email_configuration_list"
+              sequence="5"/>
+
     <menuitem id="inherit_menu_action_fetchmail_server_tree"
               name="Incoming Mail Servers"
               parent="email_configuration_list"

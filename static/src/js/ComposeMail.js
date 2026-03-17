@@ -12,6 +12,7 @@ export class ComposeMail extends Component {
         this.root = useRef('root');
         this.action = useService('action')
         this.dialog = useService('dialog')
+        this.hasInitialContent = Boolean(this.props.initialContent)
         this.state = useState({
             title: this.props.title || "New Message",
             subject: this.props.initialSubject || "",
@@ -20,6 +21,9 @@ export class ComposeMail extends Component {
             bcc: this.props.initialBcc || "",
             senderServerId: this.props.initialServerId ? String(this.props.initialServerId) : "",
             senderAccounts: [],
+            signatures: [],
+            selectedSignatureId: "",
+            lastAppliedSignature: "",
             content: this.props.initialContent || "",
             images: [],
             originalHeight: null,
@@ -44,9 +48,83 @@ export class ComposeMail extends Component {
             if (!this.state.senderServerId && this.state.senderAccounts.length) {
                 this.state.senderServerId = String(this.state.senderAccounts[0].id)
             }
+
+            try {
+                this.state.signatures = await this.orm.searchRead(
+                    'mail.signature',
+                    [['active', '=', true]],
+                    ['name', 'body', 'server_id', 'is_default'],
+                    { order: 'is_default desc, name asc' }
+                )
+            } catch (error) {
+                this.state.signatures = []
+            }
+
+            this.selectDefaultSignature(!this.hasInitialContent)
         })
 
     }
+
+    get availableSignatures() {
+        const serverId = this.state.senderServerId ? parseInt(this.state.senderServerId, 10) : false
+        if (!serverId) {
+            return this.state.signatures.filter((signature) => !signature.server_id)
+        }
+        const accountSignatures = this.state.signatures.filter(
+            (signature) => signature.server_id && signature.server_id[0] === serverId
+        )
+        if (accountSignatures.length) {
+            return accountSignatures
+        }
+        return this.state.signatures.filter((signature) => !signature.server_id)
+    }
+
+    selectDefaultSignature(applyToContent = false) {
+        const signatures = this.availableSignatures
+        if (!signatures.length) {
+            this.state.selectedSignatureId = ""
+            return
+        }
+        const defaultSignature = signatures.find((signature) => signature.is_default) || signatures[0]
+        this.state.selectedSignatureId = String(defaultSignature.id)
+        if (applyToContent) {
+            this.applySignatureBody(defaultSignature.body || '')
+        }
+    }
+
+    applySignatureBody(signatureBody) {
+        const normalizedBody = signatureBody || ''
+        if (this.state.lastAppliedSignature) {
+            const previousSignatureBlock = `\n\n${this.state.lastAppliedSignature}`
+            if ((this.state.content || '').endsWith(previousSignatureBlock)) {
+                this.state.content = this.state.content.slice(0, -previousSignatureBlock.length)
+            }
+        }
+        if (!normalizedBody) {
+            this.state.lastAppliedSignature = ''
+            return
+        }
+        const prefix = this.state.content ? '\n\n' : ''
+        this.state.content = `${this.state.content || ''}${prefix}${normalizedBody}`
+        this.state.lastAppliedSignature = normalizedBody
+    }
+
+    onSenderAccountChange() {
+        this.selectDefaultSignature(!this.hasInitialContent)
+    }
+
+    onSignatureChange(ev) {
+        this.state.selectedSignatureId = ev.currentTarget.value || ''
+        const signature = this.availableSignatures.find((item) => String(item.id) === this.state.selectedSignatureId)
+        if (signature && !this.hasInitialContent) {
+            this.applySignatureBody(signature.body || '')
+        }
+    }
+
+    openSignatureManager() {
+        this.action.doAction('odoo_mail_client.action_mail_signatures')
+    }
+
     async imageReader(file) {
         const fileReader = new FileReader();
         fileReader.onload = (event) => {

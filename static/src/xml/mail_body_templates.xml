@@ -36,9 +36,6 @@
                 <div class="message-subject message-content">
             <span t-att-class="props.mail.is_read ? 'read' : 'unread'" t-out="props.mail.subject"/>
         </div>
-                <div class="message-body message-content">
-             <span t-out="html_content"/>
-        </div>
                 <div class="message-account-tag" t-if="props.mail.incoming_server_id and props.mail.incoming_server_id[1]">
             <span t-out="props.mail.incoming_server_id[1]"/>
         </div>
