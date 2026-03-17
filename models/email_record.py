@@ -450,26 +450,27 @@ class Email(models.Model):
         if not self:
             return False
         self.ensure_one()
+        safe_subject = self.subject or '(No subject)'
+        sender_name = self.sender.display_name if self.sender else 'Unknown Sender'
+        sender_email = self.sender.email if self.sender and self.sender.email else ''
         body_text = tools.html_sanitize(self.body)
-        user_tz = self.env.user.tz or pytz.utc
-        local = pytz.timezone(user_tz)
-        display_date_time = datetime.strftime(
-            pytz.utc.localize(self.date_time).astimezone(
-                local), "%a, %b %d, %Y at %H:%M")
+        localized_dt = fields.Datetime.context_timestamp(self, self.date_time or fields.Datetime.now())
+        display_date_time = localized_dt.strftime("%a, %b %d, %Y at %H:%M")
         arr = self.to if self.type == 'outgoing' else self.sender
+        compose_view = self.env.ref('odoo_mail_client.email_form_view', raise_if_not_found=False)
         return {
             'type': 'ir.actions.act_window',
             'name': 'Compose Reply',
             'view_mode': 'form',
             'target': 'new',
-            'view_id': self.env.ref('odoo_mail_client.email_form_view').id,
+            'view_id': compose_view.id if compose_view else False,
             'res_model': 'email.record',
             'context': {
-                'default_subject': 'Re: ' + self.subject,
+                'default_subject': 'Re: %s' % safe_subject,
                 'default_to': [rec.id for rec in arr],
                 'default_incoming_server_id': self.incoming_server_id.id if self.incoming_server_id else False,
                 'default_body': tools.html_sanitize('<p><br><br></p>' + str(self.env.user.signature) + '<br><br>' + 'On ' + str(display_date_time) +
-                                ' ' + str(self.sender.display_name) + ' &lt;' + str(self.sender.email) + '&gt; wrote:<br/>' +
+                                ' ' + str(sender_name) + ' &lt;' + str(sender_email) + '&gt; wrote:<br/>' +
                                 '<hr style="height:0.01em; background-color:black;">' + str(body_text))
             }
         }
@@ -480,27 +481,28 @@ class Email(models.Model):
         if not self:
             return False
         self.ensure_one()
+        safe_subject = self.subject or '(No subject)'
+        sender_name = self.sender.display_name if self.sender else 'Unknown Sender'
+        sender_email = self.sender.email if self.sender and self.sender.email else ''
         body_text = tools.html_sanitize(self.body)
-        user_tz = self.env.user.tz or pytz.utc
-        local = pytz.timezone(user_tz)
-        display_date_time = datetime.strftime(
-            pytz.utc.localize(self.date_time).astimezone(
-                local), "%a, %b %d, %Y at %H:%M")
+        localized_dt = fields.Datetime.context_timestamp(self, self.date_time or fields.Datetime.now())
+        display_date_time = localized_dt.strftime("%a, %b %d, %Y at %H:%M")
+        compose_view = self.env.ref('odoo_mail_client.email_form_view', raise_if_not_found=False)
         return {
             'type': 'ir.actions.act_window',
             'name': 'Compose Forward',
             'view_mode': 'form',
             'target': 'new',
-            'view_id': self.env.ref('odoo_mail_client.email_form_view').id,
+            'view_id': compose_view.id if compose_view else False,
             'res_model': 'email.record',
             'context': {
-                'default_subject': 'Fwd: ' + self.subject,
+                'default_subject': 'Fwd: %s' % safe_subject,
                 'default_attachments': [rec.id for rec in self.attachments],
                 'default_incoming_server_id': self.incoming_server_id.id if self.incoming_server_id else False,
                 'default_body': tools.html_sanitize('<p><br><br></p>' + str(self.env.user.signature) + '<br/><br/>' + '---------- Forwarded message ----------' +
-                                '<br>From: <strong>' + str(self.sender.display_name) + '</strong> &lt;' + str(self.sender.email) + '&gt;' +
+                                '<br>From: <strong>' + str(sender_name) + '</strong> &lt;' + str(sender_email) + '&gt;' +
                                 '<br>Date: ' + str(display_date_time) +
-                                '<br>Subject: ' + str(self.subject) +
+                                '<br>Subject: ' + str(safe_subject) +
                                 '<br>To: ' + str([rec.name + ' &lt;' + rec.email + '&gt;' for rec in self.to])
                                     .replace('[', '').replace(']', '').replace("'", "") +
                                 '<br>Cc: ' + str([rec.name + ' &lt;' + rec.email + '&gt;' for rec in self.cc])

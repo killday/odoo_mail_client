@@ -57,7 +57,8 @@ export class MessageView extends  Component {
                 await this.action.doAction(action)
             }
         } catch (error) {
-            this.notification.add('Unable to open reply composer.', { type: 'warning' })
+            const message = error?.data?.message || error?.message || 'Unable to open reply composer.'
+            this.notification.add(message, { type: 'warning' })
         }
     }
 
@@ -71,7 +72,8 @@ export class MessageView extends  Component {
                 await this.action.doAction(action)
             }
         } catch (error) {
-            this.notification.add('Unable to open forward composer.', { type: 'warning' })
+            const message = error?.data?.message || error?.message || 'Unable to open forward composer.'
+            this.notification.add(message, { type: 'warning' })
         }
     }
 
