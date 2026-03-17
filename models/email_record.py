@@ -117,7 +117,7 @@ class Email(models.Model):
     def get_mail_count(self):
         base_domain = self._mail_interface_domain()
         return {
-            'all_count': self.search_count(base_domain + [('type', '=', 'incoming'), ('is_archived', '=', False)]),
+            'all_count': self.search_count(base_domain + [('type', '=', 'incoming'), ('is_read', '=', False), ('is_archived', '=', False)]),
             'sent_count': self.search_count(base_domain + [('type', '=', 'outgoing'), ('is_archived', '=', False)]),
             'outbox_count': self.search_count(base_domain + [('type', '=', 'draft'), ('is_archived', '=', False)]),
             'starred_count': self.search_count(base_domain + [('is_starred', '=', True), ('is_archived', '=', False)]),
