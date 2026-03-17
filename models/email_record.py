@@ -443,24 +443,19 @@ class Email(models.Model):
         self.log_message_history(message="Email", key=self.env.context.get('key'))
 
     @api.model
-    def reply_popup(self, mail_id):
-        self = self.browse(mail_id).exists()
-        if not self:
+    def reply_popup(self, mail_id=None):
+        record = self
+        if mail_id:
+            record = self.browse(mail_id).exists()
+        if not record:
             return False
-        self.ensure_one()
-        safe_subject = self.subject or '(No subject)'
-        sender_name = self.sender.display_name if self.sender else 'Unknown Sender'
-        sender_email = self.sender.email if self.sender and self.sender.email else ''
-        body_text = tools.html_sanitize(self.body)
-        tz_value = self.env.context.get('tz') or self.env.user.tz or 'UTC'
-        if not isinstance(tz_value, str):
-            tz_value = str(tz_value)
-        localized_dt = fields.Datetime.context_timestamp(
-            self.with_context(tz=tz_value),
-            self.date_time or fields.Datetime.now(),
-        )
-        display_date_time = localized_dt.strftime("%a, %b %d, %Y at %H:%M")
-        arr = self.to if self.type == 'outgoing' else self.sender
+        record.ensure_one()
+        safe_subject = record.subject or '(No subject)'
+        sender_name = record.sender.display_name if record.sender else 'Unknown Sender'
+        sender_email = record.sender.email if record.sender and record.sender.email else ''
+        body_text = tools.html_sanitize(record.body)
+        display_date_time = fields.Datetime.to_string(record.date_time or fields.Datetime.now())
+        arr = record.to if record.type == 'outgoing' else record.sender
         compose_view = self.env.ref('odoo_mail_client.email_form_view', raise_if_not_found=False)
         return {
             'type': 'ir.actions.act_window',
@@ -472,7 +467,7 @@ class Email(models.Model):
             'context': {
                 'default_subject': 'Re: %s' % safe_subject,
                 'default_to': [rec.id for rec in arr],
-                'default_incoming_server_id': self.incoming_server_id.id if self.incoming_server_id else False,
+                'default_incoming_server_id': record.incoming_server_id.id if record.incoming_server_id else False,
                 'default_body': tools.html_sanitize('<p><br><br></p>' + str(self.env.user.signature) + '<br><br>' + 'On ' + str(display_date_time) +
                                 ' ' + str(sender_name) + ' &lt;' + str(sender_email) + '&gt; wrote:<br/>' +
                                 '<hr style="height:0.01em; background-color:black;">' + str(body_text))
@@ -480,23 +475,18 @@ class Email(models.Model):
         }
 
     @api.model
-    def forward_popup(self, mail_id):
-        self = self.browse(mail_id).exists()
-        if not self:
+    def forward_popup(self, mail_id=None):
+        record = self
+        if mail_id:
+            record = self.browse(mail_id).exists()
+        if not record:
             return False
-        self.ensure_one()
-        safe_subject = self.subject or '(No subject)'
-        sender_name = self.sender.display_name if self.sender else 'Unknown Sender'
-        sender_email = self.sender.email if self.sender and self.sender.email else ''
-        body_text = tools.html_sanitize(self.body)
-        tz_value = self.env.context.get('tz') or self.env.user.tz or 'UTC'
-        if not isinstance(tz_value, str):
-            tz_value = str(tz_value)
-        localized_dt = fields.Datetime.context_timestamp(
-            self.with_context(tz=tz_value),
-            self.date_time or fields.Datetime.now(),
-        )
-        display_date_time = localized_dt.strftime("%a, %b %d, %Y at %H:%M")
+        record.ensure_one()
+        safe_subject = record.subject or '(No subject)'
+        sender_name = record.sender.display_name if record.sender else 'Unknown Sender'
+        sender_email = record.sender.email if record.sender and record.sender.email else ''
+        body_text = tools.html_sanitize(record.body)
+        display_date_time = fields.Datetime.to_string(record.date_time or fields.Datetime.now())
         compose_view = self.env.ref('odoo_mail_client.email_form_view', raise_if_not_found=False)
         return {
             'type': 'ir.actions.act_window',
@@ -507,15 +497,15 @@ class Email(models.Model):
             'res_model': 'email.record',
             'context': {
                 'default_subject': 'Fwd: %s' % safe_subject,
-                'default_attachments': [rec.id for rec in self.attachments],
-                'default_incoming_server_id': self.incoming_server_id.id if self.incoming_server_id else False,
+                'default_attachments': [rec.id for rec in record.attachments],
+                'default_incoming_server_id': record.incoming_server_id.id if record.incoming_server_id else False,
                 'default_body': tools.html_sanitize('<p><br><br></p>' + str(self.env.user.signature) + '<br/><br/>' + '---------- Forwarded message ----------' +
                                 '<br>From: <strong>' + str(sender_name) + '</strong> &lt;' + str(sender_email) + '&gt;' +
                                 '<br>Date: ' + str(display_date_time) +
                                 '<br>Subject: ' + str(safe_subject) +
-                                '<br>To: ' + str([rec.name + ' &lt;' + rec.email + '&gt;' for rec in self.to])
+                                '<br>To: ' + str([rec.name + ' &lt;' + rec.email + '&gt;' for rec in record.to])
                                     .replace('[', '').replace(']', '').replace("'", "") +
-                                '<br>Cc: ' + str([rec.name + ' &lt;' + rec.email + '&gt;' for rec in self.cc])
+                                '<br>Cc: ' + str([rec.name + ' &lt;' + rec.email + '&gt;' for rec in record.cc])
                                     .replace('[', '').replace(']', '').replace("'", "") +
                                 '<hr style="height:0.01em; background-color:black;"><br>' + str(body_text))
             }
