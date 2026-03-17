@@ -51,30 +51,46 @@ export class MessageView extends  Component {
         if (!this.props.mail.id) {
             return
         }
-        try {
-            const action = await this.orm.call('email.record', 'reply_popup', [this.props.mail.id])
-            if (action) {
-                await this.action.doAction(action)
-            }
-        } catch (error) {
-            const message = error?.data?.message || error?.message || 'Unable to open reply composer.'
-            this.notification.add(message, { type: 'warning' })
-        }
+        const senderId = this.props.mail.sender && this.props.mail.sender[0] ? this.props.mail.sender[0] : false
+        const toIds = Array.isArray(this.props.mail.to) ? this.props.mail.to : []
+        const recipients = this.props.mail.type === 'outgoing' ? toIds : (senderId ? [senderId] : [])
+        const subject = this.props.mail.subject || '(No subject)'
+        const body = this.props.mail.body || ''
+        await this.action.doAction({
+            type: 'ir.actions.act_window',
+            name: 'Compose Reply',
+            res_model: 'email.record',
+            view_mode: 'form',
+            views: [[false, 'form']],
+            target: 'new',
+            context: {
+                default_subject: `Re: ${subject}`,
+                default_to: recipients,
+                default_body: `<p><br><br></p>${body}`,
+            },
+        })
     }
 
     async forwardMail(){
         if (!this.props.mail.id) {
             return
         }
-        try {
-            const action = await this.orm.call('email.record', 'forward_popup', [this.props.mail.id])
-            if (action) {
-                await this.action.doAction(action)
-            }
-        } catch (error) {
-            const message = error?.data?.message || error?.message || 'Unable to open forward composer.'
-            this.notification.add(message, { type: 'warning' })
-        }
+        const subject = this.props.mail.subject || '(No subject)'
+        const body = this.props.mail.body || ''
+        const attachmentIds = Array.isArray(this.props.mail.attachments) ? this.props.mail.attachments : []
+        await this.action.doAction({
+            type: 'ir.actions.act_window',
+            name: 'Compose Forward',
+            res_model: 'email.record',
+            view_mode: 'form',
+            views: [[false, 'form']],
+            target: 'new',
+            context: {
+                default_subject: `Fwd: ${subject}`,
+                default_attachments: attachmentIds,
+                default_body: `<p><br><br></p>${body}`,
+            },
+        })
     }
 
     async archiveMail(){
