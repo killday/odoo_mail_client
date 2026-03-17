@@ -422,7 +422,6 @@ class Email(models.Model):
         if not recipients:
             raise exceptions.UserError(_('Please add at least one recipient in To before sending.'))
 
-        template = self.env.ref("odoo_mail_client.send_email_template").sudo()
         mail_fields = self.env['mail.mail']._fields
 
         smtp_attempted = bool(sender_server and sender_server.smtp_host)
@@ -457,6 +456,8 @@ class Email(models.Model):
             )
 
         email_values = {
+            'subject': self.subject or '(No subject)',
+            'body_html': self.body or '',
             'attachment_ids': [(6, 0, self.attachments.ids)],
             'email_to': ','.join(recipients),
             'auto_delete': False,
@@ -469,40 +470,14 @@ class Email(models.Model):
             email_values['email_from'] = sender_email
             email_values['reply_to'] = sender_email
 
-        mail_id = False
-        try:
-            mail_id = template.send_mail(
-                res_id=self.id,
-                force_send=False,
-                email_values=email_values,
-            )
-        except ValueError as error:
-            # Odoo 18 installations can reject email_bcc on mail.mail depending on schema.
-            # Fallback to a safe direct mail.mail payload with only supported fields.
-            if "email_bcc" not in str(error):
-                raise
-            _logger.warning("Template send fallback triggered due to schema mismatch: %s", error)
-            safe_email_values = {
-                'subject': self.subject or '(No subject)',
-                'body_html': self.body or '',
-                'email_to': ','.join(recipients),
-                'auto_delete': False,
-                'attachment_ids': [(6, 0, self.attachments.ids)],
-            }
-            if sender_email:
-                safe_email_values['email_from'] = sender_email
-                safe_email_values['reply_to'] = sender_email
-            if 'email_cc' in mail_fields:
-                safe_email_values['email_cc'] = ','.join(cc_list)
-
-            create_values = {
-                key: value
-                for key, value in safe_email_values.items()
-                if key in mail_fields
-            }
-            fallback_mail = self.env['mail.mail'].sudo().create(create_values)
-            fallback_mail.send()
-            mail_id = fallback_mail.id
+        create_values = {
+            key: value
+            for key, value in email_values.items()
+            if key in mail_fields
+        }
+        queued_mail = self.env['mail.mail'].sudo().create(create_values)
+        queued_mail.send()
+        mail_id = queued_mail.id
         if mail_id:
             self.message_post(body=_('Email queued for delivery.'))
 
