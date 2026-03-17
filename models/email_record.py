@@ -317,12 +317,21 @@ class Email(models.Model):
 
     def _resolve_sender_account(self):
         self.ensure_one()
-        server = self.incoming_server_id or self._get_default_server_for_current_user()
+        forced_server_id = self.env.context.get('force_outgoing_server_id')
+        server = False
+        if forced_server_id:
+            server = self.env['fetchmail.server'].sudo().browse(forced_server_id).exists()
+        if not server:
+            server = self.incoming_server_id or self._get_default_server_for_current_user()
         sender_email = False
         sender_partner = False
 
         if server:
             sender_email = self._extract_email_from_server(server)
+            if not sender_email:
+                smtp_user = (server.smtp_user or '').strip().lower()
+                if '@' in smtp_user:
+                    sender_email = smtp_user
             if sender_email:
                 sender_partner = self.env['res.partner'].sudo().search([
                     ('email', '=ilike', sender_email)
