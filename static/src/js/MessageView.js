@@ -12,6 +12,7 @@ export class MessageView extends  Component {
     setup(){
         this.root = useRef("root-mail")
         this.action = useService("action");
+        this.notification = useService("notification");
         this.html_content = markup(this.props.mail.body || "")
         this.orm = useService("orm");
         this.state = useState({
@@ -51,12 +52,12 @@ export class MessageView extends  Component {
             return
         }
         try {
-            const action = await this.orm.call('email.record', 'reply_popup', [[this.props.mail.id]])
+            const action = await this.orm.call('email.record', 'reply_popup', [this.props.mail.id])
             if (action) {
                 await this.action.doAction(action)
             }
         } catch (error) {
-            // keep message view usable even if backend method is unavailable
+            this.notification.add('Unable to open reply composer.', { type: 'warning' })
         }
     }
 
@@ -65,12 +66,12 @@ export class MessageView extends  Component {
             return
         }
         try {
-            const action = await this.orm.call('email.record', 'forward_popup', [[this.props.mail.id]])
+            const action = await this.orm.call('email.record', 'forward_popup', [this.props.mail.id])
             if (action) {
                 await this.action.doAction(action)
             }
         } catch (error) {
-            // keep message view usable even if backend method is unavailable
+            this.notification.add('Unable to open forward composer.', { type: 'warning' })
         }
     }
 

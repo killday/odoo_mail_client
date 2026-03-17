@@ -444,7 +444,12 @@ class Email(models.Model):
         self.parent_exists = False
         self.log_message_history(message="Email", key=self.env.context.get('key'))
 
-    def reply_popup(self):
+    @api.model
+    def reply_popup(self, mail_id):
+        self = self.browse(mail_id).exists()
+        if not self:
+            return False
+        self.ensure_one()
         body_text = tools.html_sanitize(self.body)
         user_tz = self.env.user.tz or pytz.utc
         local = pytz.timezone(user_tz)
@@ -469,7 +474,12 @@ class Email(models.Model):
             }
         }
 
-    def forward_popup(self):
+    @api.model
+    def forward_popup(self, mail_id):
+        self = self.browse(mail_id).exists()
+        if not self:
+            return False
+        self.ensure_one()
         body_text = tools.html_sanitize(self.body)
         user_tz = self.env.user.tz or pytz.utc
         local = pytz.timezone(user_tz)
