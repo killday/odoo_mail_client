@@ -146,11 +146,17 @@
         <field name="context" eval="{'default_object_id': ref('model_email_record')}"/>
     </record>
 
+    <record id="action_email_root_client" model="ir.actions.client">
+        <field name="name">Odoo Mail</field>
+        <field name="tag">odoo_mail_client</field>
+        <field name="target">current</field>
+    </record>
+
 <!--    Root menu-->
     <menuitem id="email_root_menu"
               name="Email Management"
               web_icon="odoo_mail_client,static/description/icon.png"
-              action="action_odoo_mail_client"
+              action="action_email_root_client"
               sequence="5"/>
 
 <!--    Tree view actions-->
