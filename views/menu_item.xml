@@ -156,7 +156,7 @@
     <menuitem id="email_root_menu"
               name="Email Management"
               web_icon="odoo_mail_client,static/description/icon.png"
-              action="action_email_root_client"
+              action="action_all_emails"
               sequence="5"/>
 
 <!--    Tree view actions-->

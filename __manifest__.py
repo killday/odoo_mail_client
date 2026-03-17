@@ -8,7 +8,7 @@
     'website': 'https://www.rolustech.com/',
     'description': """
     """,
-    'depends': ['contacts', 'mail', 'calendar', 'base'],
+    'depends': ['contacts', 'mail', 'calendar', 'base', 'web'],
     'data': [
         'data/mail_icon_data.xml',
         'views/odoo_mail_views.xml',
