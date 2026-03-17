@@ -457,16 +457,18 @@ class Email(models.Model):
         display_date_time = fields.Datetime.to_string(record.date_time or fields.Datetime.now())
         arr = record.to if record.type == 'outgoing' else record.sender
         compose_view = self.env.ref('odoo_mail_client.email_form_view', raise_if_not_found=False)
+        view_id = compose_view.id if compose_view else False
         return {
             'type': 'ir.actions.act_window',
             'name': 'Compose Reply',
             'view_mode': 'form',
+            'views': [[view_id, 'form']] if view_id else [[False, 'form']],
             'target': 'new',
-            'view_id': compose_view.id if compose_view else False,
+            'view_id': view_id,
             'res_model': 'email.record',
             'context': {
                 'default_subject': 'Re: %s' % safe_subject,
-                'default_to': [rec.id for rec in arr],
+                'default_to': [rec.id for rec in arr] if arr else [],
                 'default_incoming_server_id': record.incoming_server_id.id if record.incoming_server_id else False,
                 'default_body': tools.html_sanitize('<p><br><br></p>' + str(self.env.user.signature) + '<br><br>' + 'On ' + str(display_date_time) +
                                 ' ' + str(sender_name) + ' &lt;' + str(sender_email) + '&gt; wrote:<br/>' +
@@ -488,16 +490,18 @@ class Email(models.Model):
         body_text = tools.html_sanitize(record.body)
         display_date_time = fields.Datetime.to_string(record.date_time or fields.Datetime.now())
         compose_view = self.env.ref('odoo_mail_client.email_form_view', raise_if_not_found=False)
+        view_id = compose_view.id if compose_view else False
         return {
             'type': 'ir.actions.act_window',
             'name': 'Compose Forward',
             'view_mode': 'form',
+            'views': [[view_id, 'form']] if view_id else [[False, 'form']],
             'target': 'new',
-            'view_id': compose_view.id if compose_view else False,
+            'view_id': view_id,
             'res_model': 'email.record',
             'context': {
                 'default_subject': 'Fwd: %s' % safe_subject,
-                'default_attachments': [rec.id for rec in record.attachments],
+                'default_attachments': [rec.id for rec in record.attachments] if record.attachments else [],
                 'default_incoming_server_id': record.incoming_server_id.id if record.incoming_server_id else False,
                 'default_body': tools.html_sanitize('<p><br><br></p>' + str(self.env.user.signature) + '<br/><br/>' + '---------- Forwarded message ----------' +
                                 '<br>From: <strong>' + str(sender_name) + '</strong> &lt;' + str(sender_email) + '&gt;' +
