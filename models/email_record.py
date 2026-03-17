@@ -104,6 +104,8 @@ class Email(models.Model):
             'subject',
             'sender',
             'to',
+            'cc',
+            'bcc',
             'body',
             'date_time',
             'attachments',
@@ -191,9 +193,16 @@ class Email(models.Model):
             attachment_ids.append(attachment.id)
 
         to_contact_ids = self.get_contact_ids(self.get_emails(recipient))
+        cc_string = (kwargs.get('cc') or '').strip()
+        cc_contact_ids = self.get_contact_ids(self.get_emails(cc_string)) if cc_string else []
+        bcc_string = (kwargs.get('bcc') or '').strip()
+        bcc_contact_ids = self.get_contact_ids(self.get_emails(bcc_string)) if bcc_string else []
+        
         values = {
             'subject': kwargs.get('subject') or '(No subject)',
             'to': [(6, 0, to_contact_ids)],
+            'cc': [(6, 0, cc_contact_ids)],
+            'bcc': [(6, 0, bcc_contact_ids)],
             'body': tools.html_sanitize((kwargs.get('content') or '').replace('\n', '<br/>')),
             'attachments': [(6, 0, attachment_ids)],
             'associated_users': [(6, 0, [self.env.user.id])],

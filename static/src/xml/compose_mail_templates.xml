@@ -33,6 +33,16 @@
                                    aria-describedby="emailHelp" required="1"
                                    placeholder="To"/>
                             <br/>
+                            <input type="email" class="form-control"
+                                   id="cc" t-model="state.cc"
+                                   aria-describedby="emailHelp"
+                                   placeholder="Cc"/>
+                            <br/>
+                            <input type="email" class="form-control"
+                                   id="bcc" t-model="state.bcc"
+                                   aria-describedby="emailHelp"
+                                   placeholder="Bcc"/>
+                            <br/>
                             <input type="text" class="form-control"
                                    id="subject" t-model="state.subject"
                                    aria-describedby="emailHelp"

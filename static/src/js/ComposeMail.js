@@ -16,6 +16,8 @@ export class ComposeMail extends Component {
             title: this.props.title || "New Message",
             subject: this.props.initialSubject || "",
             recipient: this.props.initialRecipient || "",
+            cc: this.props.initialCc || "",
+            bcc: this.props.initialBcc || "",
             content: this.props.initialContent || "",
             images: [],
             originalHeight: null,
@@ -61,6 +63,8 @@ export class ComposeMail extends Component {
         const {
             subject,
             recipient,
+            cc,
+            bcc,
             content,
             images,
         } = this.state
@@ -70,6 +74,8 @@ export class ComposeMail extends Component {
                 sendMail = await this.orm.call('email.record', 'sent_mail', [], {
                     subject,
                     recipient,
+                    cc,
+                    bcc,
                     content,
                     images,
                 })

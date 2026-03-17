@@ -55,14 +55,17 @@ export class MessageView extends  Component {
         }
         const senderId = this.props.mail.sender && this.props.mail.sender[0] ? this.props.mail.sender[0] : false
         const toIds = Array.isArray(this.props.mail.to) ? this.props.mail.to : []
+        const ccIds = Array.isArray(this.props.mail.cc) ? this.props.mail.cc : []
         const recipientIds = this.props.mail.type === 'outgoing' ? toIds : (senderId ? [senderId] : [])
         const recipients = await this.getRecipientEmails(recipientIds)
+        const ccRecipients = await this.getRecipientEmails(ccIds)
         const subject = this.props.mail.subject || '(No subject)'
         const body = this.props.mail.body || ''
         this.dialog.add(ComposeMail, {
             title: 'Reply',
             initialSubject: `Re: ${subject}`,
             initialRecipient: recipients,
+            initialCc: ccRecipients,
             initialContent: `\n\n${this.stripHtml(body)}`,
             reloadOnSend: true,
         })
