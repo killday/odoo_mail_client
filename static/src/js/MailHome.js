@@ -67,14 +67,14 @@ class odooMail extends Component {
 
     async computeCountsFallback() {
         const baseDomain = this.mailboxBaseDomain
-        let allCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_archived', '=', false]])
+        let allCount = await this.orm.searchCount('email.record', [...baseDomain, ['type', '=', 'incoming'], ['is_archived', '=', false]])
         let sentCount = await this.orm.searchCount('email.record', [...baseDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]])
         let outboxCount = await this.orm.searchCount('email.record', [...baseDomain, ['type', '=', 'draft'], ['is_archived', '=', false]])
         let starredCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_starred', '=', true], ['is_archived', '=', false]])
         let archivedCount = await this.orm.searchCount('email.record', [...baseDomain, ['is_archived', '=', true]])
 
         if (!allCount) {
-            allCount = await this.orm.searchCount('email.record', [['is_archived', '=', false]])
+            allCount = await this.orm.searchCount('email.record', [['type', '=', 'incoming'], ['is_archived', '=', false]])
             sentCount = await this.orm.searchCount('email.record', [['type', '=', 'outgoing'], ['is_archived', '=', false]])
             outboxCount = await this.orm.searchCount('email.record', [['type', '=', 'draft'], ['is_archived', '=', false]])
             starredCount = await this.orm.searchCount('email.record', [['is_starred', '=', true], ['is_archived', '=', false]])
@@ -234,14 +234,14 @@ class odooMail extends Component {
         this.resetView()
         this.mailState.loadMail = await this.orm.searchRead(
             'email.record',
-            [...this.mailboxBaseDomain, ['is_archived', '=', false]],
+            [...this.mailboxBaseDomain, ['type', '=', 'incoming'], ['is_archived', '=', false]],
             ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
             { order: 'date_time desc' }
         )
         if (!this.mailState.loadMail.length) {
             this.mailState.loadMail = await this.orm.searchRead(
                 'email.record',
-                [['is_archived', '=', false]],
+                [['type', '=', 'incoming'], ['is_archived', '=', false]],
                 ['subject', 'sender', 'to', 'body', 'date_time', 'attachments', 'is_starred', 'is_archived', 'type'],
                 { order: 'date_time desc' }
             )
