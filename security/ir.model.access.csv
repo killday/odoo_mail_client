@@ -4,3 +4,4 @@ access_email_tags,access.email.tags,model_email_tags,base.group_user,1,1,1,1
 access_fetchmail_server_internal_user,fetchmail_server_internal_user,mail.model_fetchmail_server,base.group_user,1,0,0,0
 access_fetchmail_range_wizard,access.fetchmail.range.wizard,model_fetchmail_range_wizard,base.group_user,1,1,1,1
 access_mail_signature_user,access.mail.signature.user,model_mail_signature,base.group_user,1,1,1,1
+access_mail_icon_user,access.mail.icon.user,model_mail_icon,base.group_user,1,1,1,1
