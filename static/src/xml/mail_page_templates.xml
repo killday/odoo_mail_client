@@ -154,6 +154,7 @@
                                     aria-label="Select"
                                     style="margin-top:6px;">
                                 <input type="checkbox" id="checkall"
+                                       t-att-checked="mailState.selectAllChecked"
                                        t-on-click="onClickSelectAll"/>
                             </button>
                         </div>

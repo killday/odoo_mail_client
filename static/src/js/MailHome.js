@@ -21,6 +21,7 @@ class odooMail extends Component {
             loadMail: [],
             page: 1,
             pageSize: 25,
+            selectAllChecked: false,
             accounts: [],
             selectedAccountId: null,
             selectedCount: 0,
@@ -87,6 +88,21 @@ class odooMail extends Component {
         return this.mailState.loadMail.slice(this.pageStart, this.pageEnd)
     }
 
+    clearSelectionState() {
+        this.selectedMails = []
+        this.mailState.selectedCount = 0
+        this.mailState.selectAllChecked = false
+    }
+
+    syncSelectAllState() {
+        const currentPageIds = this.paginatedMails.map((mail) => mail.id)
+        if (!currentPageIds.length) {
+            this.mailState.selectAllChecked = false
+            return
+        }
+        this.mailState.selectAllChecked = currentPageIds.every((id) => this.selectedMails.includes(id))
+    }
+
     get pageFromLabel() {
         if (!this.totalRows) {
             return 0
@@ -101,18 +117,23 @@ class odooMail extends Component {
     prevPage() {
         if (this.mailState.page > 1) {
             this.mailState.page -= 1
+            this.clearSelectionState()
+            this.env.bus.trigger("SELECT:ALL", { checked: false })
         }
     }
 
     nextPage() {
         if (this.mailState.page < this.totalPages) {
             this.mailState.page += 1
+            this.clearSelectionState()
+            this.env.bus.trigger("SELECT:ALL", { checked: false })
         }
     }
 
     setMailRows(rows) {
         this.mailState.loadMail = rows
         this.mailState.page = 1
+        this.clearSelectionState()
     }
 
     groupByConversation(mails) {
@@ -338,6 +359,7 @@ class odooMail extends Component {
      */
     onClickSelectAll(ev) {
         const checked = ev.target.checked
+        this.mailState.selectAllChecked = checked
         this.env.bus.trigger("SELECT:ALL", { checked })
     }
     /**
@@ -369,8 +391,7 @@ class odooMail extends Component {
         this.mailState.formData = {}
         this.mailState.mode = "tree"
         this.mailState.page = 1
-        this.selectedMails = []
-        this.mailState.selectedCount = 0
+        this.clearSelectionState()
     }
     /**
      * Method to open a specific mail.
@@ -426,6 +447,7 @@ class odooMail extends Component {
             this.selectedMails = this.selectedMails.filter(item => !selectedIds.includes(item))
         }
         this.mailState.selectedCount = this.selectedMails.length
+        this.syncSelectAllState()
     }
 
     get hasSelection() {
@@ -502,8 +524,7 @@ class odooMail extends Component {
                 await this.orm.write('email.record', this.selectedMails, { is_archived: true })
             }
             this.getCount()
-            this.selectedMails = []
-            this.mailState.selectedCount = 0
+            this.clearSelectionState()
         }
     }
 
@@ -512,8 +533,7 @@ class odooMail extends Component {
             this.mailState.loadMail = this.mailState.loadMail.filter(item => !this.selectedMails.includes(item.id))
             await this.orm.write('email.record', this.selectedMails, { is_archived: false })
             this.getCount()
-            this.selectedMails = []
-            this.mailState.selectedCount = 0
+            this.clearSelectionState()
         }
     }
     /**
@@ -535,8 +555,7 @@ class odooMail extends Component {
                 await this.orm.unlink('email.record', this.selectedMails)
             }
             this.getCount()
-            this.selectedMails = []
-            this.mailState.selectedCount = 0
+            this.clearSelectionState()
         }
     }
     /**
