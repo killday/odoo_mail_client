@@ -1,6 +1,6 @@
 /** @odoo-module **/
 import { registry } from '@web/core/registry';
-import { Component, useRef, useState, onWillStart, onMounted } from '@odoo/owl'
+import { Component, useRef, useState, onWillStart, onMounted, onWillUnmount } from '@odoo/owl'
 import { useService } from "@web/core/utils/hooks";
 import { MailBody } from './MailBody'
 import { SentMail } from './SentMail'
@@ -44,8 +44,15 @@ class odooMail extends Component {
         this.action = useService('action')
         this.orm = useService('orm')
         this.selectedMails = []
+        this.autoRefreshTimer = null
+        this.autoRefreshInFlight = false
+        this.autoRefreshIntervalMs = 60000
         onMounted(() => {
             this.allMailView()
+            this.startAutoRefresh()
+        })
+        onWillUnmount(() => {
+            this.stopAutoRefresh()
         })
         onWillStart(async () => {
             try {
@@ -339,6 +346,47 @@ class odooMail extends Component {
     async getCount() {
         const counts = await this.safeModelCall('email.record', 'get_mail_count', [])
         this.mailState.getCount = counts || await this.computeCountsFallback()
+    }
+
+    startAutoRefresh() {
+        this.stopAutoRefresh()
+        this.autoRefreshTimer = setInterval(() => {
+            this.runAutoRefresh()
+        }, this.autoRefreshIntervalMs)
+    }
+
+    stopAutoRefresh() {
+        if (this.autoRefreshTimer) {
+            clearInterval(this.autoRefreshTimer)
+            this.autoRefreshTimer = null
+        }
+    }
+
+    async runAutoRefresh() {
+        if (this.autoRefreshInFlight) {
+            return
+        }
+        if (document.hidden) {
+            return
+        }
+
+        this.autoRefreshInFlight = true
+        try {
+            // Always refresh counters cheaply.
+            await this.getCount()
+
+            // Reload inbox list only in low-risk context to avoid disruptive resets.
+            if (
+                this.mailState.mode === 'tree'
+                && this.mailState.mailType === 'all'
+                && this.mailState.page === 1
+                && this.mailState.selectedCount === 0
+            ) {
+                await this.allMailView()
+            }
+        } finally {
+            this.autoRefreshInFlight = false
+        }
     }
     /**
      * Method to compose a new mail.
