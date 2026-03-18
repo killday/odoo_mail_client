@@ -66,11 +66,15 @@ export class MessageView extends  Component {
             minute: '2-digit',
         }).format(parsed)
     }
-    onClickImage(value){
-     this.action.doAction({
-            type: "ir.actions.act_url",
-            url: "/web/content/" + value+ "?download=true",
-        });
+    onClickImage(evOrValue){
+        const value = (evOrValue && evOrValue.currentTarget && evOrValue.currentTarget.dataset)
+            ? parseInt(evOrValue.currentTarget.dataset.attachmentId, 10)
+            : parseInt(evOrValue, 10)
+        if (!value || Number.isNaN(value)) {
+            return
+        }
+        // Avoid service-context issues by navigating directly to attachment download URL.
+        window.location.href = `/web/content/${value}?download=true`
     }
 
     async replyMail(){

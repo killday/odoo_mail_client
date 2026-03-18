@@ -51,7 +51,9 @@
                     <div t-if="data.mimetype == 'image/jpeg' ||  data.mimetype == 'image/png' ||  data.mimetype == 'image/gif' ||  data.mimetype == 'image/svg+xml' ||  data.mimetype == 'image/webp'">
                         <div class="row">
                             <div class="img-container" style="">
-                                <div class="hover-card"  t-on-click="() => onClickImage(data.attachment)">
+                                          <div class="hover-card"
+                                                 t-att-data-attachment-id="data.attachment"
+                                                 t-on-click="onClickImage">
                                    <i class="fa fa-download"/>
                                 </div>
                                 <img class="img-fluid" style="width: 300px;height: 100px" t-att-src="'data:image/png;base64,'+data.datas"
@@ -73,8 +75,9 @@
                                 </div>
                                 <div style="width: 50px"/>
                                 <div>
-                                    <button type="download" class="btn mt-3"
-                                            t-on-click="() => onClickImage(data.attachment)">
+                                        <button type="download" class="btn mt-3"
+                                            t-att-data-attachment-id="data.attachment"
+                                            t-on-click="onClickImage">
                                                 <i class="text-black fa fa-download" aria-hidden="true"/>
                               </button>
                                 </div>
