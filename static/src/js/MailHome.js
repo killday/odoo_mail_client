@@ -61,7 +61,82 @@ class odooMail extends Component {
     }
 
     get mailReadFields() {
-        return ['subject', 'sender', 'to', 'cc', 'bcc', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type', 'incoming_server_id']
+        return ['subject', 'sender', 'to', 'cc', 'bcc', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type', 'incoming_server_id', 'parent_message_id']
+    }
+
+    groupByConversation(mails) {
+        const rows = Array.isArray(mails) ? [...mails] : []
+        if (!rows.length) {
+            return []
+        }
+
+        const byId = new Map(rows.map((row) => [row.id, row]))
+
+        const findRootId = (row) => {
+            let current = row
+            const seen = new Set()
+            while (current && current.parent_message_id && current.parent_message_id[0] && !seen.has(current.id)) {
+                seen.add(current.id)
+                const parentId = current.parent_message_id[0]
+                const parent = byId.get(parentId)
+                if (!parent) {
+                    return parentId
+                }
+                current = parent
+            }
+            return current ? current.id : row.id
+        }
+
+        const groups = new Map()
+        for (const row of rows) {
+            const rootId = findRootId(row)
+            if (!groups.has(rootId)) {
+                groups.set(rootId, [])
+            }
+            groups.get(rootId).push(row)
+        }
+
+        const conversationRows = []
+        for (const [, group] of groups.entries()) {
+            const sorted = [...group].sort((a, b) => (a.date_time < b.date_time ? 1 : -1))
+            const latest = { ...sorted[0] }
+            latest.conversation_count = sorted.length
+            latest.conversation_ids = sorted.map((item) => item.id)
+            conversationRows.push(latest)
+        }
+
+        const normalizeComparableValue = (value) => {
+            if (Array.isArray(value)) {
+                return String(value[1] || '')
+            }
+            return String(value || '')
+        }
+
+        const direction = this.mailState.sortOrder === 'asc' ? 1 : -1
+        const sortBy = this.mailState.sortBy || 'date'
+
+        conversationRows.sort((a, b) => {
+            if (sortBy === 'date') {
+                if (a.date_time === b.date_time) return 0
+                return (a.date_time < b.date_time ? -1 : 1) * direction
+            }
+
+            if (sortBy === 'sender') {
+                return normalizeComparableValue(a.sender).localeCompare(normalizeComparableValue(b.sender)) * direction
+            }
+
+            if (sortBy === 'subject') {
+                return normalizeComparableValue(a.subject).localeCompare(normalizeComparableValue(b.subject)) * direction
+            }
+
+            if (sortBy === 'account') {
+                return normalizeComparableValue(a.incoming_server_id).localeCompare(normalizeComparableValue(b.incoming_server_id)) * direction
+            }
+
+            return 0
+        })
+
+        return conversationRows
     }
 
     get sortOrder() {
@@ -277,14 +352,20 @@ class odooMail extends Component {
      * @param {Number} mailId - Mail ID.
      * @param {Boolean} check - Checked or not.
      */
-    onSelectMail(mailId, check) {
+    onSelectMail(mailRecord, check) {
+        const selectedIds = mailRecord && mailRecord.conversation_ids && mailRecord.conversation_ids.length
+            ? mailRecord.conversation_ids
+            : [mailRecord.id || mailRecord]
+
         if (check) {
-            if (!this.selectedMails.includes(mailId)) {
-                this.selectedMails.push(mailId)
+            for (const selectedId of selectedIds) {
+                if (!this.selectedMails.includes(selectedId)) {
+                    this.selectedMails.push(selectedId)
+                }
             }
         }
         else {
-            this.selectedMails = this.selectedMails.filter(item => item !== mailId)
+            this.selectedMails = this.selectedMails.filter(item => !selectedIds.includes(item))
         }
         this.mailState.selectedCount = this.selectedMails.length
     }
@@ -407,19 +488,21 @@ class odooMail extends Component {
         this.setActiveSidebarItem('all_mail');
         this.mailState.mailType = 'all'
         this.resetView()
-        this.mailState.loadMail = await this.orm.searchRead(
+        const loaded = await this.orm.searchRead(
             'email.record',
             [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['type', '=', 'incoming'], ['is_archived', '=', false]],
             this.mailReadFields,
             { order: this.sortOrder }
         )
+        this.mailState.loadMail = this.groupByConversation(loaded)
         if (!this.mailState.loadMail.length) {
-            this.mailState.loadMail = await this.orm.searchRead(
+            const fallbackLoaded = await this.orm.searchRead(
                 'email.record',
                 [...this.accountFilterDomain, ['type', '=', 'incoming'], ['is_archived', '=', false]],
                 this.mailReadFields,
                 { order: this.sortOrder }
             )
+            this.mailState.loadMail = this.groupByConversation(fallbackLoaded)
         }
     }
     /**
@@ -431,22 +514,24 @@ class odooMail extends Component {
         this.resetView()
         const starred = await this.safeModelCall('email.record', 'get_starred_mail', [])
         if (starred !== null) {
-            this.mailState.loadMail = this.filterMailsBySelectedAccount(starred)
+            this.mailState.loadMail = this.groupByConversation(this.filterMailsBySelectedAccount(starred))
             return
         }
-        this.mailState.loadMail = await this.orm.searchRead(
+        const loaded = await this.orm.searchRead(
             'email.record',
             [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['is_starred', '=', true], ['is_archived', '=', false]],
             this.mailReadFields,
             { order: this.sortOrder }
         )
+        this.mailState.loadMail = this.groupByConversation(loaded)
         if (!this.mailState.loadMail.length) {
-            this.mailState.loadMail = await this.orm.searchRead(
+            const fallbackLoaded = await this.orm.searchRead(
                 'email.record',
                 [...this.accountFilterDomain, ['is_starred', '=', true], ['is_archived', '=', false]],
                 this.mailReadFields,
                 { order: this.sortOrder }
             )
+            this.mailState.loadMail = this.groupByConversation(fallbackLoaded)
         }
     }
     /**
@@ -458,22 +543,24 @@ class odooMail extends Component {
         this.resetView()
         const archived = await this.safeModelCall('email.record', 'get_archived_mail', [])
         if (archived !== null) {
-            this.mailState.loadMail = this.filterMailsBySelectedAccount(archived)
+            this.mailState.loadMail = this.groupByConversation(this.filterMailsBySelectedAccount(archived))
             return
         }
-        this.mailState.loadMail = await this.orm.searchRead(
+        const loaded = await this.orm.searchRead(
             'email.record',
             [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['is_archived', '=', true]],
             this.mailReadFields,
             { order: this.sortOrder }
         )
+        this.mailState.loadMail = this.groupByConversation(loaded)
         if (!this.mailState.loadMail.length) {
-            this.mailState.loadMail = await this.orm.searchRead(
+            const fallbackLoaded = await this.orm.searchRead(
                 'email.record',
                 [...this.accountFilterDomain, ['is_archived', '=', true]],
                 this.mailReadFields,
                 { order: this.sortOrder }
             )
+            this.mailState.loadMail = this.groupByConversation(fallbackLoaded)
         }
     }
     /**
@@ -483,19 +570,21 @@ class odooMail extends Component {
         this.setActiveSidebarItem('outbox');
         this.mailState.mailType = "outbox"
         this.resetView()
-        this.mailState.loadMail = await this.orm.searchRead(
+        const loaded = await this.orm.searchRead(
             'email.record',
             [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['type', '=', 'draft'], ['is_archived', '=', false]],
             this.mailReadFields,
             { order: this.sortOrder }
         )
+        this.mailState.loadMail = this.groupByConversation(loaded)
         if (!this.mailState.loadMail.length) {
-            this.mailState.loadMail = await this.orm.searchRead(
+            const fallbackLoaded = await this.orm.searchRead(
                 'email.record',
                 [...this.accountFilterDomain, ['type', '=', 'draft'], ['is_archived', '=', false]],
                 this.mailReadFields,
                 { order: this.sortOrder }
             )
+            this.mailState.loadMail = this.groupByConversation(fallbackLoaded)
         }
     }
     /**
@@ -505,19 +594,21 @@ class odooMail extends Component {
         this.setActiveSidebarItem('sent');
         this.mailState.mailType = 'sent'
         this.resetView()
-        this.mailState.loadMail = await this.orm.searchRead(
+        const loaded = await this.orm.searchRead(
             'email.record',
             [...this.mailboxBaseDomain, ...this.accountFilterDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]],
             this.mailReadFields,
             { order: this.sortOrder }
         )
+        this.mailState.loadMail = this.groupByConversation(loaded)
         if (!this.mailState.loadMail.length) {
-            this.mailState.loadMail = await this.orm.searchRead(
+            const fallbackLoaded = await this.orm.searchRead(
                 'email.record',
                 [...this.accountFilterDomain, ['type', '=', 'outgoing'], ['is_archived', '=', false]],
                 this.mailReadFields,
                 { order: this.sortOrder }
             )
+            this.mailState.loadMail = this.groupByConversation(fallbackLoaded)
         }
     }
     /**

@@ -45,7 +45,7 @@ export class MailBody extends  Component {
      */
     onClickSelect(ev) {
         const checked = ev.target.checked
-        this.props.onSelectMail(this.props.mail.id, checked)
+      this.props.onSelectMail(this.props.mail, checked)
     }
      /**
      * Method to archive the mail.

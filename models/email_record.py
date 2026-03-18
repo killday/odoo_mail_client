@@ -109,6 +109,7 @@ class Email(models.Model):
             'body',
             'date_time',
             'incoming_server_id',
+            'parent_message_id',
             'attachments',
             'is_read',
             'is_starred',
@@ -204,6 +205,13 @@ class Email(models.Model):
                 incoming_server_id = int(incoming_server_id)
             except (TypeError, ValueError):
                 incoming_server_id = False
+
+        parent_message_id = kwargs.get('parent_message_id')
+        if parent_message_id:
+            try:
+                parent_message_id = int(parent_message_id)
+            except (TypeError, ValueError):
+                parent_message_id = False
         
         values = {
             'subject': kwargs.get('subject') or '(No subject)',
@@ -217,6 +225,8 @@ class Email(models.Model):
         }
         if incoming_server_id:
             values['incoming_server_id'] = incoming_server_id
+        if parent_message_id:
+            values['parent_message_id'] = parent_message_id
         email = self.create(values)
         if incoming_server_id:
             email.send_email(forced_server_id=incoming_server_id)

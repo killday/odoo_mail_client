@@ -35,6 +35,9 @@
         </div>
                 <div class="message-subject message-content">
             <span t-att-class="props.mail.is_read ? 'read' : 'unread'" t-out="props.mail.subject"/>
+                        <span t-if="props.mail.conversation_count and props.mail.conversation_count &gt; 1"
+                                    class="message-conversation-count"
+                                    t-out="'(' + props.mail.conversation_count + ')'"/>
         </div>
                 <div class="message-account-tag" t-if="props.mail.incoming_server_id and props.mail.incoming_server_id[1]">
             <span t-out="props.mail.incoming_server_id[1]"/>

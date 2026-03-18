@@ -20,6 +20,7 @@ export class ComposeMail extends Component {
             recipient: this.props.initialRecipient || "",
             cc: this.props.initialCc || "",
             bcc: this.props.initialBcc || "",
+            parentMessageId: this.props.initialParentMessageId || false,
             senderServerId: this.props.initialServerId ? String(this.props.initialServerId) : "",
             senderAccounts: [],
             signatures: [],
@@ -167,6 +168,7 @@ export class ComposeMail extends Component {
             cc,
             bcc,
             senderServerId,
+            parentMessageId,
             content,
             images,
         } = this.state
@@ -179,6 +181,7 @@ export class ComposeMail extends Component {
                     cc,
                     bcc,
                     incoming_server_id: senderServerId ? parseInt(senderServerId, 10) : false,
+                    parent_message_id: parentMessageId || false,
                     content,
                     images,
                 })

@@ -90,6 +90,7 @@ export class MessageView extends  Component {
             initialSubject: `Re: ${subject}`,
             initialRecipient: recipients,
             initialCc: ccRecipients,
+            initialParentMessageId: this.props.mail.id,
             initialServerId: this.props.mail.incoming_server_id && this.props.mail.incoming_server_id[0],
             initialContent: `\n\n${this.stripHtml(body)}`,
             reloadOnSend: true,

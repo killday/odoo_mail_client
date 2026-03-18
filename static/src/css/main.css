@@ -638,6 +638,13 @@ opacity:1;
 	min-width: 0;
 }
 
+.message-conversation-count {
+	margin-left: 8px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: #5f6368;
+}
+
 .message-seperator {
 	vertical-align: middle;
 	line-height: 1;
