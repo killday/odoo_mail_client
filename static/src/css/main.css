@@ -588,7 +588,7 @@ opacity:1;
 
 .message-default {
 	display: grid;
-	grid-template-columns: 240px minmax(320px, 1fr) 240px 150px;
+	grid-template-columns: 240px minmax(320px, 1fr) 190px 150px;
 	column-gap: 8px;
 	align-items: center;
 	font-family: var(--font);
@@ -667,7 +667,7 @@ opacity:1;
 	color: #3559a8;
 	font-size: 0.72rem;
 	font-weight: 600;
-	max-width: 240px;
+	max-width: 190px;
 	min-width: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -687,7 +687,7 @@ opacity:1;
 
 .mail-list-header {
 	display: grid;
-	grid-template-columns: 30px 32px 240px minmax(320px, 1fr) 240px 150px;
+	grid-template-columns: 30px 32px 240px minmax(320px, 1fr) 190px 150px;
 	column-gap: 8px;
 	align-items: center;
 	padding: 12px 4px;
@@ -804,6 +804,23 @@ opacity:1;
 	align-items: center;
 	gap: 4px;
 	margin-left: auto;
+}
+
+#send_message .header {
+	flex-wrap: nowrap;
+	align-items: center;
+}
+
+#send_message .title {
+	margin-bottom: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+#send_message .compose-header-actions .btn,
+#send_message .compose-header-actions .btn-close {
+	flex: 0 0 auto;
 }
 
 .compose-field-label {

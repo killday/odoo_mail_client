@@ -11,10 +11,9 @@
                     <div class="content-group">
                         <div class="header d-flex justify-content-between">
                             <h1 class="title fs-5" id="send_message_label"><t t-out="state.title"/></h1>
-                            <div class="ms-auto">
+                            <div class="compose-header-actions">
                                 <button class="btn" id="minimizeButton"
                                         type="button"
-                                        style="margin-left: 297px; margin-top: -1px;"
                                         t-on-click="minimizeMail">
                                     <i class="fa fa-window-minimize"
                                        aria-hidden="true"/>
@@ -40,6 +39,7 @@
                                 </t>
                             </select>
                             <br/>
+                            <label for="signature_selector" class="compose-field-label">Signature</label>
                             <div class="d-flex align-items-center" t-if="availableSignatures.length">
                                 <select class="form-control"
                                         id="signature_selector"
