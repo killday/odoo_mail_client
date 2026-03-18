@@ -183,6 +183,11 @@ class odooMail extends Component {
             conversationRows.push(latest)
         }
 
+        return this.sortConversationRows(conversationRows)
+    }
+
+    sortConversationRows(rows) {
+        const list = Array.isArray(rows) ? [...rows] : []
         const normalizeComparableValue = (value) => {
             if (Array.isArray(value)) {
                 return String(value[1] || '')
@@ -193,7 +198,7 @@ class odooMail extends Component {
         const direction = this.mailState.sortOrder === 'asc' ? 1 : -1
         const sortBy = this.mailState.sortBy || 'date'
 
-        conversationRows.sort((a, b) => {
+        list.sort((a, b) => {
             if (sortBy === 'date') {
                 if (a.date_time === b.date_time) return 0
                 return (a.date_time < b.date_time ? -1 : 1) * direction
@@ -214,7 +219,7 @@ class odooMail extends Component {
             return 0
         })
 
-        return conversationRows
+        return list
     }
 
     get sortOrder() {
@@ -245,7 +250,7 @@ class odooMail extends Component {
     filterByAccount(accountId) {
         this.mailState.selectedAccountId = accountId || null
         this.resetSortToDefault()
-        this.reloadCurrentFolder(false)
+        this.setMailRows(this.sortConversationRows(this.mailState.loadMail))
     }
 
     onAccountFilterClick(ev) {
