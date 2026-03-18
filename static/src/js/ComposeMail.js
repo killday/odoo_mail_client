@@ -204,22 +204,13 @@ export class ComposeMail extends Component {
      */
     maximizeMail() {
         const mailBody = this.root.el;
-        const TextArea = this.root.el.querySelector("#content");
-
-        if (mailBody.classList.contains('maximized')) {
-            mailBody.style.height = '532px';
-            mailBody.style.right = '5%';
-            mailBody.style.width = '30%';
-            mailBody.style.position = 'fixed';
-            TextArea.style.height = '300px';
-        } else {
-            mailBody.style.height = '900px';
-            mailBody.style.right = '5%';
-            mailBody.style.width = '100%';
-            mailBody.style.position = 'absolute';
-
-        }
         mailBody.classList.toggle('maximized');
+
+        if (!mailBody.classList.contains('maximized')) {
+            // Reset inline dimensions so CSS viewport constraints apply after restore.
+            mailBody.style.width = '';
+            mailBody.style.height = '';
+        }
     }
     /**
      * Method to close the mail composition window.

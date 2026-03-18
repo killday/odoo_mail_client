@@ -442,99 +442,6 @@
 	margin: 0;
 }
 
-.inbox-category {
-	display: -webkit-box;
-	display: -ms-flexbox;
-	display: flex;
-	-webkit-box-orient: horizontal;
-	-webkit-box-direction: normal;
-	-ms-flex-flow: row nowrap;
-	flex-flow: row nowrap;
-	-webkit-box-pack: start;
-	-ms-flex-pack: start;
-	justify-content: flex-start;
-	-webkit-box-align: center;
-	-ms-flex-align: center;
-	align-items: center;
-	height: 56px;
-	color: var(--light-grey);
-	font-family: var(--font-sec);
-	font-weight: 500;
-	font-size: 0.875rem;
-	letter-spacing: 0.25px;
-	white-space: nowrap;
-	border-bottom: 1px solid var(--fill-border);
-	overflow: hidden;
-	margin-right: 16px;
-}
-
-.inbox-category-item {
-	position: relative;
-	display: -webkit-box;
-	display: -ms-flexbox;
-	display: flex;
-	-webkit-box-align: center;
-	-ms-flex-align: center;
-	align-items: center;
-	height: 56px;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	cursor: pointer;
-	-webkit-box-flex: 0;
-	-ms-flex: 0 1 251px;
-	flex: 0 1 251px;
-}
-
-.inbox-category-title {
-	margin-right: 18px;
-	padding: 0;
-}
-
-.inbox-category-icon {
-	margin-left: 16px;
-	margin-right: 12px;
-
-	-webkit-transition: opacity 350ms ease;
-
-	-o-transition: opacity 350ms ease;
-
-	transition: opacity 350ms ease;
-}
-
-.inbox-category-item:hover {
-	background-color: var(--fill-hover);
-	color: var(--black);
-}
-
-.inbox-category-item:hover .inbox-category-icon {
-	opacity: 1;
-}
-
-.inbox-category-item.active {
-	color: #7a539e;
-}
-
-.inbox-category-icon.active {
-	fill: #7a539e;
-	opacity: 1;
-}
-
-#ctg-primary.inbox-category-item.active::before {
-	content: "";
-	position: absolute;
-	display: block;
-	height: 4px;
-	background-color: #7a539e;
-	border-top-left-radius: 4px;
-	border-top-right-radius: 4px;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	margin: 0 8px;
-}
-
 /* ==== MAIL CONTENT ==== */
 
 .mail-content {
@@ -842,6 +749,53 @@ opacity:1;
 	align-items: center;
 	gap: 4px;
 	margin-left: auto;
+}
+
+#send_message.compose-window {
+	position: fixed;
+	bottom: 8px;
+	right: 12px;
+	width: min(720px, calc(100vw - 24px));
+	max-width: calc(100vw - 24px);
+	height: min(640px, calc(100vh - 24px));
+	max-height: calc(100vh - 24px);
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	box-shadow: 0 12px 28px rgb(0 0 0 / 20%);
+	background: #fff;
+	z-index: 1000;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	resize: both;
+}
+
+#send_message.compose-window.maximized {
+	inset: 12px;
+	width: auto;
+	height: auto;
+	max-width: none;
+	max-height: none;
+	resize: none;
+}
+
+#send_message .dialog,
+#send_message .form_submit,
+#send_message .content-group {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+}
+
+#send_message .body {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+}
+
+#send_message .footer {
+	flex: 0 0 auto;
 }
 
 #send_message .header {

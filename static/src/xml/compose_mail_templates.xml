@@ -2,8 +2,7 @@
 <templates id="template" xml:space="preserve">
         <!-- ComposeMail template for composing a new mail -->
     <t t-name="ComposeMail" owl="1">
-        <div class="container" t-ref="root"
-             style="position: fixed; bottom: 3px; right: 5%; width: 30%; border: 1px solid #ccc; z-index: 1000; background: white;"
+        <div class="container compose-window" t-ref="root"
              id="send_message" tabindex="-1"
              aria-labelledby="send_message_label" aria-hidden="true"><br />
             <div class="dialog ">
