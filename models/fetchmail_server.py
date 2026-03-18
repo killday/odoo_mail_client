@@ -64,60 +64,113 @@ class FetchmailServer(models.Model):
         Uses native fetchmail server fetch flow so all supported server types
         (IMAP/POP/provider-specific setups) follow Odoo's standard behavior.
         """
-        servers = self.search([
-            ('active', '=', True),
-            ('object_id', '!=', False),
-        ])
+        all_active_servers = self.search([('active', '=', True)])
+        servers = all_active_servers.filtered(lambda server: bool(server.object_id))
+        skipped_servers = all_active_servers - servers
         fetched_servers = 0
         failed_servers = 0
+        processed_messages = 0
+        created_records = 0
+
+        _logger.info(
+            'Manual refresh requested by uid=%s login=%s. Active servers=%s, eligible=%s, skipped_no_action=%s',
+            self.env.user.id,
+            self.env.user.login,
+            len(all_active_servers),
+            len(servers),
+            len(skipped_servers),
+        )
+        if skipped_servers:
+            _logger.info(
+                'Skipped incoming servers with no action model: %s',
+                [(server.id, server.name, server.server_type) for server in skipped_servers],
+            )
 
         if not servers:
             return {
                 'servers_total': 0,
                 'servers_fetched': 0,
                 'servers_failed': 0,
+                'messages_processed': 0,
+                'records_created': 0,
             }
 
         # Keep server visibility constrained by current user search, but execute
         # the fetch with elevated rights to avoid write-access failures on
         # fetch metadata fields (date/last_* counters).
         for server in self.sudo().browse(servers.ids):
-
             server_ctx = {
                 'fetchmail_cron_running': True,
                 'default_fetchmail_server_id': server.id,
                 'fetchmail_server_id': server.id,
                 'mail_fetchmail_server_id': server.id,
+                'mail_interface_request_uid': self.env.user.id,
             }
+            before_count = self.env['email.record'].sudo().search_count([
+                ('incoming_server_id', '=', server.id),
+                ('type', '=', 'incoming'),
+            ])
             try:
                 # Native method from fetchmail.server supports both IMAP and POP.
-                server.with_context(**server_ctx).fetch_mail()
+                fetch_result = server.with_context(**server_ctx).fetch_mail()
                 fetched_servers += 1
             except TypeError:
                 try:
-                    server.with_context(**server_ctx).fetch_mail(raise_exception=False)
+                    fetch_result = server.with_context(**server_ctx).fetch_mail(raise_exception=False)
                     fetched_servers += 1
                 except Exception:
                     failed_servers += 1
-                    _logger.warning(
-                        'Manual fetch failed on server %s (%s).',
+                    _logger.exception(
+                        'Manual fetch failed on server %s (%s) id=%s.',
                         server.name,
                         server.server_type,
-                        exc_info=True,
+                        server.id,
                     )
+                    continue
             except Exception:
                 failed_servers += 1
-                _logger.warning(
-                    'Manual fetch failed on server %s (%s).',
+                _logger.exception(
+                    'Manual fetch failed on server %s (%s) id=%s.',
                     server.name,
                     server.server_type,
-                    exc_info=True,
+                    server.id,
                 )
+                continue
+
+            after_count = self.env['email.record'].sudo().search_count([
+                ('incoming_server_id', '=', server.id),
+                ('type', '=', 'incoming'),
+            ])
+            server_created = max(after_count - before_count, 0)
+            created_records += server_created
+            if isinstance(fetch_result, int):
+                processed_messages += max(fetch_result, 0)
+
+            _logger.info(
+                'Manual fetch server result id=%s name=%s type=%s result=%s created_incoming=%s',
+                server.id,
+                server.name,
+                server.server_type,
+                fetch_result,
+                server_created,
+            )
+
+        _logger.info(
+            'Manual refresh summary uid=%s: eligible=%s fetched=%s failed=%s processed=%s created=%s',
+            self.env.user.id,
+            len(servers),
+            fetched_servers,
+            failed_servers,
+            processed_messages,
+            created_records,
+        )
 
         return {
             'servers_total': len(servers),
             'servers_fetched': fetched_servers,
             'servers_failed': failed_servers,
+            'messages_processed': processed_messages,
+            'records_created': created_records,
         }
 
     def action_open_fetch_range_wizard(self):

@@ -120,13 +120,21 @@ class Email(models.Model):
     @api.model
     def get_mail_count(self):
         base_domain = self._mail_interface_domain()
-        return {
+        counts = {
             'all_count': self.search_count(base_domain + [('type', '=', 'incoming'), ('is_read', '=', False), ('is_archived', '=', False)]),
             'sent_count': self.search_count(base_domain + [('type', '=', 'outgoing'), ('is_archived', '=', False)]),
             'outbox_count': self.search_count(base_domain + [('type', '=', 'draft'), ('is_archived', '=', False)]),
             'starred_count': self.search_count(base_domain + [('is_starred', '=', True), ('is_archived', '=', False)]),
             'archived_count': self.search_count(base_domain + [('is_archived', '=', True)]),
         }
+        _logger.info(
+            'Inbox visibility uid=%s login=%s domain=%s unread_inbox=%s',
+            self.env.user.id,
+            self.env.user.login,
+            base_domain,
+            counts['all_count'],
+        )
+        return counts
 
     @api.model
     def get_starred_mail(self):
@@ -669,6 +677,20 @@ class Email(models.Model):
             or self.env.context.get('fetchmail_server_id')
             or self.env.context.get('mail_fetchmail_server_id')
         )
+        request_uid = self.env.context.get('mail_interface_request_uid')
+        if request_uid:
+            try:
+                request_uid = int(request_uid)
+            except (TypeError, ValueError):
+                request_uid = False
+        if request_uid:
+            associated_users.append(request_uid)
+            _logger.info(
+                'Incoming mail context linked to requesting uid=%s server_id=%s message_id=%s',
+                request_uid,
+                context_server_id,
+                normalized_message_id,
+            )
 
         if normalized_message_id:
             duplicate_domain = [('external_message_id', '=', normalized_message_id)]
@@ -681,6 +703,13 @@ class Email(models.Model):
                     update_vals['associated_users'] = [(6, 0, list(set(duplicate.associated_users.ids + associated_users)))]
                 if update_vals:
                     duplicate.write(update_vals)
+                _logger.info(
+                    'Duplicate incoming message skipped message_id=%s server_id=%s duplicate_id=%s associated_users=%s',
+                    normalized_message_id,
+                    context_server_id,
+                    duplicate.id,
+                    duplicate.associated_users.ids,
+                )
                 return duplicate.id
 
         if not associated_users and context_server_id:
@@ -698,6 +727,15 @@ class Email(models.Model):
                     associated_users.append(server.create_uid.id)
 
         associated_users = list(set(associated_users))
+        _logger.info(
+            'Incoming message visibility mapping message_id=%s server_id=%s associated_users=%s to=%s cc=%s from=%s',
+            normalized_message_id,
+            context_server_id,
+            associated_users,
+            to_contact_ids,
+            cc_contact_ids,
+            from_contact_ids,
+        )
         received_on_server = self.env.context.get('default_received_on_server')
         if isinstance(received_on_server, str):
             received_on_server = fields.Datetime.to_datetime(received_on_server)
@@ -727,6 +765,13 @@ class Email(models.Model):
             'incoming_server_id': context_server_id,
         }
         res = super(Email, self).message_new(msg, custom_values=vals)
+        _logger.info(
+            'Incoming message created record_id=%s message_id=%s server_id=%s associated_users=%s',
+            res,
+            normalized_message_id,
+            context_server_id,
+            associated_users,
+        )
         return res
 
     def unlink(self):
