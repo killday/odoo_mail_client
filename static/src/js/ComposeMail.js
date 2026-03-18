@@ -131,33 +131,34 @@ export class ComposeMail extends Component {
         this.action.doAction('odoo_mail_client.action_mail_signatures')
     }
 
-    async imageReader(file) {
+    async attachmentReader(file) {
         const fileReader = new FileReader();
+        fileReader.onerror = () => {
+            console.warn(`Failed to read attachment: ${file.name}`)
+        }
         fileReader.onload = (event) => {
-            const imageDataUrl = event.target.result; // Data URL of the image
-            if (imageDataUrl) {
-                this.state.images.push({name: file.name, image_uri: imageDataUrl.split(",")[1]})
+            const fileDataUrl = event.target.result;
+            if (fileDataUrl) {
+                const content = String(fileDataUrl).split(",")[1]
+                if (!content) {
+                    return
+                }
+                this.state.images.push({
+                    name: file.name,
+                    image_uri: content,
+                    content,
+                    mimetype: file.type || 'application/octet-stream',
+                })
             }
         };
         fileReader.readAsDataURL(file);
 
     }
     contentHandler(file) {
-    switch (file.type) {
-        case "image/jpeg":
-        case "image/png":
-        case "image/gif":
-        case "image/svg+xml":
-        case "image/webp":
-            return this.imageReader(file);
-        case "application/pdf":
-            return this.imageReader(file);
-        case "text/csv":
-            return this.csvReader(file);
-        default:
-            console.warn(`Unsupported file type: ${file.type}`);
+        // Read any selected file as base64 so business documents and other binary
+        // formats can be attached like a standard email client.
+        return this.attachmentReader(file)
     }
-}
     /**
      * Method to send the composed mail.
      */
@@ -184,6 +185,7 @@ export class ComposeMail extends Component {
                     parent_message_id: parentMessageId || false,
                     content,
                     images,
+                    attachments: images,
                 })
             } catch (error) {
                 sendMail = []

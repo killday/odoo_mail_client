@@ -189,15 +189,18 @@ class Email(models.Model):
         if not recipient:
             raise exceptions.UserError(_('Recipient is required before sending.'))
 
-        image_payloads = kwargs.get('images') or []
+        attachment_payloads = kwargs.get('attachments')
+        if attachment_payloads is None:
+            attachment_payloads = kwargs.get('images') or []
         attachment_ids = []
-        for image_data in image_payloads:
-            content = image_data.get('image_uri')
+        for attachment_data in attachment_payloads:
+            content = attachment_data.get('content') or attachment_data.get('image_uri')
             if not content:
                 continue
             attachment = self.env['ir.attachment'].sudo().create({
-                'name': image_data.get('name') or 'attachment',
+                'name': attachment_data.get('name') or 'attachment',
                 'datas': content,
+                'mimetype': attachment_data.get('mimetype') or False,
                 'res_model': 'email.record',
             })
             attachment_ids.append(attachment.id)

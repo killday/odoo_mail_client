@@ -56,7 +56,8 @@
                                                  t-on-click="onClickImage">
                                    <i class="fa fa-download"/>
                                 </div>
-                                <img class="img-fluid" style="width: 300px;height: 100px" t-att-src="'data:image/png;base64,'+data.datas"
+                                          <img class="img-fluid" style="width: 300px;height: 100px"
+                                              t-att-src="'data:' + (data.mimetype or 'application/octet-stream') + ';base64,' + data.datas"
                                      alt=""/>
                                 </div>
                         </div>
@@ -80,6 +81,30 @@
                                             t-on-click="onClickImage">
                                                 <i class="text-black fa fa-download" aria-hidden="true"/>
                               </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div t-if="data.mimetype != 'image/jpeg' and data.mimetype != 'image/png' and data.mimetype != 'image/gif' and data.mimetype != 'image/svg+xml' and data.mimetype != 'image/webp' and data.mimetype != 'application/pdf'">
+                        <div class="row bg-secondary">
+                            <div class="d-flex flex-row">
+                                <div>
+                                    <img class="p-2" style="width: 45px; height:45px"
+                                         src="/odoo_mail_client/static/src/img/attachment.svg"
+                                         alt="Attachment"
+                                    />
+                                </div>
+                                <div>
+                                    <p class="mt-2 mb-0" t-out="data.name or 'Attachment'"/>
+                                    <small class="text-muted" t-out="data.mimetype or 'application/octet-stream'"/>
+                                </div>
+                                <div style="width: 50px"/>
+                                <div>
+                                    <button type="download" class="btn mt-3"
+                                            t-att-data-attachment-id="data.attachment"
+                                            t-on-click="onClickImage">
+                                        <i class="text-black fa fa-download" aria-hidden="true"/>
+                                    </button>
                                 </div>
                             </div>
                         </div>
