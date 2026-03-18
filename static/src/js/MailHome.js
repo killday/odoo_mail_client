@@ -245,7 +245,7 @@ class odooMail extends Component {
     filterByAccount(accountId) {
         this.mailState.selectedAccountId = accountId || null
         this.resetSortToDefault()
-        this.reloadCurrentFolder()
+        this.reloadCurrentFolder(false)
     }
 
     onAccountFilterClick(ev) {
@@ -556,24 +556,24 @@ class odooMail extends Component {
         this.getCount()
     }
 
-    async reloadCurrentFolder() {
+    async reloadCurrentFolder(resetSort = true) {
         if (this.mailState.mailType === 'starred') {
-            await this.starredMail()
+            await this.starredMail(resetSort)
             return
         }
         if (this.mailState.mailType === 'archive') {
-            await this.archivedMail()
+            await this.archivedMail(resetSort)
             return
         }
         if (this.mailState.mailType === 'outbox') {
-            await this.outboxMailView()
+            await this.outboxMailView(resetSort)
             return
         }
         if (this.mailState.mailType === 'sent') {
-            await this.sentMail()
+            await this.sentMail(resetSort)
             return
         }
-        await this.allMailView()
+        await this.allMailView(resetSort)
     }
     /**
      * Getter method to get the mail type.
@@ -656,10 +656,12 @@ class odooMail extends Component {
     /**
      * Method to view all mails.
      */
-    async allMailView() {
+    async allMailView(resetSort = true) {
         this.setActiveSidebarItem('all_mail');
         this.mailState.mailType = 'all'
-        this.resetSortToDefault()
+        if (resetSort) {
+            this.resetSortToDefault()
+        }
         this.resetView()
         const loaded = await this.orm.searchRead(
             'email.record',
@@ -681,10 +683,12 @@ class odooMail extends Component {
     /**
      * Method to view starred mails.
      */
-    async starredMail() {
+    async starredMail(resetSort = true) {
         this.setActiveSidebarItem('sent-mail');
         this.mailState.mailType = "starred"
-        this.resetSortToDefault()
+        if (resetSort) {
+            this.resetSortToDefault()
+        }
         this.resetView()
         const starred = await this.safeModelCall('email.record', 'get_starred_mail', [])
         if (starred !== null) {
@@ -711,10 +715,12 @@ class odooMail extends Component {
     /**
      * Method to view archived mails.
      */
-    async archivedMail() {
+    async archivedMail(resetSort = true) {
         this.setActiveSidebarItem('archieved-mail');
         this.mailState.mailType = 'archive'
-        this.resetSortToDefault()
+        if (resetSort) {
+            this.resetSortToDefault()
+        }
         this.resetView()
         const archived = await this.safeModelCall('email.record', 'get_archived_mail', [])
         if (archived !== null) {
@@ -741,10 +747,12 @@ class odooMail extends Component {
     /**
      * Method to view outbox mails.
      */
-    async outboxMailView() {
+    async outboxMailView(resetSort = true) {
         this.setActiveSidebarItem('outbox');
         this.mailState.mailType = "outbox"
-        this.resetSortToDefault()
+        if (resetSort) {
+            this.resetSortToDefault()
+        }
         this.resetView()
         const loaded = await this.orm.searchRead(
             'email.record',
@@ -766,10 +774,12 @@ class odooMail extends Component {
     /**
      * Method to view sent mails.
      */
-    async sentMail() {
+    async sentMail(resetSort = true) {
         this.setActiveSidebarItem('sent');
         this.mailState.mailType = 'sent'
-        this.resetSortToDefault()
+        if (resetSort) {
+            this.resetSortToDefault()
+        }
         this.resetView()
         const loaded = await this.orm.searchRead(
             'email.record',
