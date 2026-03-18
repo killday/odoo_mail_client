@@ -64,13 +64,24 @@ class FetchmailServer(models.Model):
         Uses native fetchmail server fetch flow so all supported server types
         (IMAP/POP/provider-specific setups) follow Odoo's standard behavior.
         """
-        servers = self.search([('active', '=', True)])
+        servers = self.search([
+            ('active', '=', True),
+            ('object_id', '!=', False),
+        ])
         fetched_servers = 0
         failed_servers = 0
 
-        for server in servers:
-            if not server.object_id:
-                continue
+        if not servers:
+            return {
+                'servers_total': 0,
+                'servers_fetched': 0,
+                'servers_failed': 0,
+            }
+
+        # Keep server visibility constrained by current user search, but execute
+        # the fetch with elevated rights to avoid write-access failures on
+        # fetch metadata fields (date/last_* counters).
+        for server in self.sudo().browse(servers.ids):
 
             server_ctx = {
                 'fetchmail_cron_running': True,

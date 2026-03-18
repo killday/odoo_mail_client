@@ -42,6 +42,7 @@ class odooMail extends Component {
         this.dialogService = useService("dialog")
         this.root = useRef('root');
         this.action = useService('action')
+        this.notification = useService('notification')
         this.orm = useService('orm')
         this.selectedMails = []
         this.autoRefreshTimer = null
@@ -614,13 +615,28 @@ class odooMail extends Component {
     }
 
     async refreshNow() {
+        let fetchResult = null
         try {
-            await this.orm.call('fetchmail.server', 'action_fetch_now_for_user', [])
+            fetchResult = await this.orm.call('fetchmail.server', 'action_fetch_now_for_user', [])
         } catch (error) {
-            // Keep UI usable even when one server fails.
+            this.notification.add('Failed to pull from mail servers. Showing latest available data.', {
+                type: 'warning',
+            })
         }
         await this.reloadCurrentFolder()
         await this.getCount()
+
+        if (fetchResult) {
+            const total = fetchResult.servers_total || 0
+            const fetched = fetchResult.servers_fetched || 0
+            const failed = fetchResult.servers_failed || 0
+            const message = total
+                ? `Pulled mail from ${fetched}/${total} account(s).${failed ? ` ${failed} failed.` : ''}`
+                : 'No active incoming server is configured for pull.'
+            this.notification.add(message, {
+                type: failed ? 'warning' : 'success',
+            })
+        }
     }
     /**
      * Method to delete selected mails.
