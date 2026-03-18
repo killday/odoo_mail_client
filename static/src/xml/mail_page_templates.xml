@@ -198,6 +198,10 @@
                     </div>
                     <div class="inbox-menu-pagination">
                         <span t-out="mailState.loadMail.length"/> messages
+                        <span t-if="mailState.selectedCount"
+                              class="selected-count-indicator">
+                            • <t t-out="mailState.selectedCount"/> selected
+                        </span>
                     </div>
                 </div>
                 <div class="inbox-container">
