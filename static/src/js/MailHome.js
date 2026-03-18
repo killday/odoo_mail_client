@@ -277,7 +277,7 @@ class odooMail extends Component {
             this.mailState.sortOrder = 'desc'
         }
         
-        this.reloadCurrentFolder()
+        this.reloadCurrentFolder(false)
     }
 
     filterMailsBySelectedAccount(mails) {
