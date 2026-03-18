@@ -13,6 +13,7 @@ export class ComposeMail extends Component {
         this.action = useService('action')
         this.dialog = useService('dialog')
         this.hasInitialContent = Boolean(this.props.initialContent)
+        this.baseContent = this.props.initialContent || ""
         this.state = useState({
             title: this.props.title || "New Message",
             subject: this.props.initialSubject || "",
@@ -23,7 +24,7 @@ export class ComposeMail extends Component {
             senderAccounts: [],
             signatures: [],
             selectedSignatureId: "",
-            lastAppliedSignature: "",
+            contentTouched: false,
             content: this.props.initialContent || "",
             images: [],
             originalHeight: null,
@@ -60,7 +61,7 @@ export class ComposeMail extends Component {
                 this.state.signatures = []
             }
 
-            this.selectDefaultSignature(!this.hasInitialContent)
+            this.selectDefaultSignature(true)
         })
 
     }
@@ -83,6 +84,9 @@ export class ComposeMail extends Component {
         const signatures = this.availableSignatures
         if (!signatures.length) {
             this.state.selectedSignatureId = ""
+            if (applyToContent && !this.state.contentTouched) {
+                this.state.content = this.hasInitialContent ? this.baseContent : ""
+            }
             return
         }
         const defaultSignature = signatures.find((signature) => signature.is_default) || signatures[0]
@@ -93,32 +97,33 @@ export class ComposeMail extends Component {
     }
 
     applySignatureBody(signatureBody) {
-        const normalizedBody = signatureBody || ''
-        if (this.state.lastAppliedSignature) {
-            const previousSignatureBlock = `\n\n${this.state.lastAppliedSignature}`
-            if ((this.state.content || '').endsWith(previousSignatureBlock)) {
-                this.state.content = this.state.content.slice(0, -previousSignatureBlock.length)
-            }
-        }
-        if (!normalizedBody) {
-            this.state.lastAppliedSignature = ''
+        if (this.state.contentTouched) {
             return
         }
-        const prefix = this.state.content ? '\n\n' : ''
-        this.state.content = `${this.state.content || ''}${prefix}${normalizedBody}`
-        this.state.lastAppliedSignature = normalizedBody
+        const normalizedBody = signatureBody || ''
+        if (this.hasInitialContent) {
+            // For reply/forward, keep quoted content and insert signature block above it.
+            this.state.content = normalizedBody
+                ? `${normalizedBody}\n\n${this.baseContent}`
+                : this.baseContent
+            return
+        }
+        // For new email, place signature at the bottom with space to type above.
+        this.state.content = normalizedBody ? `\n\n${normalizedBody}` : ''
     }
 
     onSenderAccountChange() {
-        this.selectDefaultSignature(!this.hasInitialContent)
+        this.selectDefaultSignature(true)
     }
 
     onSignatureChange(ev) {
         this.state.selectedSignatureId = ev.currentTarget.value || ''
         const signature = this.availableSignatures.find((item) => String(item.id) === this.state.selectedSignatureId)
-        if (signature && !this.hasInitialContent) {
-            this.applySignatureBody(signature.body || '')
-        }
+        this.applySignatureBody(signature ? (signature.body || '') : '')
+    }
+
+    onContentInput() {
+        this.state.contentTouched = true
     }
 
     openSignatureManager() {

@@ -587,11 +587,9 @@ opacity:1;
 }
 
 .message-default {
-	display: -webkit-box;
-	display: -ms-flexbox;
-	display: flex;
-	-webkit-box-align: center;
-	-ms-flex-align: center;
+	display: grid;
+	grid-template-columns: 240px minmax(320px, 1fr) 240px 150px;
+	column-gap: 8px;
 	align-items: center;
 	font-family: var(--font);
 	color: var(--light-grey);
@@ -626,16 +624,10 @@ opacity:1;
 
 .message-sender {
 	color: var(--black);
-	padding-right: 2rem;
 	overflow: hidden;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
-
-	-webkit-box-flex: 0;
-
-	-ms-flex: 0 0 260px;
-
-	flex: 0 0 260px;
+	min-width: 0;
 }
 
 .message-subject {
@@ -643,12 +635,7 @@ opacity:1;
 	overflow: hidden;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
-
-	-webkit-box-flex: 0;
-
-	-ms-flex: 0 0 400px;
-    width: 400px;
-	flex: 0 0 400px;
+	min-width: 0;
 }
 
 .message-seperator {
@@ -673,44 +660,37 @@ opacity:1;
 }
 
 .message-account-tag {
-	margin: 0 8px;
+	margin: 0;
 	padding: 2px 8px;
 	border-radius: 999px;
 	background: #eef3fd;
 	color: #3559a8;
 	font-size: 0.72rem;
 	font-weight: 600;
-	max-width: 160px;
+	max-width: 240px;
+	min-width: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
 .message-date {
-	position: relative;
 	color: var(--light-grey);
 	height: 40px;
-	right: 0;
-	top: 0;
 	font-size: 0.75rem;
 	text-align: right;
 	letter-spacing: 0.15px;
-	margin-right: 8px;
-	z-index: 1;
-
-	-webkit-box-flex: 0;
-
-	-ms-flex: 0 120px;
-
-	flex: 0 120px;
+	justify-content: flex-end;
 }
 
 /* ==== MAIL LIST HEADER ==== */
 
 .mail-list-header {
-	display: flex;
+	display: grid;
+	grid-template-columns: 30px 32px 240px minmax(320px, 1fr) 240px 150px;
+	column-gap: 8px;
 	align-items: center;
-	padding: 12px 8px;
+	padding: 12px 4px;
 	border-bottom: 1px solid var(--fill-border);
 	background-color: #fafafa;
 	font-weight: 600;
@@ -719,7 +699,6 @@ opacity:1;
 	position: sticky;
 	top: 0;
 	z-index: 10;
-	gap: 8px;
 }
 
 .mail-header-checkbox {
@@ -732,7 +711,6 @@ opacity:1;
 }
 
 .mail-header-sender {
-	flex: 0 0 260px;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -747,7 +725,6 @@ opacity:1;
 }
 
 .mail-header-subject {
-	flex: 0 0 400px;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -761,12 +738,7 @@ opacity:1;
 	background-color: #efefef;
 }
 
-.mail-header-body {
-	flex: 1 1 auto;
-}
-
 .mail-header-account {
-	flex: 0 0 140px;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -781,7 +753,6 @@ opacity:1;
 }
 
 .mail-header-date {
-	flex: 0 0 120px;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -789,6 +760,7 @@ opacity:1;
 	user-select: none;
 	padding: 0 8px;
 	text-align: right;
+	justify-content: flex-end;
 	border-radius: 4px;
 }
 
@@ -821,6 +793,25 @@ opacity:1;
 	flex: 0 0 32px;
 	display: flex;
 	align-items: center;
+}
+
+.inbox-message-item .message-default {
+	width: 100%;
+}
+
+.compose-header-actions {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: auto;
+}
+
+.compose-field-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--grey);
+	display: block;
+	margin-bottom: 4px;
 }
 
 .message-default-unread {

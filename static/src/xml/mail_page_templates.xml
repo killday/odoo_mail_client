@@ -232,7 +232,6 @@
                                     <span>Subject</span>
                                     <span t-if="mailState.sortBy === 'subject'" t-att-class="'sort-indicator ' + mailState.sortOrder"/>
                                 </div>
-                                <div class="mail-header-body"></div>
                                 <div class="mail-header-account" t-on-click="onHeaderClick" data-sort="account">
                                     <span>Account</span>
                                     <span t-if="mailState.sortBy === 'account'" t-att-class="'sort-indicator ' + mailState.sortOrder"/>

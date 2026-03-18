@@ -86,6 +86,7 @@
                             <br/>
                             <textarea class="dd form-control" id="content"
                                       rows="5" t-model="state.content"
+                                      t-on-input="onContentInput"
                                       style="height:200px">
 
                             </textarea>
