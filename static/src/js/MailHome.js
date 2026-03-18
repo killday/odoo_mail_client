@@ -48,6 +48,7 @@ class odooMail extends Component {
         this.autoRefreshTimer = null
         this.autoRefreshInFlight = false
         this.autoRefreshIntervalMs = 60000
+        this.lastKnownInboxUnread = null
         onMounted(() => {
             this.allMailView()
             this.startAutoRefresh()
@@ -342,6 +343,31 @@ class odooMail extends Component {
     async getCount() {
         const counts = await this.safeModelCall('email.record', 'get_mail_count', [])
         this.mailState.getCount = counts || await this.computeCountsFallback()
+
+        // Initialize baseline once so first load does not show a false notification.
+        if (this.lastKnownInboxUnread === null) {
+            this.lastKnownInboxUnread = this.mailState.getCount.all_count || 0
+        }
+    }
+
+    notifyIfNewInboxEmails() {
+        const current = this.mailState.getCount.all_count || 0
+        if (this.lastKnownInboxUnread === null) {
+            this.lastKnownInboxUnread = current
+            return
+        }
+
+        const diff = current - this.lastKnownInboxUnread
+        this.lastKnownInboxUnread = current
+
+        if (diff > 0) {
+            const msg = diff === 1
+                ? '1 new email received.'
+                : `${diff} new emails received.`
+            this.notification.add(msg, {
+                type: 'info',
+            })
+        }
     }
 
     startAutoRefresh() {
@@ -370,6 +396,7 @@ class odooMail extends Component {
         try {
             // Always refresh counters cheaply.
             await this.getCount()
+            this.notifyIfNewInboxEmails()
 
             // Reload inbox list only in low-risk context to avoid disruptive resets.
             if (
@@ -610,6 +637,7 @@ class odooMail extends Component {
     }
 
     async refreshNow() {
+        const previousUnread = this.mailState.getCount.all_count || 0
         let fetchResult = null
         try {
             fetchResult = await this.orm.call('fetchmail.server', 'action_fetch_now_for_user', [])
@@ -620,13 +648,16 @@ class odooMail extends Component {
         }
         await this.reloadCurrentFolder()
         await this.getCount()
+        this.notifyIfNewInboxEmails()
 
         if (fetchResult) {
             const total = fetchResult.servers_total || 0
             const fetched = fetchResult.servers_fetched || 0
             const failed = fetchResult.servers_failed || 0
+            const currentUnread = this.mailState.getCount.all_count || 0
+            const newUnread = Math.max(0, currentUnread - previousUnread)
             const message = total
-                ? `Pulled mail from ${fetched}/${total} account(s).${failed ? ` ${failed} failed.` : ''}`
+                ? `Pulled mail from ${fetched}/${total} account(s).${failed ? ` ${failed} failed.` : ''}${newUnread ? ` ${newUnread} new.` : ''}`
                 : 'No active incoming server is configured for pull.'
             this.notification.add(message, {
                 type: failed ? 'warning' : 'success',
