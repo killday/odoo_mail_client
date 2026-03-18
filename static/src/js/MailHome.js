@@ -210,8 +210,14 @@ class odooMail extends Component {
         return [['incoming_server_id', '=', this.mailState.selectedAccountId]]
     }
 
+    resetSortToDefault() {
+        this.mailState.sortBy = 'date'
+        this.mailState.sortOrder = 'desc'
+    }
+
     filterByAccount(accountId) {
         this.mailState.selectedAccountId = accountId || null
+        this.resetSortToDefault()
         this.reloadCurrentFolder()
     }
 
@@ -539,6 +545,7 @@ class odooMail extends Component {
     async allMailView() {
         this.setActiveSidebarItem('all_mail');
         this.mailState.mailType = 'all'
+        this.resetSortToDefault()
         this.resetView()
         const loaded = await this.orm.searchRead(
             'email.record',
@@ -563,6 +570,7 @@ class odooMail extends Component {
     async starredMail() {
         this.setActiveSidebarItem('sent-mail');
         this.mailState.mailType = "starred"
+        this.resetSortToDefault()
         this.resetView()
         const starred = await this.safeModelCall('email.record', 'get_starred_mail', [])
         if (starred !== null) {
@@ -592,6 +600,7 @@ class odooMail extends Component {
     async archivedMail() {
         this.setActiveSidebarItem('archieved-mail');
         this.mailState.mailType = 'archive'
+        this.resetSortToDefault()
         this.resetView()
         const archived = await this.safeModelCall('email.record', 'get_archived_mail', [])
         if (archived !== null) {
@@ -621,6 +630,7 @@ class odooMail extends Component {
     async outboxMailView() {
         this.setActiveSidebarItem('outbox');
         this.mailState.mailType = "outbox"
+        this.resetSortToDefault()
         this.resetView()
         const loaded = await this.orm.searchRead(
             'email.record',
@@ -645,6 +655,7 @@ class odooMail extends Component {
     async sentMail() {
         this.setActiveSidebarItem('sent');
         this.mailState.mailType = 'sent'
+        this.resetSortToDefault()
         this.resetView()
         const loaded = await this.orm.searchRead(
             'email.record',
