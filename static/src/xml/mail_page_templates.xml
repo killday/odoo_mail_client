@@ -245,7 +245,6 @@
                             <!-- MAIL LIST HEADER -->
                             <div class="mail-list-header">
                                 <div class="mail-header-checkbox">
-                                    <input type="checkbox" class="checkbox-header" disabled="disabled"/>
                                 </div>
                                 <div class="mail-header-star"></div>
                                 <div class="mail-header-sender" t-on-click="onHeaderClick" data-sort="sender">
