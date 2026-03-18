@@ -9,6 +9,7 @@
                    <input type="checkbox" id="checkbox"
                           data-id="' + name.id + '"
                           class="checkbox checkbox_func mail_check_box"
+                         t-att-checked="props.isMailSelected(props.mail)"
                           t-on-click="onClickSelect">
                    </input>
                </button>

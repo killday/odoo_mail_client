@@ -117,16 +117,14 @@ class odooMail extends Component {
     prevPage() {
         if (this.mailState.page > 1) {
             this.mailState.page -= 1
-            this.clearSelectionState()
-            this.env.bus.trigger("SELECT:ALL", { checked: false })
+            this.syncSelectAllState()
         }
     }
 
     nextPage() {
         if (this.mailState.page < this.totalPages) {
             this.mailState.page += 1
-            this.clearSelectionState()
-            this.env.bus.trigger("SELECT:ALL", { checked: false })
+            this.syncSelectAllState()
         }
     }
 
@@ -369,6 +367,12 @@ class odooMail extends Component {
     get mailProps() {
         return {
             onSelectMail: this.onSelectMail.bind(this),
+            isMailSelected: (mail) => {
+                const ids = mail && mail.conversation_ids && mail.conversation_ids.length
+                    ? mail.conversation_ids
+                    : [mail.id]
+                return ids.every((id) => this.selectedMails.includes(id))
+            },
             starMail: this.starMail.bind(this),
             openMail: this.openMail.bind(this),
             markRead: this.markRead.bind(this),
