@@ -24,7 +24,6 @@ export class MailBody extends  Component {
             return
           }
           checkbox.checked = checked
-            this.props.onSelectMail(this.props.mail, checked)
         }
         this.env.bus.addEventListener("SELECT:ALL", this._onSelectAll)
         onWillUnmount(() => {

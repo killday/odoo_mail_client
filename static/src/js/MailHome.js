@@ -357,6 +357,23 @@ class odooMail extends Component {
      */
     onClickSelectAll(ev) {
         const checked = ev.target.checked
+        const pageIds = this.paginatedMails.flatMap((mail) =>
+            mail && mail.conversation_ids && mail.conversation_ids.length
+                ? mail.conversation_ids
+                : [mail.id]
+        )
+
+        if (checked) {
+            for (const id of pageIds) {
+                if (!this.selectedMails.includes(id)) {
+                    this.selectedMails.push(id)
+                }
+            }
+        } else {
+            this.selectedMails = this.selectedMails.filter((id) => !pageIds.includes(id))
+        }
+
+        this.mailState.selectedCount = this.selectedMails.length
         this.mailState.selectAllChecked = checked
         this.env.bus.trigger("SELECT:ALL", { checked })
     }
