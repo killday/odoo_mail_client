@@ -1036,8 +1036,8 @@ opacity:1;
 	.body-wrapper {
 		grid-template-columns: 1fr;
 		grid-template-rows: auto auto minmax(0, 1fr);
-		min-height: 100vh;
-		height: auto;
+		height: 100dvh;
+		overflow: hidden;
 	}
 
 	.head {
@@ -1126,19 +1126,22 @@ opacity:1;
 	.mail_inbox {
 		grid-column: 1 / -1;
 		grid-row: 3 / 4;
-		height: auto;
+		height: 100%;
 		min-height: 0;
-		overflow: visible;
+		overflow: hidden;
 	}
 
 	.inbox-container {
-		height: auto;
+		height: 100%;
 		min-height: 0;
+		overflow: hidden;
 	}
 
 	.mail-content {
-		overflow-y: visible;
+		overflow-y: auto;
 		overflow-x: hidden;
+		-webkit-overflow-scrolling: touch;
+		touch-action: pan-y;
 	}
 
 	.inbox-menu {
