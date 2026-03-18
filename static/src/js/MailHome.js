@@ -248,16 +248,16 @@ class odooMail extends Component {
         this.mailState.sortOrder = 'desc'
     }
 
-    filterByAccount(accountId) {
+    async filterByAccount(accountId) {
         this.mailState.selectedAccountId = accountId || null
         this.resetSortToDefault()
-        this.reloadCurrentFolder(false)
+        await this.reloadCurrentFolder(true)
     }
 
-    onAccountFilterClick(ev) {
+    async onAccountFilterClick(ev) {
         const rawId = ev.currentTarget.dataset.accountId
         const accountId = rawId ? parseInt(rawId, 10) : null
-        this.filterByAccount(Number.isNaN(accountId) ? null : accountId)
+        await this.filterByAccount(Number.isNaN(accountId) ? null : accountId)
     }
 
     onHeaderClick(ev) {
