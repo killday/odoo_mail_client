@@ -457,7 +457,7 @@
 }
 
 .message {
-	padding: 8px 8px 24px 0;
+	padding: 8px 12px 24px 12px;
 	overflow-wrap: anywhere;
 }
 
@@ -1036,7 +1036,8 @@ opacity:1;
 	.body-wrapper {
 		grid-template-columns: 1fr;
 		grid-template-rows: auto auto minmax(0, 1fr);
-		height: 100vh;
+		min-height: 100vh;
+		height: auto;
 	}
 
 	.head {
@@ -1127,11 +1128,17 @@ opacity:1;
 		grid-row: 3 / 4;
 		height: auto;
 		min-height: 0;
+		overflow: visible;
 	}
 
 	.inbox-container {
 		height: auto;
 		min-height: 0;
+	}
+
+	.mail-content {
+		overflow-y: visible;
+		overflow-x: hidden;
 	}
 
 	.inbox-menu {
@@ -1254,7 +1261,7 @@ opacity:1;
 	}
 
 	.message {
-		padding: 6px 4px 16px 0;
+		padding: 6px 8px 16px 8px;
 	}
 }
 
