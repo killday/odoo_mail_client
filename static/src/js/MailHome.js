@@ -250,7 +250,7 @@ class odooMail extends Component {
     filterByAccount(accountId) {
         this.mailState.selectedAccountId = accountId || null
         this.resetSortToDefault()
-        this.setMailRows(this.sortConversationRows(this.mailState.loadMail))
+        this.reloadCurrentFolder(false)
     }
 
     onAccountFilterClick(ev) {
@@ -262,16 +262,6 @@ class odooMail extends Component {
     onHeaderClick(ev) {
         const sortField = ev.currentTarget.dataset.sort
         if (!sortField) return
-
-        // Map UI sort names to ORM field names
-        const sortFieldMap = {
-            'sender': 'sender',
-            'subject': 'subject',
-            'account': 'incoming_server_id',
-            'date': 'date_time'
-        }
-        
-        const ormField = sortFieldMap[sortField]
         
         if (this.mailState.sortBy === sortField) {
             // Toggle sort order
@@ -282,7 +272,7 @@ class odooMail extends Component {
             this.mailState.sortOrder = 'desc'
         }
         
-        this.reloadCurrentFolder(false)
+        this.setMailRows(this.sortConversationRows(this.mailState.loadMail))
     }
 
     filterMailsBySelectedAccount(mails) {
@@ -388,7 +378,7 @@ class odooMail extends Component {
                 && this.mailState.page === 1
                 && this.mailState.selectedCount === 0
             ) {
-                await this.allMailView()
+                await this.allMailView(false)
             }
         } finally {
             this.autoRefreshInFlight = false
