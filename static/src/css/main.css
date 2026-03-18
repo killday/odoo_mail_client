@@ -539,7 +539,9 @@
 
 .mail-content {
 	display: block;
-	margin-bottom: 16px;
+	margin-bottom: 0;
+	padding-bottom: 18px;
+	box-sizing: border-box;
 	flex: 1 1 auto;
 	min-height: 0;
 	overflow-y: auto;
