@@ -722,9 +722,9 @@ class odooMail extends Component {
             name: "Calender",
             type: 'ir.actions.act_window',
             res_model: 'calendar.event',
-            view_mode: 'calendar,tree',
+            view_mode: 'calendar,list',
             view_type: 'calendar',
-            views: [[false, 'calendar'], [false, 'tree']],
+            views: [[false, 'calendar'], [false, 'list']],
             target: 'current',
         });
     }
@@ -736,9 +736,9 @@ class odooMail extends Component {
             name: "Contacts",
             type: 'ir.actions.act_window',
             res_model: 'res.partner',
-            view_mode: 'kanban,form,tree,activity',
+            view_mode: 'kanban,form,list,activity',
             view_type: 'kanban',
-            views: [[false, 'kanban'], [false, 'form'], [false, 'tree'], [false, 'activity']],
+            views: [[false, 'kanban'], [false, 'form'], [false, 'list'], [false, 'activity']],
             target: 'current',
         });
     }
