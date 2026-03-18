@@ -324,7 +324,7 @@
 .mail_inbox {
 	grid-column: 2 / 3;
 	grid-row: 2 / -1;
-
+	height: calc(100vh - 64px);
 	overflow: hidden;
 }
 
@@ -360,6 +360,8 @@
 	-webkit-box-direction: normal;
 	-ms-flex-flow: column;
 	flex-flow: column;
+	height: calc(100vh - 112px);
+	min-height: 0;
 }
 
 .inbox-menu-group {
@@ -538,9 +540,16 @@
 .mail-content {
 	display: block;
 	margin-bottom: 16px;
-	overflow: hidden;
-	overflow-y: scroll;
-	height: 740px;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overflow-x: hidden;
+	height: auto;
+}
+
+.message {
+	padding: 8px 8px 24px 0;
+	overflow-wrap: anywhere;
 }
 
 .mail {
