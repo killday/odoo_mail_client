@@ -657,6 +657,14 @@ opacity:1;
 	color: #5f6368;
 }
 
+.message-attachment-icon {
+	margin-left: 8px;
+	font-size: 0.82rem;
+	color: #6b7280;
+	display: inline-flex;
+	align-items: center;
+}
+
 .message-seperator {
 	vertical-align: middle;
 	line-height: 1;

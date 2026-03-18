@@ -38,6 +38,12 @@
                         <span t-if="props.mail.conversation_count and props.mail.conversation_count &gt; 1"
                                     class="message-conversation-count"
                                     t-out="'(' + props.mail.conversation_count + ')'"/>
+            <span t-if="props.mail.attachments and props.mail.attachments.length"
+                  class="message-attachment-icon"
+                  title="Has attachments"
+                  aria-label="Has attachments">
+                <i class="fa fa-paperclip"/>
+            </span>
         </div>
                 <div class="message-account-tag" t-if="props.mail.incoming_server_id and props.mail.incoming_server_id[1]">
             <span t-out="props.mail.incoming_server_id[1]"/>
