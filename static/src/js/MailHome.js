@@ -19,6 +19,8 @@ class odooMail extends Component {
         this.mailState = useState({
             loadLogo: "",
             loadMail: [],
+            page: 1,
+            pageSize: 25,
             accounts: [],
             selectedAccountId: null,
             selectedCount: 0,
@@ -62,6 +64,55 @@ class odooMail extends Component {
 
     get mailReadFields() {
         return ['subject', 'sender', 'to', 'cc', 'bcc', 'body', 'date_time', 'attachments', 'is_read', 'is_starred', 'is_archived', 'type', 'incoming_server_id', 'parent_message_id']
+    }
+
+    get totalRows() {
+        return this.mailState.loadMail.length
+    }
+
+    get totalPages() {
+        const pages = Math.ceil(this.totalRows / this.mailState.pageSize)
+        return pages > 0 ? pages : 1
+    }
+
+    get pageStart() {
+        return (this.mailState.page - 1) * this.mailState.pageSize
+    }
+
+    get pageEnd() {
+        return this.pageStart + this.mailState.pageSize
+    }
+
+    get paginatedMails() {
+        return this.mailState.loadMail.slice(this.pageStart, this.pageEnd)
+    }
+
+    get pageFromLabel() {
+        if (!this.totalRows) {
+            return 0
+        }
+        return this.pageStart + 1
+    }
+
+    get pageToLabel() {
+        return Math.min(this.pageEnd, this.totalRows)
+    }
+
+    prevPage() {
+        if (this.mailState.page > 1) {
+            this.mailState.page -= 1
+        }
+    }
+
+    nextPage() {
+        if (this.mailState.page < this.totalPages) {
+            this.mailState.page += 1
+        }
+    }
+
+    setMailRows(rows) {
+        this.mailState.loadMail = rows
+        this.mailState.page = 1
     }
 
     groupByConversation(mails) {
@@ -311,6 +362,7 @@ class odooMail extends Component {
     resetView() {
         this.mailState.formData = {}
         this.mailState.mode = "tree"
+        this.mailState.page = 1
         this.selectedMails = []
         this.mailState.selectedCount = 0
     }
@@ -494,7 +546,7 @@ class odooMail extends Component {
             this.mailReadFields,
             { order: this.sortOrder }
         )
-        this.mailState.loadMail = this.groupByConversation(loaded)
+        this.setMailRows(this.groupByConversation(loaded))
         if (!this.mailState.loadMail.length) {
             const fallbackLoaded = await this.orm.searchRead(
                 'email.record',
@@ -502,7 +554,7 @@ class odooMail extends Component {
                 this.mailReadFields,
                 { order: this.sortOrder }
             )
-            this.mailState.loadMail = this.groupByConversation(fallbackLoaded)
+            this.setMailRows(this.groupByConversation(fallbackLoaded))
         }
     }
     /**
@@ -514,7 +566,7 @@ class odooMail extends Component {
         this.resetView()
         const starred = await this.safeModelCall('email.record', 'get_starred_mail', [])
         if (starred !== null) {
-            this.mailState.loadMail = this.groupByConversation(this.filterMailsBySelectedAccount(starred))
+            this.setMailRows(this.groupByConversation(this.filterMailsBySelectedAccount(starred)))
             return
         }
         const loaded = await this.orm.searchRead(
@@ -523,7 +575,7 @@ class odooMail extends Component {
             this.mailReadFields,
             { order: this.sortOrder }
         )
-        this.mailState.loadMail = this.groupByConversation(loaded)
+        this.setMailRows(this.groupByConversation(loaded))
         if (!this.mailState.loadMail.length) {
             const fallbackLoaded = await this.orm.searchRead(
                 'email.record',
@@ -531,7 +583,7 @@ class odooMail extends Component {
                 this.mailReadFields,
                 { order: this.sortOrder }
             )
-            this.mailState.loadMail = this.groupByConversation(fallbackLoaded)
+            this.setMailRows(this.groupByConversation(fallbackLoaded))
         }
     }
     /**
@@ -543,7 +595,7 @@ class odooMail extends Component {
         this.resetView()
         const archived = await this.safeModelCall('email.record', 'get_archived_mail', [])
         if (archived !== null) {
-            this.mailState.loadMail = this.groupByConversation(this.filterMailsBySelectedAccount(archived))
+            this.setMailRows(this.groupByConversation(this.filterMailsBySelectedAccount(archived)))
             return
         }
         const loaded = await this.orm.searchRead(
@@ -552,7 +604,7 @@ class odooMail extends Component {
             this.mailReadFields,
             { order: this.sortOrder }
         )
-        this.mailState.loadMail = this.groupByConversation(loaded)
+        this.setMailRows(this.groupByConversation(loaded))
         if (!this.mailState.loadMail.length) {
             const fallbackLoaded = await this.orm.searchRead(
                 'email.record',
@@ -560,7 +612,7 @@ class odooMail extends Component {
                 this.mailReadFields,
                 { order: this.sortOrder }
             )
-            this.mailState.loadMail = this.groupByConversation(fallbackLoaded)
+            this.setMailRows(this.groupByConversation(fallbackLoaded))
         }
     }
     /**
@@ -576,7 +628,7 @@ class odooMail extends Component {
             this.mailReadFields,
             { order: this.sortOrder }
         )
-        this.mailState.loadMail = this.groupByConversation(loaded)
+        this.setMailRows(this.groupByConversation(loaded))
         if (!this.mailState.loadMail.length) {
             const fallbackLoaded = await this.orm.searchRead(
                 'email.record',
@@ -584,7 +636,7 @@ class odooMail extends Component {
                 this.mailReadFields,
                 { order: this.sortOrder }
             )
-            this.mailState.loadMail = this.groupByConversation(fallbackLoaded)
+            this.setMailRows(this.groupByConversation(fallbackLoaded))
         }
     }
     /**
@@ -600,7 +652,7 @@ class odooMail extends Component {
             this.mailReadFields,
             { order: this.sortOrder }
         )
-        this.mailState.loadMail = this.groupByConversation(loaded)
+        this.setMailRows(this.groupByConversation(loaded))
         if (!this.mailState.loadMail.length) {
             const fallbackLoaded = await this.orm.searchRead(
                 'email.record',
@@ -608,7 +660,7 @@ class odooMail extends Component {
                 this.mailReadFields,
                 { order: this.sortOrder }
             )
-            this.mailState.loadMail = this.groupByConversation(fallbackLoaded)
+            this.setMailRows(this.groupByConversation(fallbackLoaded))
         }
     }
     /**

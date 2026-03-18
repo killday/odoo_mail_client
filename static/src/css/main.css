@@ -27,6 +27,12 @@
 	color: #3559a8;
 }
 
+.pagination-page-label {
+	margin: 0 8px;
+	font-size: 0.82rem;
+	color: var(--light-grey);
+}
+
 .hrt-rule {
 	height: 1px;
 	background-color: #dadce0;

@@ -197,11 +197,30 @@
                         </button>
                     </div>
                     <div class="inbox-menu-pagination">
-                        <span t-out="mailState.loadMail.length"/> messages
+                        <span t-out="pageFromLabel"/>-
+                        <span t-out="pageToLabel"/> of
+                        <span t-out="totalRows"/> messages
                         <span t-if="mailState.selectedCount"
                               class="selected-count-indicator">
                             • <t t-out="mailState.selectedCount"/> selected
                         </span>
+                        <button type="button"
+                                class="btn-page"
+                                t-att-disabled="mailState.page &lt;= 1"
+                                t-on-click="prevPage"
+                                aria-label="Previous page">
+                            <i class="fa fa-chevron-left"/>
+                        </button>
+                        <span class="pagination-page-label">
+                            Page <t t-out="mailState.page"/> / <t t-out="totalPages"/>
+                        </span>
+                        <button type="button"
+                                class="btn-page"
+                                t-att-disabled="mailState.page &gt;= totalPages"
+                                t-on-click="nextPage"
+                                aria-label="Next page">
+                            <i class="fa fa-chevron-right"/>
+                        </button>
                     </div>
                 </div>
                 <div class="inbox-container">
@@ -246,7 +265,7 @@
                                 </div>
                             </div>
                             <!-- MAIL LIST ITEMS -->
-                            <MailBody t-foreach="mailState.loadMail"
+                            <MailBody t-foreach="paginatedMails"
                                       t-as="mail" t-key="mail.id"
                                       mail="mail" t-props="mailProps"/>
                         </t>
