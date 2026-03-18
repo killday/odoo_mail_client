@@ -4,7 +4,7 @@ from email.utils import parsedate_to_datetime
 import logging
 import re
 
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
@@ -56,6 +56,58 @@ class FetchmailServer(models.Model):
             fetch_meta = fetch_meta.decode(errors='ignore')
         match = re.search(r'UID\s+(\d+)', fetch_meta or '')
         return int(match.group(1)) if match else 0
+
+    @api.model
+    def action_fetch_now_for_user(self):
+        """Fetch new messages now from all accessible incoming servers.
+
+        Uses native fetchmail server fetch flow so all supported server types
+        (IMAP/POP/provider-specific setups) follow Odoo's standard behavior.
+        """
+        servers = self.search([('active', '=', True)])
+        fetched_servers = 0
+        failed_servers = 0
+
+        for server in servers:
+            if not server.object_id:
+                continue
+
+            server_ctx = {
+                'fetchmail_cron_running': True,
+                'default_fetchmail_server_id': server.id,
+                'fetchmail_server_id': server.id,
+                'mail_fetchmail_server_id': server.id,
+            }
+            try:
+                # Native method from fetchmail.server supports both IMAP and POP.
+                server.with_context(**server_ctx).fetch_mail()
+                fetched_servers += 1
+            except TypeError:
+                try:
+                    server.with_context(**server_ctx).fetch_mail(raise_exception=False)
+                    fetched_servers += 1
+                except Exception:
+                    failed_servers += 1
+                    _logger.warning(
+                        'Manual fetch failed on server %s (%s).',
+                        server.name,
+                        server.server_type,
+                        exc_info=True,
+                    )
+            except Exception:
+                failed_servers += 1
+                _logger.warning(
+                    'Manual fetch failed on server %s (%s).',
+                    server.name,
+                    server.server_type,
+                    exc_info=True,
+                )
+
+        return {
+            'servers_total': len(servers),
+            'servers_fetched': fetched_servers,
+            'servers_failed': failed_servers,
+        }
 
     def action_open_fetch_range_wizard(self):
         self.ensure_one()

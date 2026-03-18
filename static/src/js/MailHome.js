@@ -610,7 +610,17 @@ class odooMail extends Component {
      * @param {Object} event - Event object.
      */
     refreshPage(event) {
-        window.location.reload()
+        return this.refreshNow()
+    }
+
+    async refreshNow() {
+        try {
+            await this.orm.call('fetchmail.server', 'action_fetch_now_for_user', [])
+        } catch (error) {
+            // Keep UI usable even when one server fails.
+        }
+        await this.reloadCurrentFolder()
+        await this.getCount()
     }
     /**
      * Method to delete selected mails.
