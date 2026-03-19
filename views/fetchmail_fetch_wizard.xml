@@ -23,25 +23,34 @@
         <field name="model">fetchmail.server</field>
         <field name="inherit_id" ref="mail.view_email_server_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='fetch_mail']" position="replace"/>
+            <xpath expr="//header/button[@name='action_fetch_mail']" position="replace"/>
             <xpath expr="//header" position="inside">
                 <button string="Fetch Now" type="object" name="action_open_fetch_range_wizard" invisible="state != 'done'"/>
             </xpath>
             <xpath expr="//field[@name='password']" position="after">
-                <field name="delete_from_server_on_local_delete"/>
-                <field name="smtp_host" placeholder="mail.example.com"/>
-                <field name="smtp_port"/>
-                <field name="smtp_user"/>
-                <field name="smtp_password" password="True"/>
-                <field name="smtp_encryption"/>
-                <separator string="Sync Metrics"/>
-                <field name="last_uid" readonly="1"/>
-                <field name="uid_validity" readonly="1"/>
-                <field name="last_fetch_start" readonly="1"/>
-                <field name="last_fetch_end" readonly="1"/>
-                <field name="last_fetch_duration_ms" readonly="1"/>
-                <field name="last_fetch_count" readonly="1"/>
-                <field name="last_fetch_failed_count" readonly="1"/>
-                <field name="last_fetch_error" readonly="1"/>
+                <group col="2" class="rt_fetchmail_layout_group">
+                    <group string="Server Settings">
+                        <separator string="Incoming Server Settings"/>
+                        <field name="delete_from_server_on_local_delete"/>
+                        <separator string="Outgoing Server Settings"/>
+                        <field name="smtp_host" placeholder="mail.example.com"/>
+                        <field name="smtp_port"/>
+                        <field name="smtp_user"/>
+                        <field name="smtp_password" password="True"/>
+                        <field name="smtp_encryption"/>
+                    </group>
+                    <group string="Sync Metrics">
+                        <field name="last_uid" readonly="1"/>
+                        <field name="uid_validity" readonly="1"/>
+                        <field name="last_fetch_start" readonly="1"/>
+                        <field name="last_fetch_end" readonly="1"/>
+                        <field name="last_fetch_duration_ms" readonly="1"/>
+                        <field name="last_fetch_count" readonly="1"/>
+                        <field name="last_fetch_failed_count" readonly="1"/>
+                        <field name="last_fetch_error" readonly="1"/>
+                    </group>
+                </group>
             </xpath>
         </field>
     </record>
