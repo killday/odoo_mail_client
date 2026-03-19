@@ -21,47 +21,61 @@
     <record id="view_email_server_form_inherit_rt_mail_fetch_period" model="ir.ui.view">
         <field name="name">fetchmail.server.form.inherit.rt.mail.fetch.period</field>
         <field name="model">fetchmail.server</field>
-        <field name="inherit_id" ref="mail.view_email_server_form"/>
-        <field name="priority" eval="999"/>
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="view_fetchmail_server_form_rt_mail_custom" model="ir.ui.view">
+        <field name="name">fetchmail.server.form.rt.mail.custom</field>
+        <field name="model">fetchmail.server</field>
         <field name="arch" type="xml">
-            <xpath expr="//header/button[@name='fetch_mail']" position="replace"/>
-            <xpath expr="//header" position="inside">
-                <button string="Fetch Now" type="object" name="action_open_fetch_range_wizard" invisible="state != 'done'"/>
-            </xpath>
-            <xpath expr="(//field[@name='server'])[1]/ancestor::group[1]" position="replace"/>
-            <xpath expr="//field[@name='object_id']" position="attributes">
-                <attribute name="invisible">1</attribute>
-                <attribute name="readonly">1</attribute>
-            </xpath>
-            <xpath expr="//field[@name='password']/ancestor::group[1]" position="replace">
-                <group col="2" class="rt_fetchmail_layout_group">
-                    <group string="Incoming Server Settings" class="rt_fetchmail_servers_column">
-                        <field name="server"/>
-                        <field name="port"/>
-                        <field name="is_ssl"/>
-                        <field name="user"/>
-                        <field name="password" password="True"/>
-                        <field name="delete_from_server_on_local_delete"/>
-                        <separator string="Outgoing Server Settings"/>
-                        <field name="smtp_host" placeholder="mail.example.com"/>
-                        <field name="smtp_port"/>
-                        <field name="smtp_user"/>
-                        <field name="smtp_password" password="True"/>
-                        <field name="smtp_encryption"/>
+            <form string="Incoming Mail Server">
+                <header>
+                    <button string="Fetch Now" type="object" name="action_open_fetch_range_wizard" invisible="state != 'done'"/>
+                </header>
+                <sheet>
+                    <group invisible="1">
+                        <field name="state"/>
+                        <field name="server_type"/>
                     </group>
-                    <group string="Sync Metrics" class="rt_fetchmail_metrics_column">
-                        <field name="last_uid" readonly="1"/>
-                        <field name="uid_validity" readonly="1"/>
-                        <field name="last_fetch_start" readonly="1"/>
-                        <field name="last_fetch_end" readonly="1"/>
-                        <field name="last_fetch_duration_ms" readonly="1"/>
-                        <field name="last_fetch_count" readonly="1"/>
-                        <field name="last_fetch_failed_count" readonly="1"/>
-                        <field name="last_fetch_error" readonly="1"/>
+                    <group col="2" class="rt_fetchmail_layout_group">
+                        <group string="Incoming Server Settings" class="rt_fetchmail_servers_column">
+                            <field name="name"/>
+                            <field name="server"/>
+                            <field name="port"/>
+                            <field name="is_ssl"/>
+                            <field name="user"/>
+                            <field name="password" password="True"/>
+                            <field name="delete_from_server_on_local_delete"/>
+                            <field name="active"/>
+                            <field name="object_id" invisible="1" readonly="1"/>
+                            <separator string="Outgoing Server Settings"/>
+                            <field name="smtp_host" placeholder="mail.example.com"/>
+                            <field name="smtp_port"/>
+                            <field name="smtp_user"/>
+                            <field name="smtp_password" password="True"/>
+                            <field name="smtp_encryption"/>
+                        </group>
+                        <group string="Sync Metrics" class="rt_fetchmail_metrics_column">
+                            <field name="last_uid" readonly="1"/>
+                            <field name="uid_validity" readonly="1"/>
+                            <field name="last_fetch_start" readonly="1"/>
+                            <field name="last_fetch_end" readonly="1"/>
+                            <field name="last_fetch_duration_ms" readonly="1"/>
+                            <field name="last_fetch_count" readonly="1"/>
+                            <field name="last_fetch_failed_count" readonly="1"/>
+                            <field name="last_fetch_error" readonly="1"/>
+                        </group>
                     </group>
-                </group>
-            </xpath>
+                </sheet>
+            </form>
         </field>
+    </record>
+
+    <record id="action_fetchmail_server_tree_rt_mail_form_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="50"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_fetchmail_server_form_rt_mail_custom"/>
+        <field name="act_window_id" ref="action_fetchmail_server_tree_rt_mail"/>
     </record>
 
     <record id="view_fetchmail_server_health_tree" model="ir.ui.view">
