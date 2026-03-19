@@ -31,7 +31,7 @@
             <xpath expr="(//field[@name='server'])[1]/ancestor::group[1]" position="replace"/>
             <xpath expr="//field[@name='password']/ancestor::group[1]" position="replace">
                 <group col="2" class="rt_fetchmail_layout_group">
-                    <group string="Incoming Server Settings">
+                    <group string="Incoming Server Settings" class="rt_fetchmail_servers_column">
                         <field name="server"/>
                         <field name="port"/>
                         <field name="is_ssl"/>
@@ -45,7 +45,7 @@
                         <field name="smtp_password" password="True"/>
                         <field name="smtp_encryption"/>
                     </group>
-                    <group string="Sync Metrics">
+                    <group string="Sync Metrics" class="rt_fetchmail_metrics_column">
                         <field name="last_uid" readonly="1"/>
                         <field name="uid_validity" readonly="1"/>
                         <field name="last_fetch_start" readonly="1"/>

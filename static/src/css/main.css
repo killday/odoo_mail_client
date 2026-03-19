@@ -1683,38 +1683,31 @@ border-radius:10px
 }
 }
 
-/* Fallback layout overrides in case another module ships the same class names. */
-.odoo_mails .body-wrapper {
-	grid-template-columns: 270px minmax(0, 1fr) 72px !important;
-}
-
-.odoo_mails .mail_inbox {
-	min-width: 0 !important;
-}
-
-.odoo_mails .app-container {
-	width: 72px !important;
-	overflow: hidden !important;
-	box-sizing: border-box !important;
-}
-
-.odoo_mails .app-item {
-	display: flex !important;
-	flex-direction: column !important;
-	align-items: center !important;
+/* Fetchmail form: make incoming/outgoing settings column wider than sync metrics. */
+.o_form_view .rt_fetchmail_layout_group {
 	width: 100% !important;
+	max-width: 100% !important;
+	display: flex !important;
+	gap: 20px;
 }
 
-.odoo_mails .app-item p {
-	margin: 4px 0 0 !important;
-	font-size: 0.72rem !important;
-	line-height: 1.1 !important;
-	text-align: center !important;
-	word-break: break-word !important;
+.o_form_view .rt_fetchmail_layout_group .rt_fetchmail_servers_column {
+	flex: 1 1 68% !important;
+	max-width: 68% !important;
+}
+
+.o_form_view .rt_fetchmail_layout_group .rt_fetchmail_metrics_column {
+	flex: 1 1 32% !important;
+	max-width: 32% !important;
 }
 
 @media screen and (max-width: 1200px) {
-	.odoo_mails .body-wrapper {
-		grid-template-columns: 230px minmax(0, 1fr) 64px !important;
+	.o_form_view .rt_fetchmail_layout_group {
+		display: block !important;
+	}
+
+	.o_form_view .rt_fetchmail_layout_group .rt_fetchmail_servers_column,
+	.o_form_view .rt_fetchmail_layout_group .rt_fetchmail_metrics_column {
+		max-width: 100% !important;
 	}
 }
