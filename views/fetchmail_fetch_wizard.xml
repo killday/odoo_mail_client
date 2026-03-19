@@ -30,8 +30,7 @@
             </xpath>
             <xpath expr="//field[@name='password']/ancestor::group[1]" position="replace">
                 <group col="2" class="rt_fetchmail_layout_group">
-                    <group string="Server Settings">
-                        <separator string="Incoming Server Settings"/>
+                    <group string="Incoming Server Settings">
                         <field name="server"/>
                         <field name="port"/>
                         <field name="is_ssl"/>
