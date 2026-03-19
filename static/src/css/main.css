@@ -1685,20 +1685,20 @@ border-radius:10px
 
 /* Fetchmail form: make incoming/outgoing settings column wider than sync metrics. */
 .o_form_view .rt_fetchmail_layout_group {
-	width: 100% !important;
-	max-width: 100% !important;
+	width: 80% !important;
+	max-width: 80% !important;
 	display: flex !important;
 	gap: 20px;
 }
 
 .o_form_view .rt_fetchmail_layout_group .rt_fetchmail_servers_column {
-	flex: 1 1 68% !important;
-	max-width: 68% !important;
+	flex: 1 1 48% !important;
+	max-width: 48% !important;
 }
 
 .o_form_view .rt_fetchmail_layout_group .rt_fetchmail_metrics_column {
-	flex: 1 1 32% !important;
-	max-width: 32% !important;
+	flex: 1 1 42% !important;
+	max-width: 42% !important;
 }
 
 @media screen and (max-width: 1200px) {
