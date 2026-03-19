@@ -1682,3 +1682,39 @@ border-radius:10px
     width: 481px;
 }
 }
+
+/* Fallback layout overrides in case another module ships the same class names. */
+.odoo_mails .body-wrapper {
+	grid-template-columns: 270px minmax(0, 1fr) 72px !important;
+}
+
+.odoo_mails .mail_inbox {
+	min-width: 0 !important;
+}
+
+.odoo_mails .app-container {
+	width: 72px !important;
+	overflow: hidden !important;
+	box-sizing: border-box !important;
+}
+
+.odoo_mails .app-item {
+	display: flex !important;
+	flex-direction: column !important;
+	align-items: center !important;
+	width: 100% !important;
+}
+
+.odoo_mails .app-item p {
+	margin: 4px 0 0 !important;
+	font-size: 0.72rem !important;
+	line-height: 1.1 !important;
+	text-align: center !important;
+	word-break: break-word !important;
+}
+
+@media screen and (max-width: 1200px) {
+	.odoo_mails .body-wrapper {
+		grid-template-columns: 230px minmax(0, 1fr) 64px !important;
+	}
+}
