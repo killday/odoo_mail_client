@@ -13,6 +13,10 @@ _logger = logging.getLogger(__name__)
 class FetchmailServer(models.Model):
     _inherit = 'fetchmail.server'
 
+    @api.model
+    def _email_record_model_id(self):
+        return self.env['ir.model']._get_id('email.record')
+
     delete_from_server_on_local_delete = fields.Boolean(
         string='Delete On Server When Deleted In Odoo',
         default=False,
@@ -50,6 +54,29 @@ class FetchmailServer(models.Model):
     last_fetch_error = fields.Text('Last Fetch Error', copy=False, readonly=True)
     last_uid = fields.Integer('Last Synced UID', default=0, copy=False)
     uid_validity = fields.Char('UID Validity', copy=False, readonly=True)
+
+    @api.model
+    def default_get(self, fields_list):
+        vals = super().default_get(fields_list)
+        if 'object_id' in fields_list and not vals.get('object_id'):
+            model_id = self._email_record_model_id()
+            if model_id:
+                vals['object_id'] = model_id
+        return vals
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        model_id = self._email_record_model_id()
+        if model_id:
+            for vals in vals_list:
+                vals['object_id'] = model_id
+        return super().create(vals_list)
+
+    def write(self, vals):
+        model_id = self._email_record_model_id()
+        if model_id:
+            vals = dict(vals, object_id=model_id)
+        return super().write(vals)
 
     def _extract_uid_from_fetch_meta(self, fetch_meta):
         if isinstance(fetch_meta, bytes):

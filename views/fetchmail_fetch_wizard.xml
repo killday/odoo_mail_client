@@ -29,6 +29,10 @@
                 <button string="Fetch Now" type="object" name="action_open_fetch_range_wizard" invisible="state != 'done'"/>
             </xpath>
             <xpath expr="(//field[@name='server'])[1]/ancestor::group[1]" position="replace"/>
+            <xpath expr="//field[@name='object_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="readonly">1</attribute>
+            </xpath>
             <xpath expr="//field[@name='password']/ancestor::group[1]" position="replace">
                 <group col="2" class="rt_fetchmail_layout_group">
                     <group string="Incoming Server Settings" class="rt_fetchmail_servers_column">
