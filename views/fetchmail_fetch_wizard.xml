@@ -30,10 +30,15 @@
             <xpath expr="//header" position="inside">
                 <button string="Fetch Now" type="object" name="action_open_fetch_range_wizard" invisible="state != 'done'"/>
             </xpath>
-            <xpath expr="//field[@name='password']" position="after">
+            <xpath expr="//field[@name='password']/ancestor::group[1]" position="replace">
                 <group col="2" class="rt_fetchmail_layout_group">
                     <group string="Server Settings">
                         <separator string="Incoming Server Settings"/>
+                        <field name="server"/>
+                        <field name="port"/>
+                        <field name="is_ssl"/>
+                        <field name="user"/>
+                        <field name="password" password="True"/>
                         <field name="delete_from_server_on_local_delete"/>
                         <separator string="Outgoing Server Settings"/>
                         <field name="smtp_host" placeholder="mail.example.com"/>
