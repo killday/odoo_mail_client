@@ -26,7 +26,6 @@
         <field name="arch" type="xml">
             <xpath expr="//header/button[@name='fetch_mail']" position="replace"/>
             <xpath expr="//header/button[@name='action_fetch_mail']" position="replace"/>
-            <xpath expr="//header/button[@string='Fetch Now' and @name!='action_open_fetch_range_wizard']" position="replace"/>
             <xpath expr="//header" position="inside">
                 <button string="Fetch Now" type="object" name="action_open_fetch_range_wizard" invisible="state != 'done'"/>
             </xpath>
