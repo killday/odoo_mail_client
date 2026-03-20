@@ -317,7 +317,7 @@ class FetchmailServer(models.Model):
             if use_uid_incremental:
                 try:
                     start_uid = int(self.last_uid) + 1
-                    _, data = imap_server.uid('search', None, 'UID %d:*' % start_uid)
+                    search_status, data = imap_server.uid('search', None, 'UID %d:*' % start_uid)
                     numbers = data[0].split() if data and data[0] else []
                 except Exception:
                     _logger.info(
@@ -328,14 +328,14 @@ class FetchmailServer(models.Model):
                     use_uid_incremental = False
 
             if not use_uid_incremental:
-                _, data = imap_server.search(None, 'SINCE', since_date)
+                search_status, data = imap_server.search(None, 'SINCE', since_date)
                 numbers = data[0].split() if data and data[0] else []
 
             for num in numbers:
                 if use_uid_incremental:
-                    _, payload = imap_server.uid('fetch', num, '(UID INTERNALDATE RFC822)')
+                    fetch_status, payload = imap_server.uid('fetch', num, '(UID INTERNALDATE RFC822)')
                 else:
-                    _, payload = imap_server.fetch(num, '(UID INTERNALDATE RFC822)')
+                    fetch_status, payload = imap_server.fetch(num, '(UID INTERNALDATE RFC822)')
                 if not payload or not payload[0]:
                     continue
 
