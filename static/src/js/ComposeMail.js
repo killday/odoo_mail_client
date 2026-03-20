@@ -23,10 +23,12 @@ export class ComposeMail extends Component {
             recipientPartnerIds: this.props.initialRecipientPartnerIds || [],
             ccPartnerIds: this.props.initialCcPartnerIds || [],
             bccPartnerIds: this.props.initialBccPartnerIds || [],
+            recipientSuggestions: [],
+            ccSuggestions: [],
+            bccSuggestions: [],
             parentMessageId: this.props.initialParentMessageId || false,
             senderServerId: this.props.initialServerId ? String(this.props.initialServerId) : "",
             senderAccounts: [],
-            contacts: [],
             signatures: [],
             selectedSignatureId: "",
             contentTouched: false,
@@ -53,17 +55,6 @@ export class ComposeMail extends Component {
             }
             if (!this.state.senderServerId && this.state.senderAccounts.length) {
                 this.state.senderServerId = String(this.state.senderAccounts[0].id)
-            }
-
-            try {
-                this.state.contacts = await this.orm.searchRead(
-                    'res.partner',
-                    [['email', '!=', false]],
-                    ['name', 'email'],
-                    { order: 'name asc', limit: 500 }
-                )
-            } catch (error) {
-                this.state.contacts = []
             }
 
             try {
@@ -175,22 +166,95 @@ export class ComposeMail extends Component {
         return this.attachmentReader(file)
     }
 
-    getSelectValues(ev) {
-        return Array.from(ev.currentTarget.selectedOptions || [])
-            .map((option) => parseInt(option.value, 10))
-            .filter((id) => !Number.isNaN(id))
+    getLastRecipientToken(value) {
+        const tokens = String(value || '').split(',')
+        return (tokens[tokens.length - 1] || '').trim()
     }
 
-    onToContactsChange(ev) {
-        this.state.recipientPartnerIds = this.getSelectValues(ev)
+    async fetchRecipientSuggestions(token) {
+        const searchTerm = (token || '').trim()
+        if (searchTerm.length < 2) {
+            return []
+        }
+        try {
+            const results = await this.orm.call('res.partner', 'name_search', [searchTerm], {
+                operator: 'ilike',
+                limit: 8,
+            })
+            return (results || []).map(([id, label]) => ({ id, label }))
+        } catch (error) {
+            return []
+        }
     }
 
-    onCcContactsChange(ev) {
-        this.state.ccPartnerIds = this.getSelectValues(ev)
+    async updateSuggestionsFor(fieldName, value) {
+        const token = this.getLastRecipientToken(value)
+        const suggestions = await this.fetchRecipientSuggestions(token)
+        if (fieldName === 'recipient') {
+            this.state.recipientSuggestions = suggestions
+            return
+        }
+        if (fieldName === 'cc') {
+            this.state.ccSuggestions = suggestions
+            return
+        }
+        this.state.bccSuggestions = suggestions
     }
 
-    onBccContactsChange(ev) {
-        this.state.bccPartnerIds = this.getSelectValues(ev)
+    async onRecipientInput(ev) {
+        this.state.recipient = ev.currentTarget.value || ''
+        await this.updateSuggestionsFor('recipient', this.state.recipient)
+    }
+
+    async onCcInput(ev) {
+        this.state.cc = ev.currentTarget.value || ''
+        await this.updateSuggestionsFor('cc', this.state.cc)
+    }
+
+    async onBccInput(ev) {
+        this.state.bcc = ev.currentTarget.value || ''
+        await this.updateSuggestionsFor('bcc', this.state.bcc)
+    }
+
+    insertSuggestion(fieldName, suggestion) {
+        const label = suggestion && suggestion.label ? suggestion.label : ''
+        if (!label) {
+            return
+        }
+
+        const value = String(this.state[fieldName] || '')
+        const parts = value.split(',')
+        parts[parts.length - 1] = ` ${label}`
+        const newValue = `${parts.join(',').trim()}, `
+        this.state[fieldName] = newValue
+
+        const partnerFieldByRecipientField = {
+            recipient: 'recipientPartnerIds',
+            cc: 'ccPartnerIds',
+            bcc: 'bccPartnerIds',
+        }
+        const partnerField = partnerFieldByRecipientField[fieldName]
+        if (partnerField && suggestion.id) {
+            const current = new Set(this.state[partnerField] || [])
+            current.add(suggestion.id)
+            this.state[partnerField] = Array.from(current)
+        }
+
+        this.state.recipientSuggestions = fieldName === 'recipient' ? [] : this.state.recipientSuggestions
+        this.state.ccSuggestions = fieldName === 'cc' ? [] : this.state.ccSuggestions
+        this.state.bccSuggestions = fieldName === 'bcc' ? [] : this.state.bccSuggestions
+    }
+
+    onRecipientSuggestionMouseDown(suggestion) {
+        this.insertSuggestion('recipient', suggestion)
+    }
+
+    onCcSuggestionMouseDown(suggestion) {
+        this.insertSuggestion('cc', suggestion)
+    }
+
+    onBccSuggestionMouseDown(suggestion) {
+        this.insertSuggestion('bcc', suggestion)
     }
 
     /**

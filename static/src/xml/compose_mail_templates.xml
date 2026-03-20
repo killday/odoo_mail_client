@@ -63,65 +63,68 @@
                                         t-on-click="openSignatureManager">Create</button>
                             </div>
                             <br/>
-                            <label for="to_contacts" class="compose-field-label">To (Contacts)</label>
-                            <select id="to_contacts"
-                                    class="form-control"
-                                    multiple="multiple"
-                                    t-on-change="onToContactsChange"
-                                    style="min-height:90px;">
-                                <t t-foreach="state.contacts" t-as="contact" t-key="contact.id">
-                                    <option t-att-value="contact.id"
-                                            t-att-selected="state.recipientPartnerIds.includes(contact.id) ? 'selected' : undefined">
-                                        <t t-out="(contact.name || contact.email) + ' &lt;' + contact.email + '&gt;'"/>
-                                    </option>
-                                </t>
-                            </select>
-                            <small style="display:block;color:#666;margin-top:4px;">Hold Ctrl/Cmd to pick multiple contacts.</small>
+                            <label for="Recipient" class="compose-field-label">To</label>
+                            <div style="position:relative;">
+                                <input type="text" class="form-control"
+                                       id="Recipient"
+                                       t-model="state.recipient"
+                                       t-on-input="onRecipientInput"
+                                       aria-describedby="emailHelp"
+                                       placeholder="Type name or email"/>
+                                <div t-if="state.recipientSuggestions.length"
+                                     style="position:absolute;left:0;right:0;z-index:1000;background:#fff;border:1px solid #ddd;border-top:none;max-height:180px;overflow:auto;">
+                                    <t t-foreach="state.recipientSuggestions" t-as="suggestion" t-key="suggestion.id">
+                                        <button type="button"
+                                                class="btn w-100 text-start"
+                                                style="border-radius:0;padding:8px 10px;"
+                                                t-on-mousedown="() => onRecipientSuggestionMouseDown(suggestion)">
+                                            <t t-out="suggestion.label"/>
+                                        </button>
+                                    </t>
+                                </div>
+                            </div>
                             <br/>
-                            <input type="text" class="form-control"
-                                   id="Recipient" t-model="state.recipient"
-                                aria-describedby="emailHelp"
-                                   placeholder="To (additional emails, comma separated)"/>
+                            <label for="cc" class="compose-field-label">Cc</label>
+                            <div style="position:relative;">
+                                <input type="text" class="form-control"
+                                       id="cc"
+                                       t-model="state.cc"
+                                       t-on-input="onCcInput"
+                                       aria-describedby="emailHelp"
+                                       placeholder="Type name or email"/>
+                                <div t-if="state.ccSuggestions.length"
+                                     style="position:absolute;left:0;right:0;z-index:1000;background:#fff;border:1px solid #ddd;border-top:none;max-height:180px;overflow:auto;">
+                                    <t t-foreach="state.ccSuggestions" t-as="suggestion" t-key="suggestion.id">
+                                        <button type="button"
+                                                class="btn w-100 text-start"
+                                                style="border-radius:0;padding:8px 10px;"
+                                                t-on-mousedown="() => onCcSuggestionMouseDown(suggestion)">
+                                            <t t-out="suggestion.label"/>
+                                        </button>
+                                    </t>
+                                </div>
+                            </div>
                             <br/>
-                            <label for="cc_contacts" class="compose-field-label">Cc (Contacts)</label>
-                            <select id="cc_contacts"
-                                    class="form-control"
-                                    multiple="multiple"
-                                    t-on-change="onCcContactsChange"
-                                    style="min-height:90px;">
-                                <t t-foreach="state.contacts" t-as="contact" t-key="contact.id">
-                                    <option t-att-value="contact.id"
-                                            t-att-selected="state.ccPartnerIds.includes(contact.id) ? 'selected' : undefined">
-                                        <t t-out="(contact.name || contact.email) + ' &lt;' + contact.email + '&gt;'"/>
-                                    </option>
-                                </t>
-                            </select>
-                            <small style="display:block;color:#666;margin-top:4px;">Optional additional copy recipients from Contacts.</small>
-                            <br/>
-                            <input type="text" class="form-control"
-                                   id="cc" t-model="state.cc"
-                                   aria-describedby="emailHelp"
-                                   placeholder="Cc (additional emails, comma separated)"/>
-                            <br/>
-                            <label for="bcc_contacts" class="compose-field-label">Bcc (Contacts)</label>
-                            <select id="bcc_contacts"
-                                    class="form-control"
-                                    multiple="multiple"
-                                    t-on-change="onBccContactsChange"
-                                    style="min-height:90px;">
-                                <t t-foreach="state.contacts" t-as="contact" t-key="contact.id">
-                                    <option t-att-value="contact.id"
-                                            t-att-selected="state.bccPartnerIds.includes(contact.id) ? 'selected' : undefined">
-                                        <t t-out="(contact.name || contact.email) + ' &lt;' + contact.email + '&gt;'"/>
-                                    </option>
-                                </t>
-                            </select>
-                            <small style="display:block;color:#666;margin-top:4px;">Hidden copy recipients from Contacts.</small>
-                            <br/>
-                            <input type="text" class="form-control"
-                                   id="bcc" t-model="state.bcc"
-                                   aria-describedby="emailHelp"
-                                   placeholder="Bcc (additional emails, comma separated)"/>
+                            <label for="bcc" class="compose-field-label">Bcc</label>
+                            <div style="position:relative;">
+                                <input type="text" class="form-control"
+                                       id="bcc"
+                                       t-model="state.bcc"
+                                       t-on-input="onBccInput"
+                                       aria-describedby="emailHelp"
+                                       placeholder="Type name or email"/>
+                                <div t-if="state.bccSuggestions.length"
+                                     style="position:absolute;left:0;right:0;z-index:1000;background:#fff;border:1px solid #ddd;border-top:none;max-height:180px;overflow:auto;">
+                                    <t t-foreach="state.bccSuggestions" t-as="suggestion" t-key="suggestion.id">
+                                        <button type="button"
+                                                class="btn w-100 text-start"
+                                                style="border-radius:0;padding:8px 10px;"
+                                                t-on-mousedown="() => onBccSuggestionMouseDown(suggestion)">
+                                            <t t-out="suggestion.label"/>
+                                        </button>
+                                    </t>
+                                </div>
+                            </div>
                             <br/>
                             <input type="text" class="form-control"
                                    id="subject" t-model="state.subject"
