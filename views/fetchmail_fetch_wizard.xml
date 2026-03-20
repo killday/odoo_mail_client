@@ -32,8 +32,9 @@
                 <header>
                     <button string="Reset Configuration"
                             type="object"
-                            name="action_reset_configuration"
+                            name="set_draft"
                             class="btn-secondary"
+                            invisible="state != 'done'"
                             confirm="This will clear the server configuration values for this account. Continue?"/>
                     <button string="Fetch Now" type="object" name="action_open_fetch_range_wizard" invisible="state != 'done'"/>
                 </header>

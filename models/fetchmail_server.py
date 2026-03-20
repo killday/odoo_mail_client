@@ -186,39 +186,6 @@ class FetchmailServer(models.Model):
             },
         }
 
-    def action_reset_configuration(self):
-        for server in self:
-            # Preserve account identity and action model, reset connection/sync settings.
-            reset_vals = {
-                'server': False,
-                'port': 993,
-                'is_ssl': True,
-                'user': False,
-                'password': False,
-                'smtp_host': False,
-                'smtp_port': 587,
-                'smtp_user': False,
-                'smtp_password': False,
-                'smtp_encryption': 'starttls',
-                'last_uid': 0,
-                'uid_validity': False,
-                'last_fetch_start': False,
-                'last_fetch_end': False,
-                'last_fetch_duration_ms': 0,
-                'last_fetch_count': 0,
-                'last_fetch_failed_count': 0,
-                'last_fetch_error': False,
-            }
-            server.write(reset_vals)
-
-            # Keep compatibility with native state flow if available on this model.
-            if hasattr(server, 'set_draft'):
-                try:
-                    server.set_draft()
-                except Exception:
-                    _logger.info('set_draft failed for fetchmail.server id=%s', server.id, exc_info=True)
-        return True
-
     def _delete_message_by_message_id(self, message_id):
         self.ensure_one()
         if self.server_type != 'imap' or not message_id:
