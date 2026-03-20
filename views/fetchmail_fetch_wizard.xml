@@ -30,6 +30,11 @@
         <field name="arch" type="xml">
             <form string="Incoming Mail Server">
                 <header>
+                    <button string="Test &amp; Confirm"
+                            type="object"
+                            name="fetch_mail"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
                     <button string="Reset Configuration"
                             type="object"
                             name="set_draft"
@@ -46,20 +51,20 @@
                     <group col="2" class="rt_fetchmail_layout_group">
                         <group string="Incoming Server Settings" class="rt_fetchmail_servers_column">
                             <field name="name"/>
-                            <field name="server"/>
-                            <field name="port"/>
+                            <field name="server" readonly="state != 'draft'"/>
+                            <field name="port" readonly="state != 'draft'"/>
                             <field name="is_ssl"/>
-                            <field name="user"/>
-                            <field name="password" password="True"/>
+                            <field name="user" readonly="state != 'draft'"/>
+                            <field name="password" password="True" readonly="state != 'draft'"/>
                             <field name="delete_from_server_on_local_delete"/>
                             <field name="active"/>
                             <field name="object_id" invisible="1" readonly="1"/>
                             <separator string="Outgoing Server Settings"/>
-                            <field name="smtp_host" placeholder="mail.example.com"/>
-                            <field name="smtp_port"/>
-                            <field name="smtp_user"/>
-                            <field name="smtp_password" password="True"/>
-                            <field name="smtp_encryption"/>
+                            <field name="smtp_host" placeholder="mail.example.com" readonly="state != 'draft'"/>
+                            <field name="smtp_port" readonly="state != 'draft'"/>
+                            <field name="smtp_user" readonly="state != 'draft'"/>
+                            <field name="smtp_password" password="True" readonly="state != 'draft'"/>
+                            <field name="smtp_encryption" readonly="state != 'draft'"/>
                         </group>
                         <group string="Sync Metrics" class="rt_fetchmail_metrics_column">
                             <field name="last_uid" readonly="1"/>
