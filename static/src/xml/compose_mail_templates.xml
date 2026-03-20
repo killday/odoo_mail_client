@@ -72,7 +72,7 @@
                                 <t t-foreach="state.contacts" t-as="contact" t-key="contact.id">
                                     <option t-att-value="contact.id"
                                             t-att-selected="state.recipientPartnerIds.includes(contact.id) ? 'selected' : undefined">
-                                        <t t-out="(contact.name || contact.email) + ' <' + contact.email + '>'"/>
+                                        <t t-out="(contact.name || contact.email) + ' &lt;' + contact.email + '&gt;'"/>
                                     </option>
                                 </t>
                             </select>
@@ -92,7 +92,7 @@
                                 <t t-foreach="state.contacts" t-as="contact" t-key="contact.id">
                                     <option t-att-value="contact.id"
                                             t-att-selected="state.ccPartnerIds.includes(contact.id) ? 'selected' : undefined">
-                                        <t t-out="(contact.name || contact.email) + ' <' + contact.email + '>'"/>
+                                        <t t-out="(contact.name || contact.email) + ' &lt;' + contact.email + '&gt;'"/>
                                     </option>
                                 </t>
                             </select>
@@ -112,7 +112,7 @@
                                 <t t-foreach="state.contacts" t-as="contact" t-key="contact.id">
                                     <option t-att-value="contact.id"
                                             t-att-selected="state.bccPartnerIds.includes(contact.id) ? 'selected' : undefined">
-                                        <t t-out="(contact.name || contact.email) + ' <' + contact.email + '>'"/>
+                                        <t t-out="(contact.name || contact.email) + ' &lt;' + contact.email + '&gt;'"/>
                                     </option>
                                 </t>
                             </select>
