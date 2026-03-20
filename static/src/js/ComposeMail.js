@@ -23,6 +23,9 @@ export class ComposeMail extends Component {
             recipientPartnerIds: this.props.initialRecipientPartnerIds || [],
             ccPartnerIds: this.props.initialCcPartnerIds || [],
             bccPartnerIds: this.props.initialBccPartnerIds || [],
+            recipientPartnerNames: {}, // Maps partner ID to partner name for To field
+            ccPartnerNames: {}, // Maps partner ID to partner name for Cc field
+            bccPartnerNames: {}, // Maps partner ID to partner name for Bcc field
             recipientSuggestions: [],
             ccSuggestions: [],
             bccSuggestions: [],
@@ -227,11 +230,23 @@ export class ComposeMail extends Component {
             cc: 'ccPartnerIds',
             bcc: 'bccPartnerIds',
         }
+        const partnerNamesFieldByRecipientField = {
+            recipient: 'recipientPartnerNames',
+            cc: 'ccPartnerNames',
+            bcc: 'bccPartnerNames',
+        }
+
         const partnerField = partnerFieldByRecipientField[fieldName]
+        const partnerNamesField = partnerNamesFieldByRecipientField[fieldName]
         if (partnerField && suggestion.id) {
             const current = new Set(this.state[partnerField] || [])
             current.add(suggestion.id)
             this.state[partnerField] = Array.from(current)
+            
+            // Store the partner name for display
+            const namesMap = this.state[partnerNamesField] || {}
+            namesMap[suggestion.id] = label
+            this.state[partnerNamesField] = namesMap
         }
 
         // Clear text field after adding partner ID to avoid sending invalid email text
@@ -240,6 +255,31 @@ export class ComposeMail extends Component {
         this.state.recipientSuggestions = fieldName === 'recipient' ? [] : this.state.recipientSuggestions
         this.state.ccSuggestions = fieldName === 'cc' ? [] : this.state.ccSuggestions
         this.state.bccSuggestions = fieldName === 'bcc' ? [] : this.state.bccSuggestions
+    }
+
+    removePartner(fieldName, partnerId) {
+        const partnerFieldByRecipientField = {
+            recipient: 'recipientPartnerIds',
+            cc: 'ccPartnerIds',
+            bcc: 'bccPartnerIds',
+        }
+        const partnerNamesFieldByRecipientField = {
+            recipient: 'recipientPartnerNames',
+            cc: 'ccPartnerNames',
+            bcc: 'bccPartnerNames',
+        }
+
+        const partnerField = partnerFieldByRecipientField[fieldName]
+        const partnerNamesField = partnerNamesFieldByRecipientField[fieldName]
+
+        // Remove from partner IDs array
+        const ids = (this.state[partnerField] || []).filter(id => id !== partnerId)
+        this.state[partnerField] = ids
+
+        // Remove from partner names map
+        const namesMap = this.state[partnerNamesField] || {}
+        delete namesMap[partnerId]
+        this.state[partnerNamesField] = namesMap
     }
 
     onRecipientSuggestionMouseDown(ev) {
