@@ -32,7 +32,7 @@
                 <header>
                     <button string="Test &amp; Confirm"
                             type="object"
-                            name="fetch_mail"
+                            name="button_confirm_login"
                             class="btn-primary"
                             invisible="state != 'draft'"/>
                     <button string="Reset Configuration"
