@@ -222,12 +222,6 @@ export class ComposeMail extends Component {
             return
         }
 
-        const value = String(this.state[fieldName] || '')
-        const parts = value.split(',')
-        parts[parts.length - 1] = ` ${label}`
-        const newValue = `${parts.join(',').trim()}, `
-        this.state[fieldName] = newValue
-
         const partnerFieldByRecipientField = {
             recipient: 'recipientPartnerIds',
             cc: 'ccPartnerIds',
@@ -239,6 +233,9 @@ export class ComposeMail extends Component {
             current.add(suggestion.id)
             this.state[partnerField] = Array.from(current)
         }
+
+        // Clear text field after adding partner ID to avoid sending invalid email text
+        this.state[fieldName] = ''
 
         this.state.recipientSuggestions = fieldName === 'recipient' ? [] : this.state.recipientSuggestions
         this.state.ccSuggestions = fieldName === 'cc' ? [] : this.state.ccSuggestions
