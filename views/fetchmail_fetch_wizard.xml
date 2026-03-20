@@ -71,8 +71,30 @@
         </field>
     </record>
 
+    <record id="view_fetchmail_server_tree_rt_mail_custom" model="ir.ui.view">
+        <field name="name">fetchmail.server.tree.rt.mail.custom</field>
+        <field name="model">fetchmail.server</field>
+        <field name="arch" type="xml">
+            <list string="Incoming Mail Servers" default_order="name asc">
+                <field name="name"/>
+                <field name="server"/>
+                <field name="port"/>
+                <field name="user"/>
+                <field name="last_fetch_end"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_fetchmail_server_tree_rt_mail_list_view" model="ir.actions.act_window.view">
+        <field name="sequence" eval="10"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_fetchmail_server_tree_rt_mail_custom"/>
+        <field name="act_window_id" ref="action_fetchmail_server_tree_rt_mail"/>
+    </record>
+
     <record id="action_fetchmail_server_tree_rt_mail_form_view" model="ir.actions.act_window.view">
-        <field name="sequence" eval="50"/>
+        <field name="sequence" eval="20"/>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_fetchmail_server_form_rt_mail_custom"/>
         <field name="act_window_id" ref="action_fetchmail_server_tree_rt_mail"/>
