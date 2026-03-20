@@ -13,6 +13,11 @@ _logger = logging.getLogger(__name__)
 class FetchmailServer(models.Model):
     _inherit = 'fetchmail.server'
 
+    @api.model
+    def _get_default_action_model_id(self):
+        model = self.env['ir.model'].sudo().search([('model', '=', 'email.record')], limit=1)
+        return model.id if model else False
+
     def _imap_login(self, connection):
         self.ensure_one()
         user = self.user if isinstance(self.user, str) else ''
@@ -25,6 +30,12 @@ class FetchmailServer(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+        default_action_model_id = self._get_default_action_model_id()
+        if default_action_model_id:
+            for vals in vals_list:
+                if not vals.get('object_id'):
+                    vals['object_id'] = default_action_model_id
+
         # Creating a fetchmail account can create/update linked scheduled actions.
         # Keep normal model access checks, then run create with sudo to avoid
         # requiring Settings rights on ir.cron for regular internal users.
@@ -267,6 +278,13 @@ class FetchmailServer(models.Model):
             raise ValidationError(_('Date-range fetch is supported for IMAP servers only.'))
         if months not in (1, 3, 6):
             raise ValidationError(_('Invalid fetch period. Choose 1, 3, or 6 months.'))
+
+        # Auto-heal legacy servers with no action model configured.
+        if not self.object_id:
+            default_action_model_id = self._get_default_action_model_id()
+            if default_action_model_id:
+                self.sudo().write({'object_id': default_action_model_id})
+
         if not self.object_id:
             raise ValidationError(_('Please set "Actions to Perform on Incoming Mails" first.'))
 
