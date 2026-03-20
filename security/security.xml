@@ -28,9 +28,9 @@
     </record>
 
     <record id="email_record_rule_admin_all" model="ir.rule">
-        <field name="name">Admin Email Record Full Access</field>
+        <field name="name">Admin Email Record Private Access</field>
         <field name="model_id" ref="model_email_record"/>
-        <field name="domain_force">[]</field>
+        <field name="domain_force">['|','|',('create_uid','=', user.id),('incoming_server_id.create_uid','=', user.id),('incoming_server_id.user','=ilike', user.login)]</field>
         <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         <field name="perm_read" eval="True"/>
         <field name="perm_create" eval="True"/>
@@ -39,9 +39,9 @@
     </record>
 
     <record id="incoming_mail_server_record_rule_admin" model="ir.rule">
-        <field name="name">Admin fetch mail server record rule</field>
+        <field name="name">Admin fetch mail server own-account rule</field>
         <field name="model_id" ref="mail.model_fetchmail_server"/>
-        <field name="domain_force">[]</field>
+        <field name="domain_force">['|',('create_uid','=', user.id),('user','=', user.login)]</field>
         <field name="groups" eval="[(4, ref('base.group_system'))]"/>
         <field name="perm_read" eval="True"/>
         <field name="perm_create" eval="True"/>

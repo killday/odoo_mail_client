@@ -93,7 +93,6 @@ class Email(models.Model):
     def _mail_interface_domain(self):
         user = self.env.user
         domain_parts = [
-            ('associated_users', 'in', [user.id]),
             ('create_uid', '=', user.id),
             ('incoming_server_id.create_uid', '=', user.id),
         ]
