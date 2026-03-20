@@ -30,6 +30,11 @@
         <field name="arch" type="xml">
             <form string="Incoming Mail Server">
                 <header>
+                    <button string="Reset Configuration"
+                            type="object"
+                            name="action_reset_configuration"
+                            class="btn-secondary"
+                            confirm="This will clear the server configuration values for this account. Continue?"/>
                     <button string="Fetch Now" type="object" name="action_open_fetch_range_wizard" invisible="state != 'done'"/>
                 </header>
                 <sheet>
