@@ -13,6 +13,27 @@ _logger = logging.getLogger(__name__)
 class FetchmailServer(models.Model):
     _inherit = 'fetchmail.server'
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        # Creating a fetchmail account can create/update linked scheduled actions.
+        # Keep normal model access checks, then run create with sudo to avoid
+        # requiring Settings rights on ir.cron for regular internal users.
+        self.check_access_rights('create')
+        if self.env.user.has_group('base.group_system'):
+            return super().create(vals_list)
+
+        records = super(FetchmailServer, self.sudo()).create(vals_list)
+        return records.with_env(self.env)
+
+    def write(self, vals):
+        # Updating a fetchmail account can also touch linked scheduled actions.
+        self.check_access_rights('write')
+        self.check_access_rule('write')
+        if self.env.user.has_group('base.group_system'):
+            return super().write(vals)
+
+        return super(FetchmailServer, self.sudo()).write(vals)
+
     delete_from_server_on_local_delete = fields.Boolean(
         string='Delete On Server When Deleted In Odoo',
         default=False,
