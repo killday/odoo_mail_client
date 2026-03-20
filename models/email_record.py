@@ -91,13 +91,18 @@ class Email(models.Model):
         return True
 
     def _mail_interface_domain(self):
-        return [
-            '|', '|', '|',
-            ('associated_users', 'in', [self.env.user.id]),
-            ('associated_users', '=', False),
-            ('create_uid', '=', self.env.user.id),
-            ('sender', '=', self.env.user.partner_id.id),
+        user = self.env.user
+        domain_parts = [
+            ('associated_users', 'in', [user.id]),
+            ('create_uid', '=', user.id),
+            ('incoming_server_id.create_uid', '=', user.id),
         ]
+
+        # Some accounts are linked by login in fetchmail.server.user.
+        if user.login:
+            domain_parts.append(('incoming_server_id.user', '=ilike', user.login))
+
+        return ['|'] * (len(domain_parts) - 1) + domain_parts
 
     def _mail_interface_fields(self):
         return [
