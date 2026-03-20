@@ -309,7 +309,11 @@ export class ComposeMail extends Component {
     /**
      * Method to send the composed mail.
      */
-    async sentMail() {
+    async sentMail(ev) {
+        if (ev) {
+            ev.preventDefault()
+            ev.stopPropagation()
+        }
         const {
             subject,
             recipient,

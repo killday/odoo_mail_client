@@ -17,7 +17,7 @@
                                     <i class="fa fa-window-minimize"
                                        aria-hidden="true"/>
                                 </button>
-                                <button class="btn" t-on-click="maximizeMail">
+                                <button class="btn" type="button" t-on-click="maximizeMail">
                                     <img src="/odoo_mail_client/static/src/img/expand_icon.svg"
                                          class="btn-icon btn-icon-sm"/>
                                 </button>
@@ -186,7 +186,7 @@
                                 </t>
                         </div>
                         <div class="footer d-flex justify-content-end">
-                            <button type="submit"
+                            <button type="button"
                                     style="border-radius: 15px; width: 85px;"
                                     class="btn btn-primary"
                                     t-on-click="sentMail">Send</button>
