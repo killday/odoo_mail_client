@@ -13,6 +13,16 @@ _logger = logging.getLogger(__name__)
 class FetchmailServer(models.Model):
     _inherit = 'fetchmail.server'
 
+    def _imap_login(self, connection):
+        self.ensure_one()
+        user = self.user if isinstance(self.user, str) else ''
+        password = self.password if isinstance(self.password, str) else ''
+        if not user or not password:
+            raise ValidationError(
+                _('Please set a valid Incoming Username and Password before testing the connection.')
+            )
+        return super()._imap_login(connection)
+
     @api.model_create_multi
     def create(self, vals_list):
         # Creating a fetchmail account can create/update linked scheduled actions.
