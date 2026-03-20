@@ -186,7 +186,8 @@ class Email(models.Model):
     @api.model
     def sent_mail(self, **kwargs):
         recipient = (kwargs.get('recipient') or '').strip()
-        if not recipient:
+        recipient_partner_ids = kwargs.get('recipient_partner_ids') or []
+        if not recipient and not recipient_partner_ids:
             raise exceptions.UserError(_('Recipient is required before sending.'))
 
         attachment_payloads = kwargs.get('attachments')
@@ -205,11 +206,35 @@ class Email(models.Model):
             })
             attachment_ids.append(attachment.id)
 
-        to_contact_ids = self.get_contact_ids(self.get_emails(recipient))
+        def _sanitize_partner_ids(values):
+            ids = []
+            if not isinstance(values, (list, tuple)):
+                return ids
+            for value in values:
+                try:
+                    value = int(value)
+                except (TypeError, ValueError):
+                    continue
+                if value > 0:
+                    ids.append(value)
+            return ids
+
+        to_contact_ids = _sanitize_partner_ids(recipient_partner_ids)
+        if recipient:
+            to_contact_ids.extend(self.get_contact_ids(self.get_emails(recipient)))
+        to_contact_ids = list(set(to_contact_ids))
+
         cc_string = (kwargs.get('cc') or '').strip()
-        cc_contact_ids = self.get_contact_ids(self.get_emails(cc_string)) if cc_string else []
+        cc_contact_ids = _sanitize_partner_ids(kwargs.get('cc_partner_ids') or [])
+        if cc_string:
+            cc_contact_ids.extend(self.get_contact_ids(self.get_emails(cc_string)))
+        cc_contact_ids = list(set(cc_contact_ids))
+
         bcc_string = (kwargs.get('bcc') or '').strip()
-        bcc_contact_ids = self.get_contact_ids(self.get_emails(bcc_string)) if bcc_string else []
+        bcc_contact_ids = _sanitize_partner_ids(kwargs.get('bcc_partner_ids') or [])
+        if bcc_string:
+            bcc_contact_ids.extend(self.get_contact_ids(self.get_emails(bcc_string)))
+        bcc_contact_ids = list(set(bcc_contact_ids))
         incoming_server_id = kwargs.get('incoming_server_id')
         if incoming_server_id:
             try:

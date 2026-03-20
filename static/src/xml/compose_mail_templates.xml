@@ -63,20 +63,65 @@
                                         t-on-click="openSignatureManager">Create</button>
                             </div>
                             <br/>
-                            <input type="email" class="form-control"
-                                   id="Recipient" t-model="state.recipient"
-                                   aria-describedby="emailHelp" required="1"
-                                   placeholder="To"/>
+                            <label for="to_contacts" class="compose-field-label">To (Contacts)</label>
+                            <select id="to_contacts"
+                                    class="form-control"
+                                    multiple="multiple"
+                                    t-on-change="onToContactsChange"
+                                    style="min-height:90px;">
+                                <t t-foreach="state.contacts" t-as="contact" t-key="contact.id">
+                                    <option t-att-value="contact.id"
+                                            t-att-selected="state.recipientPartnerIds.includes(contact.id) ? 'selected' : undefined">
+                                        <t t-out="(contact.name || contact.email) + ' <' + contact.email + '>'"/>
+                                    </option>
+                                </t>
+                            </select>
+                            <small style="display:block;color:#666;margin-top:4px;">Hold Ctrl/Cmd to pick multiple contacts.</small>
                             <br/>
-                            <input type="email" class="form-control"
+                            <input type="text" class="form-control"
+                                   id="Recipient" t-model="state.recipient"
+                                aria-describedby="emailHelp"
+                                   placeholder="To (additional emails, comma separated)"/>
+                            <br/>
+                            <label for="cc_contacts" class="compose-field-label">Cc (Contacts)</label>
+                            <select id="cc_contacts"
+                                    class="form-control"
+                                    multiple="multiple"
+                                    t-on-change="onCcContactsChange"
+                                    style="min-height:90px;">
+                                <t t-foreach="state.contacts" t-as="contact" t-key="contact.id">
+                                    <option t-att-value="contact.id"
+                                            t-att-selected="state.ccPartnerIds.includes(contact.id) ? 'selected' : undefined">
+                                        <t t-out="(contact.name || contact.email) + ' <' + contact.email + '>'"/>
+                                    </option>
+                                </t>
+                            </select>
+                            <small style="display:block;color:#666;margin-top:4px;">Optional additional copy recipients from Contacts.</small>
+                            <br/>
+                            <input type="text" class="form-control"
                                    id="cc" t-model="state.cc"
                                    aria-describedby="emailHelp"
-                                   placeholder="Cc"/>
+                                   placeholder="Cc (additional emails, comma separated)"/>
                             <br/>
-                            <input type="email" class="form-control"
+                            <label for="bcc_contacts" class="compose-field-label">Bcc (Contacts)</label>
+                            <select id="bcc_contacts"
+                                    class="form-control"
+                                    multiple="multiple"
+                                    t-on-change="onBccContactsChange"
+                                    style="min-height:90px;">
+                                <t t-foreach="state.contacts" t-as="contact" t-key="contact.id">
+                                    <option t-att-value="contact.id"
+                                            t-att-selected="state.bccPartnerIds.includes(contact.id) ? 'selected' : undefined">
+                                        <t t-out="(contact.name || contact.email) + ' <' + contact.email + '>'"/>
+                                    </option>
+                                </t>
+                            </select>
+                            <small style="display:block;color:#666;margin-top:4px;">Hidden copy recipients from Contacts.</small>
+                            <br/>
+                            <input type="text" class="form-control"
                                    id="bcc" t-model="state.bcc"
                                    aria-describedby="emailHelp"
-                                   placeholder="Bcc"/>
+                                   placeholder="Bcc (additional emails, comma separated)"/>
                             <br/>
                             <input type="text" class="form-control"
                                    id="subject" t-model="state.subject"

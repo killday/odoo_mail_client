@@ -20,9 +20,13 @@ export class ComposeMail extends Component {
             recipient: this.props.initialRecipient || "",
             cc: this.props.initialCc || "",
             bcc: this.props.initialBcc || "",
+            recipientPartnerIds: this.props.initialRecipientPartnerIds || [],
+            ccPartnerIds: this.props.initialCcPartnerIds || [],
+            bccPartnerIds: this.props.initialBccPartnerIds || [],
             parentMessageId: this.props.initialParentMessageId || false,
             senderServerId: this.props.initialServerId ? String(this.props.initialServerId) : "",
             senderAccounts: [],
+            contacts: [],
             signatures: [],
             selectedSignatureId: "",
             contentTouched: false,
@@ -49,6 +53,17 @@ export class ComposeMail extends Component {
             }
             if (!this.state.senderServerId && this.state.senderAccounts.length) {
                 this.state.senderServerId = String(this.state.senderAccounts[0].id)
+            }
+
+            try {
+                this.state.contacts = await this.orm.searchRead(
+                    'res.partner',
+                    [['email', '!=', false]],
+                    ['name', 'email'],
+                    { order: 'name asc', limit: 500 }
+                )
+            } catch (error) {
+                this.state.contacts = []
             }
 
             try {
@@ -159,6 +174,25 @@ export class ComposeMail extends Component {
         // formats can be attached like a standard email client.
         return this.attachmentReader(file)
     }
+
+    getSelectValues(ev) {
+        return Array.from(ev.currentTarget.selectedOptions || [])
+            .map((option) => parseInt(option.value, 10))
+            .filter((id) => !Number.isNaN(id))
+    }
+
+    onToContactsChange(ev) {
+        this.state.recipientPartnerIds = this.getSelectValues(ev)
+    }
+
+    onCcContactsChange(ev) {
+        this.state.ccPartnerIds = this.getSelectValues(ev)
+    }
+
+    onBccContactsChange(ev) {
+        this.state.bccPartnerIds = this.getSelectValues(ev)
+    }
+
     /**
      * Method to send the composed mail.
      */
@@ -168,19 +202,25 @@ export class ComposeMail extends Component {
             recipient,
             cc,
             bcc,
+            recipientPartnerIds,
+            ccPartnerIds,
+            bccPartnerIds,
             senderServerId,
             parentMessageId,
             content,
             images,
         } = this.state
         let sendMail = []
-        if (recipient) {
+        if (recipient || (Array.isArray(recipientPartnerIds) && recipientPartnerIds.length)) {
             try {
                 sendMail = await this.orm.call('email.record', 'sent_mail', [], {
                     subject,
                     recipient,
                     cc,
                     bcc,
+                    recipient_partner_ids: recipientPartnerIds,
+                    cc_partner_ids: ccPartnerIds,
+                    bcc_partner_ids: bccPartnerIds,
                     incoming_server_id: senderServerId ? parseInt(senderServerId, 10) : false,
                     parent_message_id: parentMessageId || false,
                     content,
