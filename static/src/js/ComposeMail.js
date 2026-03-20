@@ -245,16 +245,28 @@ export class ComposeMail extends Component {
         this.state.bccSuggestions = fieldName === 'bcc' ? [] : this.state.bccSuggestions
     }
 
-    onRecipientSuggestionMouseDown(suggestion) {
-        this.insertSuggestion('recipient', suggestion)
+    onRecipientSuggestionMouseDown(ev) {
+        const suggestionId = parseInt(ev.currentTarget.dataset.suggestionId, 10)
+        const suggestion = this.state.recipientSuggestions.find(s => s.id === suggestionId)
+        if (suggestion) {
+            this.insertSuggestion('recipient', suggestion)
+        }
     }
 
-    onCcSuggestionMouseDown(suggestion) {
-        this.insertSuggestion('cc', suggestion)
+    onCcSuggestionMouseDown(ev) {
+        const suggestionId = parseInt(ev.currentTarget.dataset.suggestionId, 10)
+        const suggestion = this.state.ccSuggestions.find(s => s.id === suggestionId)
+        if (suggestion) {
+            this.insertSuggestion('cc', suggestion)
+        }
     }
 
-    onBccSuggestionMouseDown(suggestion) {
-        this.insertSuggestion('bcc', suggestion)
+    onBccSuggestionMouseDown(ev) {
+        const suggestionId = parseInt(ev.currentTarget.dataset.suggestionId, 10)
+        const suggestion = this.state.bccSuggestions.find(s => s.id === suggestionId)
+        if (suggestion) {
+            this.insertSuggestion('bcc', suggestion)
+        }
     }
 
     /**

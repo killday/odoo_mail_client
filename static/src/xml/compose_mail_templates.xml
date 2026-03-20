@@ -77,7 +77,8 @@
                                         <button type="button"
                                                 class="btn w-100 text-start"
                                                 style="border-radius:0;padding:8px 10px;"
-                                                t-on-mousedown="() => onRecipientSuggestionMouseDown(suggestion)">
+                                                t-att-data-suggestion-id="suggestion.id"
+                                                t-on-mousedown="onRecipientSuggestionMouseDown">
                                             <t t-out="suggestion.label"/>
                                         </button>
                                     </t>
@@ -98,7 +99,8 @@
                                         <button type="button"
                                                 class="btn w-100 text-start"
                                                 style="border-radius:0;padding:8px 10px;"
-                                                t-on-mousedown="() => onCcSuggestionMouseDown(suggestion)">
+                                                t-att-data-suggestion-id="suggestion.id"
+                                                t-on-mousedown="onCcSuggestionMouseDown">
                                             <t t-out="suggestion.label"/>
                                         </button>
                                     </t>
@@ -119,7 +121,8 @@
                                         <button type="button"
                                                 class="btn w-100 text-start"
                                                 style="border-radius:0;padding:8px 10px;"
-                                                t-on-mousedown="() => onBccSuggestionMouseDown(suggestion)">
+                                                t-att-data-suggestion-id="suggestion.id"
+                                                t-on-mousedown="onBccSuggestionMouseDown">
                                             <t t-out="suggestion.label"/>
                                         </button>
                                     </t>
