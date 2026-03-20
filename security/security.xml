@@ -50,13 +50,13 @@
     </record>
 
     <record id="incoming_mail_server_record_rule_user" model="ir.rule">
-        <field name="name">User fetch mail server read-only rule</field>
+        <field name="name">User fetch mail server own-account rule</field>
         <field name="model_id" ref="mail.model_fetchmail_server"/>
         <field name="domain_force">['|',('create_uid','=', user.id),('user','=', user.login)]</field>
         <field name="groups" eval="[(4, ref('base.group_user'))]"/>
         <field name="perm_read" eval="True"/>
-        <field name="perm_create" eval="False"/>
-        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_write" eval="True"/>
         <field name="perm_unlink" eval="False"/>
     </record>
 
