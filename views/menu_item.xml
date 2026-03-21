@@ -227,7 +227,7 @@
     <record id="action_email_documentation" model="ir.actions.act_url">
         <field name="name">Documentation</field>
         <field name="type">ir.actions.act_url</field>
-        <field name="url">/web/static/src/xml/odoo_mail_client/static/description/quick_start_end_user.html</field>
+        <field name="url">/odoo_mail_client/static/description/quick_start_end_user.html</field>
         <field name="target">new</field>
     </record>
 
