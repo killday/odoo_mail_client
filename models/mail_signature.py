@@ -7,11 +7,23 @@ class MailSignature(models.Model):
     _order = 'is_default desc, name asc'
 
     name = fields.Char(required=True)
-    body = fields.Text(required=True)
+    body = fields.Html(required=True, sanitize=True)
+    preview_html = fields.Html(compute='_compute_preview_html')
     server_id = fields.Many2one('fetchmail.server', string='Account')
-    user_id = fields.Many2one('res.users', default=lambda self: self.env.user, required=True, index=True)
+    user_id = fields.Many2one(
+        'res.users',
+        default=lambda self: self.env.user,
+        required=True,
+        index=True,
+    )
     is_default = fields.Boolean(string='Default', default=False)
     active = fields.Boolean(default=True)
+
+    @api.depends('body')
+    def _compute_preview_html(self):
+        for rec in self:
+            body = rec.body or ''
+            rec.preview_html = body or '<p><i>No content yet.</i></p>'
 
     def _unset_other_defaults(self):
         for rec in self:

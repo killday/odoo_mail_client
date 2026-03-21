@@ -40,10 +40,17 @@
 
 /* ---- BODY GRID ---- */
 
+.odoo_mails {
+        height: 100%;
+        min-height: 0;
+}
+
 .body-wrapper {
-	display: grid;
-	grid-template-columns: 270px minmax(0, 1fr) 72px;
-	grid-template-rows: auto calc(100vh - 64px);
+        display: grid;
+        grid-template-columns: 270px minmax(0, 1fr) 72px;
+        grid-template-rows: auto minmax(0, 1fr);
+        height: 100%;
+        min-height: 0;
 
 }
 
@@ -322,12 +329,16 @@
 /* ==== BODY ==== */
 
 .mail_inbox {
-	grid-column: 2 / 3;
-	grid-row: 2 / -1;
-	height: calc(100vh - 64px);
-	overflow: hidden;
-	min-width: 0;
+        grid-column: 2 / 3;
+        grid-row: 2 / -1;
+        height: auto;
+        overflow: hidden;
+        min-width: 0;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
 }
+
 
 /* ==== MAIL ==== */
 
@@ -354,16 +365,20 @@
 }
 
 .inbox-container {
-	display: -webkit-box;
-	display: -ms-flexbox;
-	display: flex;
-	-webkit-box-orient: vertical;
-	-webkit-box-direction: normal;
-	-ms-flex-flow: column;
-	flex-flow: column;
-	height: calc(100vh - 112px);
-	min-height: 0;
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-flow: column;
+        flex-flow: column;
+        -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
 }
+
 
 .inbox-menu-group {
 	display: -webkit-box;
@@ -446,16 +461,19 @@
 /* ==== MAIL CONTENT ==== */
 
 .mail-content {
-	display: block;
-	margin-bottom: 0;
-	padding-bottom: 18px;
-	box-sizing: border-box;
-	flex: 1 1 auto;
-	min-height: 0;
-	overflow-y: auto;
-	overflow-x: hidden;
-	height: auto;
+        display: block;
+        margin-bottom: 0;
+        padding-bottom: 24px;
+        box-sizing: border-box;
+        -webkit-box-flex: 1;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: 100%;
 }
+
 
 .message {
 	padding: 8px 12px 24px 12px;
@@ -1029,7 +1047,8 @@ opacity:1;
 	}
 
 	.mail_inbox {
-		height: calc(100vh - 64px);
+		height: auto;
+                min-height: 0;
 	}
 
 	.app-container {
@@ -1053,9 +1072,10 @@ opacity:1;
 	.body-wrapper {
 		grid-template-columns: 1fr;
 		grid-template-rows: auto auto minmax(0, 1fr);
-		height: 100dvh;
-		overflow: hidden;
-	}
+                height: 100%;
+                min-height: 0;
+                overflow: hidden;
+        }
 
 	.head {
 		grid-column: 1 / -1;
@@ -1710,4 +1730,270 @@ border-radius:10px
 	.o_form_view .rt_fetchmail_layout_group .rt_fetchmail_metrics_column {
 		max-width: 100% !important;
 	}
+}
+
+/* ==== OPEN MAIL VIEW REFRESH ==== */
+.mail-open-view {
+        padding: 10px 14px 28px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+}
+
+.mail-open-card {
+        background: #ffffff;
+        border: 1px solid #e4e7ec;
+        border-radius: 14px;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+        overflow: hidden;
+}
+
+.mail-open-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 16px 18px 10px 18px;
+        border-bottom: 1px solid #eef1f5;
+}
+
+.mail-open-subject {
+        margin: 0;
+        font-size: 1.18rem;
+        font-weight: 600;
+        color: #101828;
+        line-height: 1.35;
+}
+
+.mail-open-account {
+        flex: 0 0 auto;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #ecf3ff;
+        color: #234ea2;
+        font-size: 0.75rem;
+        font-weight: 600;
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+}
+
+.mail-open-meta {
+        display: grid;
+        grid-template-columns: 1fr;
+        row-gap: 8px;
+        padding: 12px 18px 14px 18px;
+        border-bottom: 1px solid #eef1f5;
+        background: #fbfcfe;
+}
+
+.mail-meta-row {
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        column-gap: 8px;
+        align-items: start;
+}
+
+.mail-meta-label {
+        font-size: 0.78rem;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: #667085;
+        font-weight: 600;
+}
+
+.mail-meta-value {
+        font-size: 0.91rem;
+        color: #1f2937;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+}
+
+.mail-open-body {
+        padding: 18px;
+        background: #ffffff;
+}
+
+.email-rendered-content {
+        color: #111827;
+        font-size: 0.95rem;
+        line-height: 1.55;
+        overflow-x: auto;
+}
+
+.email-rendered-content * {
+        max-width: 100%;
+        box-sizing: border-box;
+}
+
+.email-rendered-content img {
+        max-width: 100% !important;
+        height: auto !important;
+}
+
+.email-rendered-content table {
+        max-width: 100% !important;
+        border-collapse: collapse;
+}
+
+.email-rendered-content td,
+.email-rendered-content th {
+        vertical-align: top;
+}
+
+.email-rendered-content p {
+        margin: 0 0 0.9rem 0;
+}
+
+.email-rendered-content blockquote {
+        margin: 0.8rem 0;
+        padding: 0.4rem 0.9rem;
+        border-left: 3px solid #d0d8e8;
+        color: #475467;
+        background: #f8fafc;
+}
+
+.email-rendered-content pre,
+.email-rendered-content code {
+        white-space: pre-wrap;
+        word-break: break-word;
+}
+
+.email-rendered-content a {
+        color: #185abc;
+        text-decoration: underline;
+}
+
+.mail-open-attachments {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+}
+
+.mail-attachment-card {
+        border: 1px solid #e4e7ec;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 10px;
+}
+
+.mail-attachment-image {
+        width: 100%;
+        max-height: 240px;
+        object-fit: contain;
+        border-radius: 8px;
+        background: #f8fafc;
+}
+
+.mail-attachment-caption {
+        margin-top: 8px;
+        font-size: 0.84rem;
+        color: #475467;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+}
+
+.mail-attachment-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+}
+
+.mail-attachment-icon {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 auto;
+}
+
+.mail-attachment-meta {
+        min-width: 0;
+        flex: 1 1 auto;
+}
+
+.mail-attachment-name {
+        margin: 0;
+        font-size: 0.88rem;
+        color: #111827;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+}
+
+.mail-attachment-type {
+        color: #667085;
+}
+
+@media screen and (max-width: 768px) {
+        .mail-open-view {
+                padding: 8px 8px 18px 8px;
+                gap: 8px;
+        }
+
+        .mail-open-header {
+                padding: 12px;
+                align-items: flex-start;
+                flex-direction: column;
+        }
+
+        .mail-open-meta {
+                padding: 10px 12px;
+        }
+
+        .mail-meta-row {
+                grid-template-columns: 72px 1fr;
+        }
+
+        .mail-open-body {
+                padding: 12px;
+        }
+}
+
+/* ==== SIGNATURE TEMPLATE EDITOR ==== */
+.o_form_view .o_mail_signature_editor {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid #e5edf7;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.o_form_view .o_mail_signature_editor .oe_title {
+    margin-bottom: 8px;
+}
+
+.o_form_view .o_mail_signature_editor .o_notebook {
+    margin-top: 14px;
+}
+
+.o_form_view .o_mail_signature_editor .o_field_widget[name="body"] {
+    min-height: 12.5rem;
+}
+
+.o_form_view .o_mail_signature_editor .o_field_widget[name="body"] .odoo-editor-editable,
+.o_form_view .o_mail_signature_editor .o_field_widget[name="body"] .note-editable,
+.o_form_view .o_mail_signature_editor .o_field_widget[name="body"] [contenteditable="true"] {
+    min-height: 12.5rem;
+    line-height: 1.55;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+
+.o_form_view .o_mail_signature_editor .o_field_widget[name="body"] .odoo-editor-editable:focus,
+.o_form_view .o_mail_signature_editor .o_field_widget[name="body"] .note-editable:focus,
+.o_form_view .o_mail_signature_editor .o_field_widget[name="body"] [contenteditable="true"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.o_form_view .o_mail_signature_hint {
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+.o_form_view .o_mail_signature_editor .o_field_widget[name="preview_html"] {
+    border: 1px solid #dbe6f5;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 12px;
+    min-height: 180px;
 }

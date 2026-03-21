@@ -1,39 +1,46 @@
 /** @odoo-module **/
 import { Component } from '@odoo/owl';
 import { useService } from "@web/core/utils/hooks";
-import { useState, onMounted, markup, useRef} from "@odoo/owl";
+import { useState, onMounted, onWillUpdateProps, markup, useRef } from "@odoo/owl";
 import { ComposeMail } from './ComposeMail'
-
 
 /**
  * MessageView component for displaying a message.
  * @extends Component
  */
-export class MessageView extends  Component {
-    setup(){
+export class MessageView extends Component {
+    setup() {
         this.root = useRef("root-mail")
         this.action = useService("action");
         this.dialog = useService("dialog");
         this.notification = useService("notification");
-        this.html_content = markup(this.props.mail.body || "")
         this.orm = useService("orm");
         this.state = useState({
             attachments: [],
             data: [],
             toEmails: '',
+            ccEmails: '',
             receivedAt: '',
         })
         onMounted(() => {
-            this.fetch_data()
+            this.fetch_data(this.props.mail)
+        });
+        onWillUpdateProps((nextProps) => {
+            this.fetch_data(nextProps.mail)
         });
     }
-    async fetch_data(){
-        const attachmentIds = this.props.mail.attachments || []
-        const toIds = Array.isArray(this.props.mail.to) ? this.props.mail.to : []
+
+    async fetch_data(mail = this.props.mail) {
+        const safeMail = mail || {}
+        const attachmentIds = safeMail.attachments || []
+        const toIds = Array.isArray(safeMail.to) ? safeMail.to : []
+        const ccIds = Array.isArray(safeMail.cc) ? safeMail.cc : []
 
         this.state.toEmails = await this.getRecipientEmails(toIds)
-        this.state.receivedAt = this.formatDateTime(this.props.mail.date_time)
+        this.state.ccEmails = await this.getRecipientEmails(ccIds)
+        this.state.receivedAt = this.formatDateTime(safeMail.date_time)
 
+        this.state.attachments = []
         if (attachmentIds.length) {
             try {
                 this.state.attachments = await this.orm.call("ir.attachment", "get_fields", [attachmentIds], {})
@@ -66,7 +73,8 @@ export class MessageView extends  Component {
             minute: '2-digit',
         }).format(parsed)
     }
-    onClickImage(evOrValue){
+
+    onClickImage(evOrValue) {
         const value = (evOrValue && evOrValue.currentTarget && evOrValue.currentTarget.dataset)
             ? parseInt(evOrValue.currentTarget.dataset.attachmentId, 10)
             : parseInt(evOrValue, 10)
@@ -77,7 +85,7 @@ export class MessageView extends  Component {
         window.location.href = `/web/content/${value}?download=true`
     }
 
-    async replyMail(){
+    async replyMail() {
         if (!this.props.mail.id) {
             return
         }
@@ -103,7 +111,7 @@ export class MessageView extends  Component {
         })
     }
 
-    async forwardMail(){
+    async forwardMail() {
         if (!this.props.mail.id) {
             return
         }
@@ -153,7 +161,11 @@ export class MessageView extends  Component {
         return (doc.body.textContent || '').trim()
     }
 
-    async archiveMail(){
+    getHtmlContent() {
+        return markup(this.props.mail.body || "")
+    }
+
+    async archiveMail() {
         if (!this.props.mail.id) {
             return
         }
@@ -170,7 +182,7 @@ export class MessageView extends  Component {
         }
     }
 
-    async unarchiveMail(){
+    async unarchiveMail() {
         if (!this.props.mail.id) {
             return
         }
@@ -187,7 +199,7 @@ export class MessageView extends  Component {
         }
     }
 
-    async deleteMail(){
+    async deleteMail() {
         if (!this.props.mail.id) {
             return
         }
@@ -204,7 +216,7 @@ export class MessageView extends  Component {
         }
     }
 
-    async markUnreadMail(){
+    async markUnreadMail() {
         if (!this.props.mail.id) {
             return
         }
@@ -221,11 +233,10 @@ export class MessageView extends  Component {
         }
     }
 
-    backToList(){
+    backToList() {
         if (this.props.onBack) {
             this.props.onBack()
         }
     }
-
 }
 MessageView.template = 'MessageView'

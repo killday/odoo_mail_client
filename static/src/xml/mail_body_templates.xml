@@ -46,8 +46,8 @@
                 <i class="fa fa-paperclip"/>
             </span>
         </div>
-                <div class="message-account-tag" t-if="props.mail.incoming_server_id and props.mail.incoming_server_id[1]">
-            <span t-out="props.mail.incoming_server_id[1]"/>
+                <div class="message-account-tag" t-if="props.mail.display_account_name or (props.mail.incoming_server_id and props.mail.incoming_server_id[1])">
+            <span t-out="props.mail.display_account_name or props.mail.incoming_server_id[1]"/>
         </div>
                 <div class="message-date center-text">
             <span t-out="props.mail.date_time"/>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates id="tmp" xml:space="preserve">
-        <!-- MessageView template for displaying a single mail message -->
+    <!-- MessageView template for displaying a single mail message -->
     <t t-name="MessageView" owl="1">
-        <div class="message" t-ref="root-mail">
+        <div class="message mail-open-view" t-ref="root-mail">
             <div class="inbox-menu open-mail-toolbar">
                 <div class="inbox-menu-group">
                     <button type="button" class="btn toolbar-btn" title="Back to Inbox" aria-label="Back to Inbox" t-on-click="backToList">
@@ -28,85 +28,76 @@
                     </button>
                 </div>
             </div>
-            <h4 t-out="props.mail.subject" style="margin-right: auto; margin-top: 8px;"/>
-            <br/>
-            <div>
-                <strong>From:</strong>
-                <span t-out="props.mail.sender and props.mail.sender[1] or ''"/>
+
+            <div class="mail-open-card">
+                <div class="mail-open-header">
+                    <h4 class="mail-open-subject" t-out="props.mail.subject or '(No subject)'"/>
+                    <div class="mail-open-account" t-if="props.mail.incoming_server_id and props.mail.incoming_server_id[1]">
+                        <span t-out="props.mail.incoming_server_id[1]"/>
+                    </div>
+                </div>
+
+                <div class="mail-open-meta">
+                    <div class="mail-meta-row">
+                        <span class="mail-meta-label">From</span>
+                        <span class="mail-meta-value" t-out="props.mail.sender and props.mail.sender[1] or ''"/>
+                    </div>
+                    <div class="mail-meta-row">
+                        <span class="mail-meta-label">To</span>
+                        <span class="mail-meta-value" t-out="state.toEmails or 'No recipients'"/>
+                    </div>
+                    <div class="mail-meta-row" t-if="state.ccEmails">
+                        <span class="mail-meta-label">Cc</span>
+                        <span class="mail-meta-value" t-out="state.ccEmails"/>
+                    </div>
+                    <div class="mail-meta-row">
+                        <span class="mail-meta-label">Received</span>
+                        <span class="mail-meta-value" t-out="state.receivedAt or (props.mail.date_time or '')"/>
+                    </div>
+                </div>
+
+                <div class="mail-open-body email-rendered-content">
+                    <t t-out="getHtmlContent()"/>
+                </div>
             </div>
-            <div>
-                <strong>To:</strong>
-                <span t-out="state.toEmails or 'No recipients'"/>
-            </div>
-            <div>
-                <strong>Received:</strong>
-                <span t-out="state.receivedAt or (props.mail.date_time or '')"/>
-            </div>
-            <br/>
-            <div>
-                <t t-out="html_content"/>
-            </div>
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap; ">
+
+            <div class="mail-open-attachments" t-if="state.attachments and state.attachments.length">
                 <t t-foreach="state.attachments" t-as="data" t-key="data.attachment">
-                    <div t-if="data.mimetype == 'image/jpeg' ||  data.mimetype == 'image/png' ||  data.mimetype == 'image/gif' ||  data.mimetype == 'image/svg+xml' ||  data.mimetype == 'image/webp'">
-                        <div class="row">
-                            <div class="img-container" style="">
-                                          <div class="hover-card"
-                                                 t-att-data-attachment-id="data.attachment"
-                                                 t-on-click="onClickImage">
-                                   <i class="fa fa-download"/>
-                                </div>
-                                          <img class="img-fluid" style="width: 300px;height: 100px"
-                                              t-att-src="'data:' + (data.mimetype or 'application/octet-stream') + ';base64,' + data.datas"
-                                     alt=""/>
-                                </div>
+                    <div class="mail-attachment-card" t-if="data.mimetype == 'image/jpeg' or data.mimetype == 'image/png' or data.mimetype == 'image/gif' or data.mimetype == 'image/svg+xml' or data.mimetype == 'image/webp'">
+                        <div class="img-container">
+                            <div class="hover-card" t-att-data-attachment-id="data.attachment" t-on-click="onClickImage">
+                                <i class="fa fa-download"/>
+                            </div>
+                            <img class="img-fluid mail-attachment-image"
+                                 t-att-src="'data:' + (data.mimetype or 'application/octet-stream') + ';base64,' + data.datas"
+                                 t-att-alt="data.name or 'image attachment'"/>
+                        </div>
+                        <div class="mail-attachment-caption" t-out="data.name or 'Image attachment'"/>
+                    </div>
+
+                    <div class="mail-attachment-card" t-if="data.mimetype == 'application/pdf'">
+                        <div class="mail-attachment-row">
+                            <img class="mail-attachment-icon" src="/odoo_mail_client/static/src/img/pdf.png" alt="PDF"/>
+                            <div class="mail-attachment-meta">
+                                <p class="mail-attachment-name" t-out="data.name or 'PDF'"/>
+                                <small class="mail-attachment-type">application/pdf</small>
+                            </div>
+                            <button type="button" class="btn toolbar-btn" t-att-data-attachment-id="data.attachment" t-on-click="onClickImage" aria-label="Download PDF">
+                                <i class="text-black fa fa-download" aria-hidden="true"/>
+                            </button>
                         </div>
                     </div>
-                    <div t-if="data.mimetype == 'application/pdf'">
-                        <div class="row bg-secondary">
-                            <div class="d-flex flex-row">
-                                <div>
-                                    <img class="p-2" style="width: 45px; height:45px"
-                                         src="/odoo_mail_client/static/src/img/pdf.png"
-                                         alt="PDF Preview"
-                                    />
-                                </div>
-                                <div>
-                                    <p class="mt-3" t-out="data.name"/>
-                                </div>
-                                <div style="width: 50px"/>
-                                <div>
-                                        <button type="download" class="btn mt-3"
-                                            t-att-data-attachment-id="data.attachment"
-                                            t-on-click="onClickImage">
-                                                <i class="text-black fa fa-download" aria-hidden="true"/>
-                              </button>
-                                </div>
+
+                    <div class="mail-attachment-card" t-if="data.mimetype != 'image/jpeg' and data.mimetype != 'image/png' and data.mimetype != 'image/gif' and data.mimetype != 'image/svg+xml' and data.mimetype != 'image/webp' and data.mimetype != 'application/pdf'">
+                        <div class="mail-attachment-row">
+                            <img class="mail-attachment-icon" src="/odoo_mail_client/static/src/img/attachment.svg" alt="Attachment"/>
+                            <div class="mail-attachment-meta">
+                                <p class="mail-attachment-name" t-out="data.name or 'Attachment'"/>
+                                <small class="mail-attachment-type" t-out="data.mimetype or 'application/octet-stream'"/>
                             </div>
-                        </div>
-                    </div>
-                    <div t-if="data.mimetype != 'image/jpeg' and data.mimetype != 'image/png' and data.mimetype != 'image/gif' and data.mimetype != 'image/svg+xml' and data.mimetype != 'image/webp' and data.mimetype != 'application/pdf'">
-                        <div class="row bg-secondary">
-                            <div class="d-flex flex-row">
-                                <div>
-                                    <img class="p-2" style="width: 45px; height:45px"
-                                         src="/odoo_mail_client/static/src/img/attachment.svg"
-                                         alt="Attachment"
-                                    />
-                                </div>
-                                <div>
-                                    <p class="mt-2 mb-0" t-out="data.name or 'Attachment'"/>
-                                    <small class="text-muted" t-out="data.mimetype or 'application/octet-stream'"/>
-                                </div>
-                                <div style="width: 50px"/>
-                                <div>
-                                    <button type="download" class="btn mt-3"
-                                            t-att-data-attachment-id="data.attachment"
-                                            t-on-click="onClickImage">
-                                        <i class="text-black fa fa-download" aria-hidden="true"/>
-                                    </button>
-                                </div>
-                            </div>
+                            <button type="button" class="btn toolbar-btn" t-att-data-attachment-id="data.attachment" t-on-click="onClickImage" aria-label="Download attachment">
+                                <i class="text-black fa fa-download" aria-hidden="true"/>
+                            </button>
                         </div>
                     </div>
                 </t>

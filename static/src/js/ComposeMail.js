@@ -12,6 +12,7 @@ export class ComposeMail extends Component {
         this.root = useRef('root');
         this.action = useService('action')
         this.dialog = useService('dialog')
+        this.notification = useService('notification')
         this.hasInitialContent = Boolean(this.props.initialContent)
         this.baseContent = this.props.initialContent || ""
         this.state = useState({
@@ -346,16 +347,23 @@ export class ComposeMail extends Component {
                 })
             } catch (error) {
                 sendMail = []
+                const message = (error && error.data && error.data.message)
+                    || (error && error.message)
+                    || 'Failed to send email. Please check SMTP settings and recipients.'
+                this.notification.add(message, { type: 'danger' })
+                return
             }
             if (Array.isArray(sendMail) && sendMail.length) {
                 if (this.props.loadMail) {
                     this.props.loadMail(sendMail[0])
                 }
+                this.props.close()
+                if (this.props.reloadOnSend !== false) {
+                    window.location.reload()
+                }
+                return
             }
-            this.props.close()
-            if (this.props.reloadOnSend !== false) {
-                window.location.reload()
-            }
+            this.notification.add('Email was not sent. No result returned from server.', { type: 'warning' })
         }
     }
     /**

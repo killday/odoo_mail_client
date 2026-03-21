@@ -465,9 +465,25 @@ class Email(models.Model):
                 all_recipients.extend(cc_list if isinstance(cc_list, list) else [cc_list])
             if bcc_list:
                 all_recipients.extend(bcc_list if isinstance(bcc_list, list) else [bcc_list])
-            
-            smtp.sendmail(sender_email, all_recipients, msg.as_string())
+
+            # Normalize and deduplicate envelope recipients.
+            all_recipients = [addr.strip() for addr in all_recipients if addr and addr.strip()]
+            all_recipients = list(dict.fromkeys(all_recipients))
+            if not all_recipients:
+                _logger.error('SMTP send aborted: no valid recipients for email.record payload.')
+                smtp.quit()
+                return False
+
+            refused = smtp.sendmail(sender_email, all_recipients, msg.as_string())
             smtp.quit()
+            if refused:
+                _logger.error(
+                    'SMTP refused recipient(s) for sender %s. Envelope=%s Refused=%s',
+                    sender_email,
+                    all_recipients,
+                    refused,
+                )
+                return False
             _logger.info('Email sent from %s via SMTP to %s', sender_email, all_recipients)
             return True
         except Exception as e:

@@ -181,6 +181,14 @@ class odooMail extends Component {
             const latest = { ...sorted[0] }
             latest.conversation_count = sorted.length
             latest.conversation_ids = sorted.map((item) => item.id)
+
+            const selectedAccount = this.mailState.selectedAccountId
+                ? (this.mailState.accounts || []).find((item) => item.id === this.mailState.selectedAccountId)
+                : null
+            latest.display_account_name = selectedAccount && latest.type === 'incoming'
+                ? (selectedAccount.name || '')
+                : (latest.incoming_server_id && latest.incoming_server_id[1] ? latest.incoming_server_id[1] : '')
+
             conversationRows.push(latest)
         }
 
@@ -214,7 +222,9 @@ class odooMail extends Component {
             }
 
             if (sortBy === 'account') {
-                return normalizeComparableValue(a.incoming_server_id).localeCompare(normalizeComparableValue(b.incoming_server_id)) * direction
+                const aAccount = a.display_account_name || normalizeComparableValue(a.incoming_server_id)
+                const bAccount = b.display_account_name || normalizeComparableValue(b.incoming_server_id)
+                return String(aAccount).localeCompare(String(bAccount)) * direction
             }
 
             return 0
@@ -240,7 +250,29 @@ class odooMail extends Component {
         if (!this.mailState.selectedAccountId) {
             return []
         }
-        return [['incoming_server_id', '=', this.mailState.selectedAccountId]]
+
+        const selectedId = this.mailState.selectedAccountId
+        const account = (this.mailState.accounts || []).find((item) => item.id === selectedId)
+        const accountEmail = account && account.user && String(account.user).includes('@')
+            ? String(account.user).trim().toLowerCase()
+            : ''
+
+        // Keep strict server matching, but for incoming also include messages
+        // addressed to the selected account in To/Cc even when fetched by
+        // another linked mailbox of the same user.
+        if (!accountEmail) {
+            return [['incoming_server_id', '=', selectedId]]
+        }
+
+        return [
+            '|',
+            ['incoming_server_id', '=', selectedId],
+            '&',
+            ['type', '=', 'incoming'],
+            '|',
+            ['to.email', '=ilike', accountEmail],
+            ['cc.email', '=ilike', accountEmail],
+        ]
     }
 
     resetSortToDefault() {
@@ -394,7 +426,10 @@ class odooMail extends Component {
 
         this.autoRefreshInFlight = true
         try {
-            // Always refresh counters cheaply.
+            // Pull from incoming servers first so counts/list reflect truly new mail.
+            await this.safeModelCall('fetchmail.server', 'action_fetch_now_for_user', [])
+
+            // Then refresh counters from updated records.
             await this.getCount()
             this.notifyIfNewInboxEmails()
 

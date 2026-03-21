@@ -153,8 +153,14 @@ class FetchmailServer(models.Model):
                 ('type', '=', 'incoming'),
             ])
             try:
-                # Native method from fetchmail.server supports both IMAP and POP.
-                fetch_result = server.with_context(**server_ctx).fetch_mail()
+                # For IMAP, use module incremental fetch (UID/SINCE) so refresh
+                # can pull newly arrived messages even if they were already marked read
+                # by another mail client before Odoo polls.
+                if server.server_type == 'imap':
+                    fetch_result = server.with_context(**server_ctx).fetch_mail_by_month_window(1, raise_exception=False)
+                else:
+                    # Native method from fetchmail.server supports non-IMAP servers.
+                    fetch_result = server.with_context(**server_ctx).fetch_mail()
                 fetched_servers += 1
             except TypeError:
                 try:
@@ -185,7 +191,9 @@ class FetchmailServer(models.Model):
             ])
             server_created = max(after_count - before_count, 0)
             created_records += server_created
-            if isinstance(fetch_result, int):
+            if isinstance(fetch_result, dict):
+                processed_messages += max(int(fetch_result.get('count', 0) or 0), 0)
+            elif isinstance(fetch_result, int):
                 processed_messages += max(fetch_result, 0)
 
             _logger.info(
