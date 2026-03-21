@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odoo Mail Client - End User Quick Start</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --brand: #0b6bcb;
+      --ok: #0f766e;
+      --warn: #b45309;
+      --line: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 260px);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 32px auto;
+      padding: 0 16px 24px;
+    }
+
+    .hero {
+      background: radial-gradient(circle at 80% 20%, #dceeff 0%, #ffffff 65%);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      color: #111827;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+
+    ul, ol {
+      margin: 8px 0 0 22px;
+      padding: 0;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: #ffffff;
+      background: var(--brand);
+      margin-bottom: 8px;
+    }
+
+    .note {
+      border-left: 4px solid var(--ok);
+      background: #ecfdf5;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .warning {
+      border-left: 4px solid var(--warn);
+      background: #fffbeb;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .footer {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <span class="badge">ONE-PAGE GUIDE</span>
+      <h1>Odoo Mail Client - End User Quick Start</h1>
+      <p class="subtitle">Use this guide to start reading, sending, and organizing email in Odoo within minutes.</p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>1) Before You Start</h2>
+        <ol>
+          <li>Log in with your Odoo user account.</li>
+          <li>Make sure your administrator has configured at least one mail account for you.</li>
+          <li>If your Inbox is empty, ask your admin to run a manual fetch.</li>
+        </ol>
+      </article>
+
+      <article class="card">
+        <h2>2) Open the App</h2>
+        <ol>
+          <li>Open the Odoo app launcher.</li>
+          <li>Select <strong>Email Management</strong>.</li>
+          <li>Use mailbox views: Inbox, Sent, Draft, Unread, Starred, Archived, All Emails.</li>
+        </ol>
+      </article>
+
+      <article class="card">
+        <h2>3) Read and Process Messages</h2>
+        <ul>
+          <li>Open a message to read full details.</li>
+          <li>Use actions: Mark Read/Unread, Star/Unstar, Archive/Unarchive.</li>
+          <li>Use Reply and Forward directly from the message form.</li>
+          <li>Use search and filters to find emails quickly.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>4) Send a New Email</h2>
+        <ol>
+          <li>Create a draft message.</li>
+          <li>Fill <strong>To</strong> (required), then Cc/Bcc if needed.</li>
+          <li>Add subject, body, and attachments.</li>
+          <li>Select <strong>From Account</strong> if multiple accounts exist.</li>
+          <li>Click <strong>Send</strong>.</li>
+        </ol>
+        <div class="note">
+          If account SMTP is configured, the message is sent through that account. Otherwise, Odoo may queue delivery based on configuration.
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>5) Organize Your Mailbox</h2>
+        <ul>
+          <li>Star important messages for follow-up.</li>
+          <li>Archive completed threads.</li>
+          <li>Apply tags to classify conversations.</li>
+          <li>Use priority to flag urgent items.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>6) Troubleshooting Quick Checks</h2>
+        <ul>
+          <li><strong>Cannot send:</strong> confirm at least one valid recipient in To.</li>
+          <li><strong>SMTP error:</strong> re-check From Account and notify admin.</li>
+          <li><strong>No incoming mail:</strong> refresh view and ask admin to fetch now.</li>
+          <li><strong>Missing expected emails:</strong> verify correct user login; mailboxes are private by account/user rules.</li>
+        </ul>
+        <div class="warning">
+          Contact your administrator for account setup changes, permissions, or sync failures.
+        </div>
+      </article>
+    </section>
+
+    <p class="footer">Odoo Mail Client • End User Quick Start</p>
+  </main>
+</body>
+</html>
