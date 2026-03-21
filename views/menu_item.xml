@@ -222,5 +222,20 @@
               parent="email_configuration_list"
               action="action_fetchmail_server_tree_rt_mail"
               sequence="0"/>
+
+    <!-- Documentation action -->
+    <record id="action_email_documentation" model="ir.actions.act_url">
+        <field name="name">Documentation</field>
+        <field name="type">ir.actions.act_url</field>
+        <field name="url">/web/static/src/xml/odoo_mail_client/static/description/quick_start_end_user.html</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Documentation menu -->
+    <menuitem id="email_documentation_list"
+              name="Documentation"
+              parent="email_configuration_list"
+              action="action_email_documentation"
+              sequence="10"/>
     
 </odoo>
