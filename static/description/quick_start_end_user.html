@@ -3,94 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Odoo Mail Client - End User Quick Start</title>
+  <title>Odoo Mail Client - User & Administrator Manual</title>
   <style>
     :root {
       --bg: #f5f7fb;
-      --card: #ffffff;
-      --ink: #1f2937;
+      --text: #1f2937;
       --muted: #6b7280;
       --brand: #0b6bcb;
       --ok: #0f766e;
       --warn: #b45309;
       --line: #e5e7eb;
+      --card: #ffffff;
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
       font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
-      background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 260px);
-      color: var(--ink);
-      line-height: 1.5;
+      background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 320px);
+      color: var(--text);
+      line-height: 1.6;
     }
 
-    .page {
-      max-width: 980px;
-      margin: 32px auto;
-      padding: 0 16px 24px;
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
     }
 
-    .hero {
+    .header {
       background: radial-gradient(circle at 80% 20%, #dceeff 0%, #ffffff 65%);
       border: 1px solid var(--line);
       border-radius: 16px;
-      padding: 28px;
+      padding: 36px 28px;
       box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+      margin-bottom: 32px;
     }
 
     h1 {
       margin: 0 0 8px;
-      font-size: 30px;
-      letter-spacing: 0.2px;
+      font-size: 36px;
+      letter-spacing: 0.3px;
+    }
+
+    h2 {
+      margin: 28px 0 12px;
+      font-size: 24px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--line);
+    }
+
+    h3 {
+      margin: 18px 0 10px;
+      font-size: 18px;
+      color: #111827;
     }
 
     .subtitle {
       margin: 0;
       color: var(--muted);
-      font-size: 16px;
-    }
-
-    .grid {
-      margin-top: 16px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-
-    @media (min-width: 900px) {
-      .grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      padding: 18px;
-    }
-
-    h2 {
-      margin: 0 0 8px;
-      font-size: 20px;
-      color: #111827;
-    }
-
-    p {
-      margin: 8px 0;
-    }
-
-    ul, ol {
-      margin: 8px 0 0 22px;
-      padding: 0;
-    }
-
-    li {
-      margin: 6px 0;
+      font-size: 17px;
     }
 
     .badge {
@@ -98,113 +77,421 @@
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.3px;
-      padding: 5px 9px;
+      padding: 6px 11px;
       border-radius: 999px;
       color: #ffffff;
       background: var(--brand);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .section {
+      margin-bottom: 28px;
+    }
+
+    p {
+      margin: 10px 0;
+    }
+
+    ul, ol {
+      margin: 10px 0 10px 24px;
+      padding: 0;
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    strong {
+      font-weight: 600;
+      color: #111827;
     }
 
     .note {
       border-left: 4px solid var(--ok);
       background: #ecfdf5;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-radius: 8px;
-      margin-top: 10px;
+      margin: 12px 0;
+      font-size: 15px;
     }
 
     .warning {
       border-left: 4px solid var(--warn);
       background: #fffbeb;
-      padding: 10px 12px;
+      padding: 12px 14px;
       border-radius: 8px;
-      margin-top: 10px;
+      margin: 12px 0;
+      font-size: 15px;
+    }
+
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 28px;
+    }
+
+    .toc h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+
+    .toc ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .toc li {
+      margin: 6px 0;
+    }
+
+    .toc a {
+      color: var(--brand);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
     }
 
     .footer {
-      margin-top: 14px;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
       color: var(--muted);
-      font-size: 13px;
+      font-size: 14px;
       text-align: center;
+    }
+
+    code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: "Monaco", "Courier New", monospace;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <main class="page">
-    <section class="hero">
-      <span class="badge">ONE-PAGE GUIDE</span>
-      <h1>Odoo Mail Client - End User Quick Start</h1>
-      <p class="subtitle">Use this guide to start reading, sending, and organizing email in Odoo within minutes.</p>
+  <div class="container">
+    <div class="header">
+      <span class="badge">USER & ADMINISTRATOR MANUAL</span>
+      <h1>Odoo Mail Client</h1>
+      <p class="subtitle">Complete guide to setting up, using, and managing personal email accounts within Odoo 18.</p>
+    </div>
+
+    <div class="toc">
+      <h3>Table of Contents</h3>
+      <ul>
+        <li><a href="#purpose">Purpose & Scope</a></li>
+        <li><a href="#overview">Module Overview</a></li>
+        <li><a href="#quickstart">Quick Start (End User)</a></li>
+        <li><a href="#enduser">End-User Guide</a></li>
+        <li><a href="#setup">Setting Up Your Account</a></li>
+        <li><a href="#admin">Administrator Features</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+        <li><a href="#operations">Operational Procedures</a></li>
+      </ul>
+    </div>
+
+    <!-- SECTION: PURPOSE & SCOPE -->
+    <section class="section" id="purpose">
+      <h2>1. Purpose & Scope</h2>
+      <p>This manual explains how to use the Odoo Mail Client module in Odoo 18. It covers:</p>
+      <ul>
+        <li>Day-to-day email tasks (read, compose, organize, send)</li>
+        <li>Setting up personal incoming and outgoing mail accounts</li>
+        <li>Administrator configuration and monitoring</li>
+        <li>Troubleshooting and support procedures</li>
+      </ul>
+      <p><strong>Intended for:</strong> Business users managing email communication, administrators, and support staff.</p>
     </section>
 
-    <section class="grid">
-      <article class="card">
-        <h2>1) Before You Start</h2>
-        <ol>
-          <li>Log in with your Odoo user account.</li>
-          <li>Make sure your administrator has configured at least one mail account for you.</li>
-          <li>If your Inbox is empty, ask your admin to run a manual fetch.</li>
-        </ol>
-      </article>
-
-      <article class="card">
-        <h2>2) Open the App</h2>
-        <ol>
-          <li>Open the Odoo app launcher.</li>
-          <li>Select <strong>Email Management</strong>.</li>
-          <li>Use mailbox views: Inbox, Sent, Draft, Unread, Starred, Archived, All Emails.</li>
-        </ol>
-      </article>
-
-      <article class="card">
-        <h2>3) Read and Process Messages</h2>
-        <ul>
-          <li>Open a message to read full details.</li>
-          <li>Use actions: Mark Read/Unread, Star/Unstar, Archive/Unarchive.</li>
-          <li>Use Reply and Forward directly from the message form.</li>
-          <li>Use search and filters to find emails quickly.</li>
-        </ul>
-      </article>
-
-      <article class="card">
-        <h2>4) Send a New Email</h2>
-        <ol>
-          <li>Create a draft message.</li>
-          <li>Fill <strong>To</strong> (required), then Cc/Bcc if needed.</li>
-          <li>Add subject, body, and attachments.</li>
-          <li>Select <strong>From Account</strong> if multiple accounts exist.</li>
-          <li>Click <strong>Send</strong>.</li>
-        </ol>
-        <div class="note">
-          If account SMTP is configured, the message is sent through that account. Otherwise, Odoo may queue delivery based on configuration.
-        </div>
-      </article>
-
-      <article class="card">
-        <h2>5) Organize Your Mailbox</h2>
-        <ul>
-          <li>Star important messages for follow-up.</li>
-          <li>Archive completed threads.</li>
-          <li>Apply tags to classify conversations.</li>
-          <li>Use priority to flag urgent items.</li>
-        </ul>
-      </article>
-
-      <article class="card">
-        <h2>6) Troubleshooting Quick Checks</h2>
-        <ul>
-          <li><strong>Cannot send:</strong> confirm at least one valid recipient in To.</li>
-          <li><strong>SMTP error:</strong> re-check From Account and notify admin.</li>
-          <li><strong>No incoming mail:</strong> refresh view and ask admin to fetch now.</li>
-          <li><strong>Missing expected emails:</strong> verify correct user login; mailboxes are private by account/user rules.</li>
-        </ul>
-        <div class="warning">
-          Contact your administrator for account setup changes, permissions, or sync failures.
-        </div>
-      </article>
+    <!-- SECTION: MODULE OVERVIEW -->
+    <section class="section" id="overview">
+      <h2>2. Module Overview</h2>
+      <p><strong>Module name:</strong> <code>odoo_mail_client</code></p>
+      <p><strong>Core capabilities:</strong></p>
+      <ul>
+        <li>Custom Email Management app inside Odoo</li>
+        <li>Mailbox features: Inbox, Sent, Drafts, Unread, Starred, Archived</li>
+        <li>Compose with To/Cc/Bcc and attachments</li>
+        <li>Personal incoming mail account management (IMAP)</li>
+        <li>Outgoing SMTP settings per account</li>
+        <li>Fetch tools: immediate refresh or date-range fetch (1/3/6 months)</li>
+        <li>Sync metrics and account health monitoring</li>
+        <li>Email signatures and tags</li>
+        <li>Privacy: Each user sees only their own accounts and emails</li>
+      </ul>
     </section>
 
-    <p class="footer">Odoo Mail Client • End User Quick Start</p>
-  </main>
+    <!-- SECTION: QUICK START -->
+    <section class="section" id="quickstart">
+      <h2>3. Quick Start (End User)</h2>
+      <ol>
+        <li>Open the <strong>Email Management</strong> app from Odoo.</li>
+        <li>If no incoming accounts exist yet, ask your administrator or create your own (see below).</li>
+        <li>Use the mailbox list: Inbox, Sent, Draft, Starred, Unread, Archived.</li>
+        <li>Open an email to read, reply, or forward.</li>
+        <li>Use action buttons: Mark Read/Unread, Star, Archive, Delete.</li>
+        <li>Compose new messages with To/Cc/Bcc and attachments.</li>
+      </ol>
+      <div class="note">
+        <strong>Tip:</strong> Keep draft messages until you're ready to send. Use star and archive to keep your inbox organized.
+      </div>
+    </section>
+
+    <!-- SECTION: END-USER GUIDE -->
+    <section class="section" id="enduser">
+      <h2>4. End-User Guide</h2>
+
+      <h3>4.1 Mailbox Navigation</h3>
+      <p>Available mailbox views:</p>
+      <ul>
+        <li><strong>All Emails:</strong> Every message across all accounts</li>
+        <li><strong>Inbox:</strong> Incoming messages only</li>
+        <li><strong>Sent:</strong> Outgoing messages you have sent</li>
+        <li><strong>Draft:</strong> Unsent messages in progress</li>
+        <li><strong>Unread:</strong> Messages not yet marked read</li>
+        <li><strong>Starred:</strong> Messages you flagged for follow-up</li>
+        <li><strong>Archived:</strong> Messages you have archived</li>
+      </ul>
+      <p><strong>Search and filter:</strong> Use keyword search for subject/body/sender/tag context. Use filters for unread, starred, with attachments. Group by priority or incoming account.</p>
+
+      <h3>4.2 Reading Email</h3>
+      <p>When opening a non-draft message, you can:</p>
+      <ul>
+        <li>Mark Read / Mark Unread</li>
+        <li>Star / Unstar</li>
+        <li>Archive / Unarchive</li>
+        <li>Reply (to sender and thread)</li>
+        <li>Forward (to new recipients)</li>
+        <li>Delete (permanently remove)</li>
+      </ul>
+      <p>Message metadata includes sender, recipients, date, thread references, priority, and tags.</p>
+
+      <h3>4.3 Composing and Sending</h3>
+      <ol>
+        <li>Create a new message in draft state.</li>
+        <li>Fill <strong>To</strong> (required if Cc is empty).</li>
+        <li>Optionally fill Cc and Bcc.</li>
+        <li>Add Subject (defaults to "(No subject)" if left blank).</li>
+        <li>Write body content (rich text editor).</li>
+        <li>Attach files if needed.</li>
+        <li>Select <strong>From Account</strong> if using multiple accounts.</li>
+        <li>Click <strong>Send</strong>.</li>
+      </ol>
+      <p><strong>Send behavior:</strong> If you selected a From Account with SMTP settings, the message is sent through that account. Otherwise, Odoo may queue delivery depending on configuration.</p>
+
+      <h3>4.4 Organizing Messages</h3>
+      <ul>
+        <li><strong>Tags:</strong> Color-coded categories for messages (Finance, Support, Urgent, etc.)</li>
+        <li><strong>Priority:</strong> Low, Medium, High, Very High</li>
+        <li><strong>Star:</strong> Flag important messages for follow-up</li>
+        <li><strong>Archive:</strong> Move completed conversations out of main inbox</li>
+      </ul>
+    </section>
+
+    <!-- SECTION: SETTING UP YOUR ACCOUNT -->
+    <section class="section" id="setup">
+      <h2>5. Setting Up Your Own Mail Account</h2>
+      <p>Each user can create and manage personal mail accounts. Follow this workflow to add an account:</p>
+
+      <h3>5.1 Open Configuration</h3>
+      <ol>
+        <li>In Email Management, go to <strong>Configuration → Incoming Mail Servers</strong>.</li>
+        <li>Click <strong>Create</strong> to add a new account.</li>
+      </ol>
+
+      <h3>5.2 Fill Incoming Server Settings</h3>
+      <p>In draft state, fill these fields:</p>
+      <ul>
+        <li><strong>Account Name:</strong> A friendly name (e.g., "Work Email", "Gmail")</li>
+        <li><strong>Server:</strong> IMAP hostname (e.g., <code>imap.gmail.com</code>, <code>mail.example.com</code>)</li>
+        <li><strong>Port:</strong> Usually 993 for IMAP + SSL, or 143 for plain IMAP</li>
+        <li><strong>SSL/TLS:</strong> Check if your provider requires SSL connection</li>
+        <li><strong>Username:</strong> Your email address or account login</li>
+        <li><strong>Password:</strong> Your email password (typically required for IMAP)</li>
+        <li><strong>Active:</strong> Check to enable this account</li>
+        <li><strong>Delete On Server When Deleted In Odoo:</strong> Check if you want Odoo deletions to also delete emails from the server</li>
+      </ul>
+
+      <h3>5.3 Fill Outgoing SMTP Settings</h3>
+      <p>In the same form, configure SMTP for sending:</p>
+      <ul>
+        <li><strong>SMTP Host:</strong> SMTP server hostname (e.g., <code>smtp.gmail.com</code>, <code>mail.example.com</code>)</li>
+        <li><strong>SMTP Port:</strong> Typically 587 for STARTTLS, 465 for SSL, 25 for unencrypted</li>
+        <li><strong>SMTP User:</strong> Your email address or account login</li>
+        <li><strong>SMTP Password:</strong> Your email password for SMTP authentication</li>
+        <li><strong>SMTP Encryption:</strong> Choose None, STARTTLS, or SSL/TLS based on provider</li>
+      </ul>
+      <div class="note">
+        <strong>Example (Gmail):</strong><br/>
+        IMAP: imap.gmail.com:993 (SSL)<br/>
+        SMTP: smtp.gmail.com:587 (STARTTLS)<br/>
+        Note: Gmail requires app-specific passwords if you have 2FA enabled.
+      </div>
+
+      <h3>5.4 Test and Confirm</h3>
+      <ol>
+        <li>Click <strong>Test & Confirm</strong>.</li>
+        <li>System validates IMAP connection and moves account to active (done) state.</li>
+        <li>If test fails, check credentials, server name, port, and encryption settings.</li>
+      </ol>
+
+      <h3>5.5 Fetch Your First Emails</h3>
+      <ol>
+        <li>In the confirmed account, click <strong>Fetch Now</strong>.</li>
+        <li>A wizard opens; select fetch period: 1 month, 3 months, or 6 months back.</li>
+        <li>Click <strong>Fetch</strong>.</li>
+        <li>You receive a notification with count of checked and failed messages.</li>
+      </ol>
+
+      <h3>5.6 Reset and Reconfigure</h3>
+      <p>If you need to change credentials later:</p>
+      <ol>
+        <li>Open the confirmed account.</li>
+        <li>Click <strong>Reset Configuration</strong>.</li>
+        <li>Update fields and click Test & Confirm again.</li>
+      </ol>
+    </section>
+
+    <!-- SECTION: ADMINISTRATOR FEATURES -->
+    <section class="section" id="admin">
+      <h2>6. Administrator Features</h2>
+
+      <h3>6.1 Permissions and Security</h3>
+      <p>User groups:</p>
+      <ul>
+        <li><strong>Internal Users:</strong> Can access email records based on ownership and record rules</li>
+        <li><strong>Email Manager:</strong> Can create, update, delete mail accounts with ownership rules</li>
+        <li><strong>System Administrator:</strong> Full access, but still scoped by privacy rules</li>
+      </ul>
+      <p><strong>Privacy Model:</strong> Each user sees only their own accounts and emails. Accounts are private by default; record rules enforce user ownership and login matching.</p>
+
+      <h3>6.2 Signatures</h3>
+      <p>Path: <strong>Email Management → Configuration → Signatures</strong></p>
+      <ul>
+        <li>Create reusable email signatures per account or user.</li>
+        <li>Define default signature for compose context.</li>
+        <li>Use HTML formatting for professional templates.</li>
+      </ul>
+
+      <h3>6.3 Email Tags</h3>
+      <p>Path: <strong>Email Management → Configuration → Tags</strong></p>
+      <ul>
+        <li>Create custom tags for email categorization.</li>
+        <li>Assign colors for visual organization.</li>
+        <li>Users apply tags during message review.</li>
+      </ul>
+
+      <h3>6.4 Account Health Monitoring</h3>
+      <p>Path: <strong>Email Management → Configuration → Account Health</strong></p>
+      <p>Monitor sync metrics:</p>
+      <ul>
+        <li>Last fetch start / end</li>
+        <li>Fetch duration (milliseconds)</li>
+        <li>Checked count and failed count</li>
+        <li>Last fetch error (if any)</li>
+        <li>Last synced UID and UID validity</li>
+      </ul>
+      <p><strong>Use this view daily:</strong> Check for failures, slow sync, and accounts never synced.</p>
+
+      <h3>6.5 Custom Mail Logo (Optional)</h3>
+      <p>In System Settings, admins can enable and upload a custom logo for the email client UI branding.</p>
+    </section>
+
+    <!-- SECTION: TROUBLESHOOTING -->
+    <section class="section" id="troubleshooting">
+      <h2>7. Troubleshooting</h2>
+
+      <h3>7.1 Test and Confirm Fails</h3>
+      <p><strong>Checks:</strong></p>
+      <ul>
+        <li>Verify IMAP hostname, port, SSL/TLS setting with provider.</li>
+        <li>Verify username and password are correct.</li>
+        <li>Confirm network/firewall allows IMAP port.</li>
+        <li>If using Gmail: use app-specific password, not your account password.</li>
+      </ul>
+
+      <h3>7.2 No Emails After Fetch</h3>
+      <p><strong>Checks:</strong></p>
+      <ul>
+        <li>Confirm account is active and in done state.</li>
+        <li>Run Fetch Now again and check notification for count.</li>
+        <li>Verify mailbox permissions and IMAP access on server.</li>
+        <li>Check Account Health for last fetch error details.</li>
+      </ul>
+
+      <h3>7.3 Cannot Send Email</h3>
+      <p><strong>Checks:</strong></p>
+      <ul>
+        <li>Confirm at least one valid recipient in To field.</li>
+        <li>Verify SMTP host, port, user, password, encryption with provider.</li>
+        <li>Confirm network/firewall allows SMTP port.</li>
+        <li>Check selected From Account has SMTP configured.</li>
+      </ul>
+
+      <h3>7.4 User Cannot See Expected Emails</h3>
+      <p><strong>Cause:</strong> Mailbox visibility is scoped by user ownership, incoming server ownership, or server login matching.</p>
+      <p><strong>Resolution:</strong></p>
+      <ul>
+        <li>Verify you are logged in with the correct user account.</li>
+        <li>Verify the incoming server is created by or owned by you.</li>
+        <li>Verify server username matches your user login or email.</li>
+        <li>Contact your administrator if visibility is incorrect.</li>
+      </ul>
+
+      <h3>7.5 Access Errors</h3>
+      <p><strong>Common causes:</strong> Missing group assignment, restrictive record rules, insufficient ACL on models.</p>
+      <p><strong>Resolution:</strong> Verify user group membership and contact administrator.</p>
+    </section>
+
+    <!-- SECTION: OPERATIONAL PROCEDURES -->
+    <section class="section" id="operations">
+      <h2>8. Operational Procedures</h2>
+
+      <h3>8.1 New Account Onboarding</h3>
+      <ol>
+        <li>Create a new incoming server record.</li>
+        <li>Enter incoming and outgoing settings in draft state.</li>
+        <li>Click Test & Confirm.</li>
+        <li>Use Fetch Now to retrieve initial emails (select 1, 3, or 6 months).</li>
+        <li>Verify messages appear in Inbox.</li>
+      </ol>
+
+      <h3>8.2 Credential Rotation</h3>
+      <ol>
+        <li>Open the account in done state.</li>
+        <li>Click Reset Configuration to return to draft.</li>
+        <li>Update IMAP and SMTP credentials and settings.</li>
+        <li>Click Test & Confirm.</li>
+        <li>Run Fetch Now and verify metrics update without errors.</li>
+      </ol>
+
+      <h3>8.3 Routine Health Checks (Daily Recommended)</h3>
+      <ol>
+        <li>Review Account Health view for failures and slow sync.</li>
+        <li>Check Last Fetch Error for any failing accounts.</li>
+        <li>Verify recent message flow in Inbox and Sent.</li>
+        <li>Contact users if their accounts are not syncing.</li>
+      </ol>
+
+      <h3>8.4 Backup and Recovery</h3>
+      <ul>
+        <li>Include <code>email.record</code>, <code>fetchmail.server</code>, <code>mail.signature</code>, and <code>ir.attachment</code> in database backups.</li>
+        <li>After restore, revalidate account credentials and connectivity.</li>
+        <li>Run account health review and sample send/fetch test.</li>
+      </ul>
+    </section>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <p>Odoo Mail Client User & Administrator Manual | Odoo 18</p>
+      <p>For updates and additional support, contact your administrator or visit your module documentation repository.</p>
+    </div>
+  </div>
 </body>
 </html>
